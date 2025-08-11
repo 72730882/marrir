@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../app.dart';
+
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -45,8 +47,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      // TODO: Navigate to login or home
-      debugPrint("Onboarding complete");
+       // Navigate to home (replace onboarding so user can't go back)
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const MyApp()),
+    );
     }
   }
 
@@ -188,11 +193,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Align(
                       alignment: Alignment.bottomLeft,
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 0, bottom: 50.0),
+                        padding: const EdgeInsets.only(left: 0, bottom: 10.0),
                         child: Image.asset(
                           'assets/images/onboarding_images/logo2.png',
-                          width: 100,
-                          height: 70,
+                          width: 70,
+                          height: 40,
                           fit: BoxFit.contain,
                         ),
                       ),

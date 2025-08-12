@@ -30,7 +30,7 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
             ElevatedButton(
               onPressed: onLoginTap,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.lightBlue,
+                backgroundColor: Color(0xFF65b2c9),
                 foregroundColor: Colors.white,
                  side: const BorderSide(color: Colors.white),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),

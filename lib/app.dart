@@ -10,21 +10,18 @@ import 'widgets/bottom_navbar.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
-
   @override
   State<MyApp> createState() => _MyAppState();
 }
-
 class _MyAppState extends State<MyApp> {
   int _currentIndex = 0;
-
   final List<Widget> _pages = [
     const HomeScreen(),
     const AboutScreen(),
     const ServicesScreen(),
     const ContactScreen(),
   ];
-
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

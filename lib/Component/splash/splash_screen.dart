@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:marrir/screens/onboarding/onboarding_screen.dart';
+import 'package:marrir/Component/onboarding/onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -46,7 +46,6 @@ class _SplashScreenState extends State<SplashScreen> {
               height: 150,
             ),
             const SizedBox(height: 20),
-            
           ],
         ),
       ),

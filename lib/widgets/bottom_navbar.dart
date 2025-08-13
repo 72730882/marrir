@@ -17,11 +17,13 @@ class CustomBottomNavbar extends StatelessWidget {
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
       selectedItemColor: Colors.purple,
-      unselectedItemColor: Colors.grey,
+      unselectedItemColor: const Color(0xFF4DA8DA),
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-        BottomNavigationBarItem(icon: Icon(Icons.mail_outline  ), label: "About us"),
-        BottomNavigationBarItem(icon: Icon(Icons.format_list_bulleted), label: "Services"),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.mail_outline), label: "About us"),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.format_list_bulleted), label: "Services"),
         BottomNavigationBarItem(icon: Icon(Icons.call), label: "Contact"),
       ],
     );

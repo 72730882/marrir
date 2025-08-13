@@ -23,17 +23,16 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
             Image.asset(
               'assets/images/splash_image/logo3.png', // your logo path
               height: 80,
-              
-              
             ),
             const Spacer(),
             ElevatedButton(
               onPressed: onLoginTap,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.lightBlue,
+                backgroundColor: const Color(0xFF65b2c9),
                 foregroundColor: Colors.white,
-                 side: const BorderSide(color: Colors.white),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                side: const BorderSide(color: Colors.white),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -47,7 +46,8 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.lightBlue,
                 side: const BorderSide(color: Colors.lightBlue),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),

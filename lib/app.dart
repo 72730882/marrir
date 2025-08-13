@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
-import 'screens/home/home_screen.dart';
-import 'screens/about/about_screen.dart';
-import 'screens/services/services_screen.dart';
-import 'screens/contact/contact_screen.dart';
-import 'screens/auth/login_screen.dart';
-import 'screens/auth/register_screen.dart';
+import 'package:marrir/Page/HomePage/home_page.dart';
+import 'Component/about/about_screen.dart';
+import 'Component/services/services_screen.dart';
+import 'Component/contact/contact_screen.dart';
+import 'Component/auth/login_screen.dart';
+import 'Component/auth/register_screen.dart';
 import 'widgets/navbar.dart';
 import 'widgets/bottom_navbar.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
-
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
   int _currentIndex = 0;
-
   final List<Widget> _pages = [
-    const HomeScreen(),
+    const HomePage(),
     const AboutScreen(),
     const ServicesScreen(),
     const ContactScreen(),

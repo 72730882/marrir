@@ -55,10 +55,36 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
               child: const Text("Register"),
             ),
             const SizedBox(width: 6),
-            IconButton(
-              onPressed: () {},
+
+            // === Language Dropdown ===
+            PopupMenuButton<String>(
+              tooltip: "Select Language",
               icon: const Icon(Icons.translate, color: Colors.purple),
-            )
+              onSelected: (value) {
+                // handle language change here
+                if (value == "am") {
+                  print("Amharic selected");
+                } else if (value == "en") {
+                  print("English selected");
+                } else if (value == "ar") {
+                  print("Arabic selected");
+                }
+              },
+              itemBuilder: (BuildContext context) => [
+                const PopupMenuItem(
+                  value: "am",
+                  child: Text("አማርኛ"), // Amharic letters
+                ),
+                const PopupMenuItem(
+                  value: "en",
+                  child: Text("English"),
+                ),
+                const PopupMenuItem(
+                  value: "ar",
+                  child: Text("العربية"), // Arabic letters
+                ),
+              ],
+            ),
           ],
         ),
       ),

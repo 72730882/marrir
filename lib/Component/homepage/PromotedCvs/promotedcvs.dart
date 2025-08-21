@@ -26,7 +26,7 @@ class PromotedCVsScreen extends StatelessWidget {
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: Color.fromARGB(255, 255, 255, 255)),
+              side: const BorderSide(color: Color(0xFFFFFFFF)),
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
@@ -34,9 +34,9 @@ class PromotedCVsScreen extends StatelessWidget {
                 children: [
                   Container(
                     width: double.infinity,
-                    height: 150,
+                    height: 180,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 227, 226, 226),
+                      color: const Color.fromARGB(255, 225, 225, 225),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Center(
@@ -78,12 +78,7 @@ class PromotedCVsScreen extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(
-                          255,
-                          142,
-                          212,
-                          234,
-                        ),
+                        backgroundColor: const Color(0xFF65b2c9),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -121,7 +116,7 @@ class PromotedCVsScreen extends StatelessWidget {
                 onPressed: () {},
                 child: const Text(
                   "Next →",
-                  style: TextStyle(fontSize: 14, color: Color(0xFF5AC8FA)),
+                  style: TextStyle(fontSize: 14, color: Color(0xFF65b2c9)),
                 ),
               ),
             ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'register_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../Page/Agent/agent_page.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -31,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: double.infinity,
                       decoration: const BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Color(0xFF7B4BBA),Color(0xFF48C2E9)],
+                          colors: [Color(0xFF7B4BBA), Color(0xFF48C2E9)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -107,7 +108,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           "Forgot Password?",
                           style: TextStyle(
                             color: Color(0xFF65b2c9),
-                            
                           ),
                         ),
                       ),
@@ -120,7 +120,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          // TODO: here you can add validation before navigation
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const AgentPage()),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF65b2c9),
                           shape: RoundedRectangleBorder(
@@ -155,7 +162,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           "Sign-in with Google",
                           style: TextStyle(
                             fontSize: 14,
-                           
                             color: Colors.black,
                           ),
                         ),

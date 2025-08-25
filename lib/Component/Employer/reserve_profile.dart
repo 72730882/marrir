@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ReservePage extends StatelessWidget {
-  const ReservePage({super.key});
+class ReserveProfilePage extends StatelessWidget {
+  const ReserveProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {

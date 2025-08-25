@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'register_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../Page/Agent/agent_page.dart';
+// import '../../Page/Agent/agent_page.dart';
+// import '../../Page/Recruitment/recruitment_page.dart';
+import '../../Page/Employer/employer_page.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -125,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const AgentPage()),
+                                builder: (context) => const EmployerPage()),
                           );
                         },
                         style: ElevatedButton.styleFrom(

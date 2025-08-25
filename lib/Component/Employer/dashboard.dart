@@ -45,7 +45,7 @@ class DashboardPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
                     Text(
-                      "Hi, Agency Firm Name",
+                      "Hi, Employer Name",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

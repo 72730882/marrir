@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ReserveHistoryPage extends StatelessWidget {
-  const ReserveHistoryPage({super.key});
+class TransferHistoryPage extends StatelessWidget {
+  const TransferHistoryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class ReserveHistoryPage extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _buildSummaryCard(
-                      title: "Reserves Requested",
+                      title: "Transfer Requested",
                       value: "0",
                       count: "N/A",
                     ),
@@ -46,7 +46,7 @@ class ReserveHistoryPage extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildSummaryCard(
-                      title: "Reserves Requests",
+                      title: "Transfers Requests",
                       value: "0",
                       count: "N/A",
                     ),
@@ -58,7 +58,7 @@ class ReserveHistoryPage extends StatelessWidget {
 
               // ===== Incoming Reserve Requests Section =====
               const Text(
-                "Incoming Reserve Requests",
+                "Incoming Transfer Requests",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -120,7 +120,7 @@ class ReserveHistoryPage extends StatelessWidget {
 
               // ===== Process Reserve Request Section =====
               const Text(
-                "Process Reserve Request",
+                "Process Transfer Request",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

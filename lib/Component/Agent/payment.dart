@@ -28,12 +28,11 @@ class PaymentPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         "Total Employees",
                         style: TextStyle(fontSize: 14, color: Colors.black),
@@ -84,17 +83,17 @@ class PaymentPage extends StatelessWidget {
                     children: [
                       // Table Header
                       Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF65b2c9),
-                          borderRadius: const BorderRadius.only(
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF65b2c9),
+                          borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(10),
                             topRight: Radius.circular(10),
                           ),
                         ),
                         padding: const EdgeInsets.symmetric(
                             vertical: 15, horizontal: 16),
-                        child: Row(
-                          children: const [
+                        child: const Row(
+                          children: [
                             _TableHeaderCell("Bank", 100),
                             _TableHeaderCell("Transaction ID", 120),
                             _TableHeaderCell("Amount", 80),
@@ -106,14 +105,14 @@ class PaymentPage extends StatelessWidget {
                       ),
 
                       // Table Rows
-                      _buildTableRow(
-                          "CBE", "Type", "10000", "2024-1-15", Icons.image, "Active"),
-                      _buildTableRow(
-                          "CBE", "Type", "10000", "2024-1-15", Icons.image, "Active"),
-                      _buildTableRow(
-                          "CBE", "Type", "10000", "2024-1-15", Icons.image, "Active"),
-                      _buildTableRow(
-                          "CBE", "Type", "10000", "2024-1-15", Icons.image, "Active"),
+                      _buildTableRow("CBE", "Type", "10000", "2024-1-15",
+                          Icons.image, "Active"),
+                      _buildTableRow("CBE", "Type", "10000", "2024-1-15",
+                          Icons.image, "Active"),
+                      _buildTableRow("CBE", "Type", "10000", "2024-1-15",
+                          Icons.image, "Active"),
+                      _buildTableRow("CBE", "Type", "10000", "2024-1-15",
+                          Icons.image, "Active"),
                     ],
                   ),
                 ),
@@ -139,7 +138,7 @@ class PaymentPage extends StatelessWidget {
               _TableCell(amount, 80),
               _TableCell(date, 100),
               _TableCellIcon(screenshot, 100),
-              Container(
+              SizedBox(
                 width: 80,
                 child: Text(
                   status,
@@ -155,9 +154,9 @@ class PaymentPage extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(
+        const SizedBox(
           width: 600, // sum of all cell widths
-          child: const Divider(
+          child: Divider(
             color: Colors.grey,
             height: 0.5,
             thickness: 0.3,
@@ -172,7 +171,7 @@ class PaymentPage extends StatelessWidget {
 class _TableHeaderCell extends StatelessWidget {
   final String title;
   final double width;
-  const _TableHeaderCell(this.title, this.width, {super.key});
+  const _TableHeaderCell(this.title, this.width);
 
   @override
   Widget build(BuildContext context) {
@@ -193,7 +192,7 @@ class _TableHeaderCell extends StatelessWidget {
 class _TableCell extends StatelessWidget {
   final String text;
   final double width;
-  const _TableCell(this.text, this.width, {super.key});
+  const _TableCell(this.text, this.width);
 
   @override
   Widget build(BuildContext context) {
@@ -214,7 +213,7 @@ class _TableCell extends StatelessWidget {
 class _TableCellIcon extends StatelessWidget {
   final IconData icon;
   final double width;
-  const _TableCellIcon(this.icon, this.width, {super.key});
+  const _TableCellIcon(this.icon, this.width);
 
   @override
   Widget build(BuildContext context) {

@@ -451,29 +451,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-
-  Widget _buildDropdown(String hint) {
-    return DropdownButtonFormField<String>(
-      decoration: InputDecoration(
-        hintText: hint,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF48C2E9)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF48C2E9)),
-        ),
-      ),
-      items: const [
-        DropdownMenuItem(value: "option1", child: Text("Option 1")),
-        DropdownMenuItem(value: "option2", child: Text("Option 2")),
-      ],
-      onChanged: (value) {},
-    );
-  }
 }
 
 // ===== CUSTOM CLIPPER FOR HEADER CURVE =====

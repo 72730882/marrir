@@ -106,14 +106,14 @@ class PaymentPage extends StatelessWidget {
                       ),
 
                       // Table Rows
-                      _buildTableRow(
-                          "CBE", "Type", "10000", "2024-1-15", Icons.image, "Active"),
-                      _buildTableRow(
-                          "CBE", "Type", "10000", "2024-1-15", Icons.image, "Active"),
-                      _buildTableRow(
-                          "CBE", "Type", "10000", "2024-1-15", Icons.image, "Active"),
-                      _buildTableRow(
-                          "CBE", "Type", "10000", "2024-1-15", Icons.image, "Active"),
+                      _buildTableRow("CBE", "Type", "10000", "2024-1-15",
+                          Icons.image, "Active"),
+                      _buildTableRow("CBE", "Type", "10000", "2024-1-15",
+                          Icons.image, "Active"),
+                      _buildTableRow("CBE", "Type", "10000", "2024-1-15",
+                          Icons.image, "Active"),
+                      _buildTableRow("CBE", "Type", "10000", "2024-1-15",
+                          Icons.image, "Active"),
                     ],
                   ),
                 ),
@@ -172,7 +172,7 @@ class PaymentPage extends StatelessWidget {
 class _TableHeaderCell extends StatelessWidget {
   final String title;
   final double width;
-  const _TableHeaderCell(this.title, this.width, {super.key});
+  const _TableHeaderCell(this.title, this.width);
 
   @override
   Widget build(BuildContext context) {
@@ -193,7 +193,7 @@ class _TableHeaderCell extends StatelessWidget {
 class _TableCell extends StatelessWidget {
   final String text;
   final double width;
-  const _TableCell(this.text, this.width, {super.key});
+  const _TableCell(this.text, this.width);
 
   @override
   Widget build(BuildContext context) {
@@ -214,7 +214,7 @@ class _TableCell extends StatelessWidget {
 class _TableCellIcon extends StatelessWidget {
   final IconData icon;
   final double width;
-  const _TableCellIcon(this.icon, this.width, {super.key});
+  const _TableCellIcon(this.icon, this.width);
 
   @override
   Widget build(BuildContext context) {

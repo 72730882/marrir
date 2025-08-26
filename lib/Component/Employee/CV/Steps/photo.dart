@@ -22,7 +22,6 @@ class _PhotoAndLanguageFormState extends State<PhotoAndLanguageForm> {
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Color(0xFF8EC6D6);
-    const Color borderColor = Color(0xFFD1D1D6);
     const Color textColor = Color(0xFF111111);
 
     return SingleChildScrollView(

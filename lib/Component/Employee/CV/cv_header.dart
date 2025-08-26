@@ -93,9 +93,7 @@ class CvHeader extends StatelessWidget {
                 color: Colors.transparent,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(20),
-                  onTap: () {
-                    // TODO: Handle notification tap
-                  },
+                  onTap: () {},
                   child: const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Icon(

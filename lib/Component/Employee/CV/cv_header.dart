@@ -79,9 +79,9 @@ class CvHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Column(
+              const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     'Welcome,',
                     style: TextStyle(

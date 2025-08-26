@@ -48,9 +48,9 @@ class DashboardScreen extends StatelessWidget {
                   end: Alignment.bottomRight,
                 ),
               ),
-              child: Row(
+              child: const Row(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 26,
                     backgroundColor: Colors.white,
                     child: Text(
@@ -61,10 +61,10 @@ class DashboardScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         "Hanan N",
                         style: TextStyle(

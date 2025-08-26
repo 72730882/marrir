@@ -20,7 +20,7 @@ class WaveBackground extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         // Total height is determined by the tallest wave (bottom one)
-        final double waveHeight = 260;
+        const double waveHeight = 260;
 
         return SizedBox(
           height: waveHeight,

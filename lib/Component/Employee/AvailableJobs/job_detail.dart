@@ -61,13 +61,13 @@ class JobDetailsPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 RichText(
-                  text: TextSpan(
+                  text: const TextSpan(
                     children: [
                       TextSpan(
                         text: "\$120k - \$180k  ·  ",
                         style: TextStyle(
                           fontSize: 14,
-                          color: const Color(0xFF65B2C9),
+                          color: Color(0xFF65B2C9),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -200,9 +200,9 @@ class JobDetailsPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Column(
+                      const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
                             "Apple Inc.",
                             style: TextStyle(fontWeight: FontWeight.w600),

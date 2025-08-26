@@ -22,47 +22,38 @@ class ReferencesForm extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 30),
-
           _buildLabel('Name'),
           const SizedBox(height: 8),
           _buildTextField('Enter Name'),
           const SizedBox(height: 16),
-
           _buildLabel('Email'),
           const SizedBox(height: 8),
           _buildTextField('Enter Email'),
           const SizedBox(height: 16),
-
           _buildLabel('Phone Number'),
           const SizedBox(height: 8),
           _buildPhoneField(),
           const SizedBox(height: 16),
-
           _buildLabel('Date of Birth'),
           const SizedBox(height: 8),
           _buildTextField('mm/dd/yyyy', keyboardType: TextInputType.datetime),
           const SizedBox(height: 16),
-
           _buildLabel('Select Gender'),
           const SizedBox(height: 8),
           _buildDropdownField(['Male', 'Female', 'Other'], 'Select Gender'),
           const SizedBox(height: 16),
-
           _buildLabel('Country'),
           const SizedBox(height: 8),
           _buildDropdownField(['Ethiopia', 'USA', 'Other'], 'Select Country'),
           const SizedBox(height: 16),
-
           _buildLabel('City'),
           const SizedBox(height: 8),
           _buildTextField('Enter City'),
           const SizedBox(height: 16),
-
           _buildLabel('Sub City'),
           const SizedBox(height: 8),
           _buildTextField('Enter Sub City'),
           const SizedBox(height: 16),
-
           Row(
             children: [
               Expanded(
@@ -89,12 +80,10 @@ class ReferencesForm extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-
           _buildLabel('Reference'),
           const SizedBox(height: 8),
           _buildTextField('Brief summary of the above input', maxLines: 4),
           const SizedBox(height: 30),
-
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -172,8 +161,8 @@ class ReferencesForm extends StatelessWidget {
             border: Border.all(color: const Color(0xFFD1D1D6)),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            children: const [
+          child: const Row(
+            children: [
               Text('+251', style: TextStyle(fontSize: 14)),
               SizedBox(width: 4),
               Icon(Icons.arrow_drop_down, size: 20),

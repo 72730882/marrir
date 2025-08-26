@@ -24,10 +24,10 @@ class StepPassport extends StatelessWidget {
             border: Border.all(color: Colors.grey),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Center(
+          child: const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Icon(Icons.upload_file, size: 40, color: Colors.blue),
                 SizedBox(height: 10),
                 Text("Tap to upload passport scan"),

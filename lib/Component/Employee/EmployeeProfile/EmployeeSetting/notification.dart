@@ -9,33 +9,37 @@ class NotificationSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Header with waves (same as ProfilePage)
-        WaveBackground(
-          title: "Terms And Conditions",
-          onBack: () {
-            onChildSelected(SettingPage(onChildSelected: onChildSelected));
-          },
-          onNotification: () {},
-        ),
-
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              _buildNotificationOption("General Notification"),
-              _buildNotificationOption("Sound"),
-              _buildNotificationOption("Sound Call"),
-              _buildNotificationOption("Vibrate"),
-              _buildNotificationOption("Transaction Update"),
-              _buildNotificationOption("Expense Reminder"),
-              _buildNotificationOption("Budget Notifications"),
-              _buildNotificationOption("Low Balance Alerts"),
-            ],
+    return Scaffold(
+      body: ListView(
+        padding: const EdgeInsets.all(0),
+        children: [
+          // Wave header scrolls with content
+          WaveBackground(
+            title: "Notification Settings",
+            onBack: () {
+              onChildSelected(SettingPage(onChildSelected: onChildSelected));
+            },
+            onNotification: () {},
           ),
-        ),
-      ],
+
+          // List of notification options
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Column(
+              children: [
+                _buildNotificationOption("General Notification"),
+                _buildNotificationOption("Sound"),
+                _buildNotificationOption("Sound Call"),
+                _buildNotificationOption("Vibrate"),
+                _buildNotificationOption("Transaction Update"),
+                _buildNotificationOption("Expense Reminder"),
+                _buildNotificationOption("Budget Notifications"),
+                _buildNotificationOption("Low Balance Alerts"),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -50,7 +54,7 @@ class NotificationSettingsPage extends StatelessWidget {
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
           Switch(
-            value: true, // Set your actual value here
+            value: true, // Replace with actual state
             onChanged: (bool value) {
               // Handle switch change
             },
@@ -61,5 +65,3 @@ class NotificationSettingsPage extends StatelessWidget {
     );
   }
 }
-
-// Wave Clippers (same as ProfilePage)

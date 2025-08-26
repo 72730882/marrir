@@ -40,8 +40,10 @@ class PaymentsScreen extends StatelessWidget {
             // Table
             Expanded(
               child: SingleChildScrollView(
+                scrollDirection:
+                    Axis.horizontal, // allow horizontal scroll for many columns
                 child: DataTable(
-                  headingRowColor: WidgetStateProperty.all(
+                  headingRowColor: MaterialStateProperty.all(
                     const Color.fromRGBO(142, 198, 214, 1),
                   ),
                   headingTextStyle: const TextStyle(
@@ -58,14 +60,27 @@ class PaymentsScreen extends StatelessWidget {
                     DataColumn(label: Text("Bank")),
                     DataColumn(label: Text("Transaction ID")),
                     DataColumn(label: Text("Amount")),
+                    DataColumn(label: Text("Date")),
+                    DataColumn(label: Text("Screenshot")),
+                    DataColumn(label: Text("Status")),
                   ],
                   rows: List.generate(
                     4,
-                    (index) => const DataRow(
+                    (index) => DataRow(
                       cells: [
-                        DataCell(Text("CBE")),
-                        DataCell(Text("Type")),
-                        DataCell(Text("10000")),
+                        const DataCell(Text("CBE")),
+                        const DataCell(Text("Type")),
+                        const DataCell(Text("10000")),
+                        const DataCell(Text("26-08-2025")), // example date
+                        DataCell(
+                          IconButton(
+                            icon: const Icon(Icons.image, color: Colors.blue),
+                            onPressed: () {
+                              // TODO: open screenshot image
+                            },
+                          ),
+                        ),
+                        const DataCell(Text("Pending")),
                       ],
                     ),
                   ),

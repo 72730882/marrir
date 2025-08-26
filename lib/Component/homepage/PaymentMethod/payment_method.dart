@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class PaymentMethods extends StatelessWidget {
   const PaymentMethods({super.key});
@@ -14,75 +13,89 @@ class PaymentMethods extends StatelessWidget {
           const Text(
             'Accepted Payment Methods',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           const Text(
-            'We accept a wide range of payment methods to make transactions easier for you. '
-            'Choose from trusted brands and make secure payments with ease.',
+            'We accept a wide range of payment methods to\n'
+            'make transactions easier for you. Choose from\n'
+            'trusted brands and make secure payments with ease.',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 12,
               color: Color.fromARGB(255, 57, 57, 57),
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          // Row to display payment methods inline horizontally
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildPaymentMethod(
-                'Visa',
-                'assets/visa.svg',
-                const Color.fromARGB(255, 171, 196, 222),
+          Container(
+            height: 140,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(
+                color: const Color.fromARGB(255, 239, 249, 239),
               ),
-              const SizedBox(width: 14),
-              _buildPaymentMethod(
-                'Mastercard',
-                'assets/mastercard.svg',
-                const Color.fromARGB(255, 188, 149, 171),
-              ),
-              const SizedBox(width: 14),
-              _buildPaymentMethod(
-                'Paypal',
-                'assets/paypal.svg',
-                const Color.fromARGB(255, 153, 175, 177),
-              ),
-              const SizedBox(width: 14),
-              _buildPaymentMethod(
-                'Mastercard',
-                'assets/mastercard.svg',
-                const Color.fromARGB(255, 165, 143, 143),
-              ),
-            ],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildPaymentMethod(
+                  'Visa',
+                  'assets/images/OIP (1).jpeg', // Replace with your asset path
+                  const Color.fromARGB(255, 255, 255, 255),
+                ),
+                const SizedBox(width: 12),
+                _buildPaymentMethod(
+                  'Mastercard',
+                  'assets/images/OIP.jpeg', // Replace with your asset path
+                  const Color.fromARGB(255, 255, 255, 255),
+                ),
+                const SizedBox(width: 12),
+                _buildPaymentMethod(
+                  'Paypal',
+                  'assets/images/OIP.jpeg', // Replace with your asset path
+                  const Color.fromARGB(255, 255, 255, 255),
+                ),
+                const SizedBox(width: 12),
+                _buildPaymentMethod(
+                  'Apple Pay',
+                  'assets/images/OIP.jpeg', // Replace with your asset path
+                  const Color.fromARGB(255, 255, 255, 255),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPaymentMethod(String name, String iconPath, Color boxColor) {
+  Widget _buildPaymentMethod(String name, String assetPath, Color boxColor) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           width: 50,
-          height: 40,
+          height: 50,
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: boxColor,
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(12),
           ),
-          child: SvgPicture.asset(
-            iconPath,
-            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          child: Image.asset(
+            assetPath,
+            fit: BoxFit.contain,
           ),
         ),
-        const SizedBox(height: 6),
-        Text(name, style: const TextStyle(fontSize: 16, color: Colors.black)),
+        // const SizedBox(height: ),
+        Text(
+          name,
+          style: const TextStyle(
+              fontSize: 12, color: Color.fromARGB(255, 74, 74, 74)),
+        ),
       ],
     );
   }

@@ -31,16 +31,21 @@ class PromotionScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Promotions",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            const Padding(
+              padding: EdgeInsets.only(left: 40),
+              child: Text(
+                "Promotions",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              ),
             ),
             const SizedBox(height: 4),
-            const Text(
-              "Choose the plan that's right for you",
-              style: TextStyle(fontSize: 13, color: Colors.black54),
-            ),
-            const SizedBox(height: 20),
+            const Padding(
+                padding: EdgeInsets.only(left: 40),
+                child: Text(
+                  "Choose the plan that's right for you",
+                  style: TextStyle(fontSize: 13, color: Colors.black54),
+                )),
+            const SizedBox(height: 30),
 
             // Plans
             Expanded(
@@ -85,11 +90,15 @@ class PromotionScreen extends StatelessWidget {
 
   Widget _planCard(String price, String duration, String profileCount) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      height: 240,
+      padding: const EdgeInsets.all(50),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: const LinearGradient(
-          colors: [Color(0xFFFDFBFF), Color(0xFFEDEBFF)],
+          colors: [
+            Color.fromARGB(255, 255, 255, 255),
+            Color.fromARGB(255, 255, 254, 255)
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

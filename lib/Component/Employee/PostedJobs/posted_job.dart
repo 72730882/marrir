@@ -1,7 +1,17 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
-class RecentlyPostedJobs extends StatelessWidget {
+class RecentlyPostedJobs extends StatefulWidget {
   const RecentlyPostedJobs({super.key});
+
+  @override
+  State<RecentlyPostedJobs> createState() => _RecentlyPostedJobsState();
+}
+
+class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
+  final ScrollController _scrollController = ScrollController();
+  int _currentIndex = 0;
+  Timer? _timer;
 
   // Temporary dummy job list (replace with backend later)
   final List<Map<String, dynamic>> jobs = const [
@@ -51,6 +61,36 @@ class RecentlyPostedJobs extends StatelessWidget {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _startAutoSlide();
+  }
+
+  void _startAutoSlide() {
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      if (_currentIndex < topCards.length - 1) {
+        _currentIndex++;
+
+        _scrollController.animateTo(
+          _currentIndex * 360, // 👈 keep same as card width
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        // stop sliding when last slide is reached
+        _timer?.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -61,16 +101,17 @@ class RecentlyPostedJobs extends StatelessWidget {
           SizedBox(
             height: 190,
             child: ListView.builder(
+              controller: _scrollController,
               scrollDirection: Axis.horizontal,
               itemCount: topCards.length,
               itemBuilder: (context, index) {
                 final card = topCards[index];
                 return SizedBox(
-                  width: 360, // Full width card
+                  width: 360, // 👈 kept same as your code
                   child: buildTopCard(
                     card['title'] as String,
                     card['description'] as String,
-                    const Color(0xFF65b2c9), // Card color
+                    const Color(0xFF65b2c9),
                   ),
                 );
               },
@@ -161,7 +202,6 @@ class RecentlyPostedJobs extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Posted time
             Align(
               alignment: Alignment.topRight,
               child: Text(
@@ -170,22 +210,16 @@ class RecentlyPostedJobs extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-
-            // Job title
             Text(
               title,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 2),
-
-            // Company & location
             Text(
               "$company\n$location",
               style: const TextStyle(fontSize: 14, color: Colors.black54),
             ),
             const SizedBox(height: 8),
-
-            // Tags
             Row(
               children: [
                 tag(
@@ -202,8 +236,6 @@ class RecentlyPostedJobs extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-
-            // Salary
             Text(
               salary,
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),

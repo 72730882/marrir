@@ -3,36 +3,66 @@ import 'package:flutter/material.dart';
 class ServicesApp extends StatelessWidget {
   const ServicesApp({super.key});
 
-  final List<Map<String, String>> services = const [
+  final List<Map<String, dynamic>> services = const [
     {
       "title": "Job Posting",
       "desc":
           "Efficient and swift selection of candidates based on employers' specified job descriptions.",
+      "icon": Icon(
+        Icons.work_outline,
+        color: Color(0xFF65b2c9),
+        size: 28,
+      ),
     },
     {
       "title": "Profile Reservation",
       "desc":
           "Securing candidate profiles for personal interviews and future considerations.",
+      "icon": Icon(
+        Icons.person_outline,
+        color: Color(0xFF65b2c9),
+        size: 28,
+      ),
     },
     {
       "title": "Transfer Profile",
       "desc":
           "Enabling seamless transfer of data among relevant parties with utmost security and ease.",
+      "icon": Icon(
+        Icons.swap_horiz,
+        color: Color(0xFF65b2c9),
+        size: 28,
+      ),
     },
     {
       "title": "Profile Selection",
       "desc":
           "Selecting the most suitable applied profiles that closely match the requirements of the available vacancies.",
+      "icon": Icon(
+        Icons.check_circle_outline,
+        color: Color(0xFF65b2c9),
+        size: 28,
+      ),
     },
     {
       "title": "Job Applications",
       "desc":
           "Employees can apply directly to job postings or users like RECRUITMENT FIRMS can submit applications on behalf of candidates.",
+      "icon": Icon(
+        Icons.assignment_outlined,
+        color: Color(0xFF65b2c9),
+        size: 28,
+      ),
     },
     {
       "title": "Profile Promotion",
       "desc":
           "Facilitating the effective promotion of individual professional profiles, enhancing visibility and potential.",
+      "icon": Icon(
+        Icons.trending_up,
+        color: Color(0xFF65b2c9),
+        size: 28,
+      ),
     },
   ];
 
@@ -50,13 +80,16 @@ class ServicesApp extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            "Empowering RECRUITMENT FIRMS, agents, and EMPLOYER with streamlined tools to manage job postings, profiles, and talent acquisition processes efficiently.",
+            'Empowering RECRUITMENT FIRMS, agents,\n'
+            'and EMPLOYER with streamlined tools to\n'
+            'manage job postings, profiles, and talent\n'
+            'acquisition processes efficiently.',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               color: Color.fromARGB(255, 57, 57, 57),
               height: 1.4,
             ),
-            textAlign: TextAlign.center,
+            textAlign: TextAlign.left,
           ),
           const SizedBox(height: 20),
 
@@ -82,11 +115,7 @@ class ServicesApp extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
-                      Icons.work_outline,
-                      color: Color(0xFF5AC8FA),
-                      size: 28,
-                    ),
+                    services[index]["icon"],
                     const SizedBox(height: 8),
                     Text(
                       services[index]["title"]!,
@@ -99,7 +128,7 @@ class ServicesApp extends StatelessWidget {
                     Text(
                       services[index]["desc"]!,
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         color: Color.fromARGB(255, 57, 57, 57),
                         height: 1.3,
                       ),

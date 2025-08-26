@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:marrir/Component/Employee/EmployeeDashboard/dashboard.dart';
 import 'package:marrir/Component/Employee/EmployeeDashboard/help.dart';
 import 'package:marrir/Component/Employee/EmployeeDashboard/payment.dart';
+import 'package:marrir/Component/Employee/EmployeeDashboard/promotion.dart';
 import 'package:marrir/Component/Employee/EmployeeDashboard/rating.dart';
 import 'package:marrir/Component/Employee/EmployeeDashboard/reserve.dart';
 import 'package:marrir/Component/Employee/EmployeeDashboard/status.dart';
 import 'package:marrir/Component/Employee/layout/header_drawer.dart';
-import 'package:marrir/Component/homepage/PromotedCvs/promotedcvs.dart';
 import 'employee_header.dart';
 import 'employee_footer.dart';
-
-// Import screens
 
 class EmployeeLayout extends StatefulWidget {
   final Widget child;
@@ -32,7 +30,7 @@ class EmployeeLayout extends StatefulWidget {
 
 class _EmployeeLayoutState extends State<EmployeeLayout> {
   bool _isDrawerOpen = false;
-  int _selectedMenuIndex = -1; // -1 = tab layout, >=0 = drawer page
+  int _selectedMenuIndex = -1;
 
   void _toggleDrawer() {
     setState(() {
@@ -43,7 +41,7 @@ class _EmployeeLayoutState extends State<EmployeeLayout> {
   void _onMenuSelected(int index) {
     setState(() {
       _selectedMenuIndex = index;
-      _isDrawerOpen = false; // Close drawer immediately after selection
+      _isDrawerOpen = false;
     });
   }
 
@@ -60,7 +58,7 @@ class _EmployeeLayoutState extends State<EmployeeLayout> {
       case 3:
         return const ReservesScreen();
       case 4:
-        return const PromotedCVsScreen();
+        return const PromotionScreen();
       case 5:
         return const PaymentsScreen();
       case 6:
@@ -77,27 +75,25 @@ class _EmployeeLayoutState extends State<EmployeeLayout> {
       body: Stack(
         children: [
           SafeArea(
-            child: Column(
-              children: [
-                // Only show header if not on a drawer screen
-                if (widget.showHeader && !_isDrawerScreen)
-                  EmployeeHeader(onMenuTap: _toggleDrawer),
-
-                Expanded(child: _getSelectedScreen()),
-              ],
+            child: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  if (widget.showHeader && !_isDrawerScreen)
+                    SliverToBoxAdapter(
+                      child: EmployeeHeader(onMenuTap: _toggleDrawer),
+                    ),
+                ];
+              },
+              body: _getSelectedScreen(), // ✅ screens work normally
             ),
           ),
-
-          // Overlay background when drawer is open
           if (_isDrawerOpen)
             Positioned.fill(
               child: GestureDetector(
-                onTap: _toggleDrawer, // Close drawer when tapping outside
+                onTap: _toggleDrawer,
                 child: Container(color: Colors.black.withOpacity(0.4)),
               ),
             ),
-
-          // Full-screen Animated Drawer
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
@@ -115,8 +111,6 @@ class _EmployeeLayoutState extends State<EmployeeLayout> {
           ),
         ],
       ),
-
-      // Hide footer when a drawer screen is active
       bottomNavigationBar: _isDrawerScreen
           ? null
           : EmployeeNavBar(

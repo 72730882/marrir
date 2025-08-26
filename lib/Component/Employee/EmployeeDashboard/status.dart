@@ -210,7 +210,7 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Colors.redAccent,
+                      color: Colors.black,
                     ),
                   ),
                 ),

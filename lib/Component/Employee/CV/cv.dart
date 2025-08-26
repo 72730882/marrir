@@ -22,8 +22,6 @@ import 'package:marrir/Component/Employee/layout/header_drawer.dart';
 import 'cv_header.dart';
 import 'cv_footer.dart';
 
-// Dashboard-like pages
-
 class CVMain extends StatefulWidget {
   const CVMain({super.key});
 
@@ -34,7 +32,6 @@ class CVMain extends StatefulWidget {
 class _CVMainState extends State<CVMain> {
   int currentStep = 1;
   final int totalSteps = 10;
-
   int _selectedMenuIndex = -1; // -1 = CV steps, >=0 = menu page
 
   final List<Widget> steps = [
@@ -51,19 +48,11 @@ class _CVMainState extends State<CVMain> {
   ];
 
   void nextStep() {
-    if (currentStep < totalSteps) {
-      setState(() {
-        currentStep++;
-      });
-    }
+    if (currentStep < totalSteps) setState(() => currentStep++);
   }
 
   void prevStep() {
-    if (currentStep > 1) {
-      setState(() {
-        currentStep--;
-      });
-    }
+    if (currentStep > 1) setState(() => currentStep--);
   }
 
   Widget _getSelectedScreen() {
@@ -109,37 +98,30 @@ class _CVMainState extends State<CVMain> {
       backgroundColor: Colors.white,
       drawer: EmployeeHeaderDrawer(
         selectedIndex: _selectedMenuIndex,
-        closeDrawer: () {
-          Navigator.of(context).pop();
-        },
+        closeDrawer: () => Navigator.of(context).pop(),
         onMenuSelected: (index) {
-          setState(() {
-            _selectedMenuIndex = index; // navigate to menu page
-          });
+          setState(() => _selectedMenuIndex = index);
           Navigator.of(context).pop();
         },
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            // Only show header if in CV steps mode
-            if (_selectedMenuIndex == -1)
-              Builder(
-                builder: (context) {
-                  return CvHeader(
-                    currentStep: currentStep,
-                    totalSteps: totalSteps,
-                    onMenuTap: () {
-                      Scaffold.of(context).openDrawer();
-                    },
-                  );
-                },
-              ),
-            const Divider(height: 1),
-            // Expanded body to fill remaining space
-            Expanded(
-              child: _selectedMenuIndex == -1
-                  ? SingleChildScrollView(
+        child: _selectedMenuIndex == -1
+            ? SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Use Builder to provide correct context for openDrawer()
+                    Builder(
+                      builder: (context) => CvHeader(
+                        currentStep: currentStep,
+                        totalSteps: totalSteps,
+                        onMenuTap: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -154,11 +136,11 @@ class _CVMainState extends State<CVMain> {
                           ),
                         ],
                       ),
-                    )
-                  : _getSelectedScreen(), // render menu page directly
-            ),
-          ],
-        ),
+                    ),
+                  ],
+                ),
+              )
+            : _getSelectedScreen(),
       ),
     );
   }

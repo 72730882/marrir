@@ -143,8 +143,8 @@ class _RatingScreenState extends State<RatingScreen> {
                   });
                 },
                 icon: Icon(
-                  starIndex < rating ? Icons.star : Icons.star_border_outlined,
-                  color: Colors.amber,
+                  Icons.star,
+                  color: starIndex < rating ? Colors.red : Colors.grey,
                   size: 28,
                 ),
               );

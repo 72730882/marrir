@@ -17,7 +17,7 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       titleSpacing: 0,
       title: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 1),
         child: Row(
           children: [
             Image.asset(
@@ -30,31 +30,30 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF65b2c9),
                 foregroundColor: Colors.white,
-                side: const BorderSide(color: Colors.white),
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: const Text("Login"),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 5),
             ElevatedButton(
               onPressed: onRegisterTap,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                foregroundColor: Colors.lightBlue,
-                side: const BorderSide(color: Colors.lightBlue),
+                foregroundColor: const Color(0xFF65b2c9),
+                side: const BorderSide(color: Color(0xFF65b2c9)),
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: const Text("Register"),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 4),
 
             // === Language Dropdown ===
             PopupMenuButton<String>(

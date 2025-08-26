@@ -102,7 +102,7 @@ class EmployeeHeaderDrawer extends StatelessWidget {
             const SizedBox(width: 16),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: _ink,

@@ -190,13 +190,12 @@ class RecentlyPostedJobs extends StatelessWidget {
               children: [
                 tag(
                   type,
-                  Color.fromARGB(255, 151, 196, 210),
-                  Color.fromARGB(255, 251, 252, 252),
+                  const Color.fromARGB(255, 151, 196, 210),
+                  const Color.fromARGB(255, 251, 252, 252),
                 ),
                 const SizedBox(width: 6),
                 tag(
                   workplace,
-
                   const Color.fromARGB(255, 150, 99, 143),
                   const Color.fromARGB(255, 253, 252, 253),
                 ),

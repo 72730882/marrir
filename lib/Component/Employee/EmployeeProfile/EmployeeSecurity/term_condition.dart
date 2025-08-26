@@ -112,7 +112,7 @@ class _TermConditionPageState extends State<TermConditionPage> {
                             214,
                             1,
                           ),
-                          disabledBackgroundColor: Color.fromRGBO(
+                          disabledBackgroundColor: const Color.fromRGBO(
                             142,
                             198,
                             214,

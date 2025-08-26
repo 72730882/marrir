@@ -42,7 +42,7 @@ class AdditionalContactForm extends StatelessWidget {
               platform['icon'] as IconData,
             ),
           );
-        }).toList(),
+        }),
 
         // Submit Button
         SizedBox(
@@ -88,7 +88,7 @@ class AdditionalContactForm extends StatelessWidget {
         const SizedBox(height: 8),
         TextField(
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: Color(0xFF111111)),
+            prefixIcon: Icon(icon, color: const Color(0xFF111111)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: borderColor),

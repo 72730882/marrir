@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/Component/Employee/EmployeeDashboard/dashboard.dart';
 import 'package:marrir/Component/Employee/EmployeeDashboard/help.dart';
+import 'package:marrir/Component/Employee/EmployeeDashboard/payment.dart';
 import 'package:marrir/Component/Employee/EmployeeDashboard/rating.dart';
 import 'package:marrir/Component/Employee/EmployeeDashboard/reserve.dart';
 import 'package:marrir/Component/Employee/EmployeeDashboard/status.dart';
 import 'package:marrir/Component/Employee/layout/header_drawer.dart';
-import 'package:marrir/Component/homepage/PaymentMethod/payment_method.dart';
 import 'package:marrir/Component/homepage/PromotedCvs/promotedcvs.dart';
 import 'employee_header.dart';
 import 'employee_footer.dart';
@@ -62,7 +62,7 @@ class _EmployeeLayoutState extends State<EmployeeLayout> {
       case 4:
         return const PromotedCVsScreen();
       case 5:
-        return const PaymentMethods();
+        return const PaymentsScreen();
       case 6:
         return const HelpCenterScreen();
       default:

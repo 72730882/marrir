@@ -27,7 +27,7 @@ class EmployeeHeader extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: onMenuTap, // call the drawer toggle
-                    child: SizedBox(
+                    child: const SizedBox(
                       width: 40,
                       height: 40,
                       child: UnevenHamburgerIcon(
@@ -41,9 +41,9 @@ class EmployeeHeader extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Column(
+                  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'Welcome,',
                         style: TextStyle(
@@ -67,8 +67,8 @@ class EmployeeHeader extends StatelessWidget {
                   ),
                 ],
               ),
-              Row(
-                children: const [
+              const Row(
+                children: [
                   ChatWithTranslateBadge(iconSize: 22, color: _ink),
                   SizedBox(width: 14),
                   Icon(Icons.notifications_none, size: 22, color: _ink),
@@ -150,16 +150,17 @@ class UnevenHamburgerIcon extends StatelessWidget {
     final totalHeight = lineThickness * 3 + gap * 2;
 
     Widget bar(double width) => Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        width: width,
-        height: lineThickness,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(roundedEnds ? lineThickness : 0),
-        ),
-      ),
-    );
+          alignment: Alignment.centerLeft,
+          child: Container(
+            width: width,
+            height: lineThickness,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius:
+                  BorderRadius.circular(roundedEnds ? lineThickness : 0),
+            ),
+          ),
+        );
 
     return SizedBox(
       width: middleLength,
@@ -212,9 +213,9 @@ class ChatWithTranslateBadge extends StatelessWidget {
                 color: Colors.black,
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
+                children: [
                   Text(
                     'A',
                     style: TextStyle(

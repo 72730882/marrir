@@ -54,32 +54,26 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
             ),
           ),
           const SizedBox(height: 30),
-
           _buildLabel('Country'),
           const SizedBox(height: 8),
           _buildTextField('Select Country'),
           const SizedBox(height: 16),
-
           _buildLabel('City'),
           const SizedBox(height: 8),
           _buildTextField('Enter City'),
           const SizedBox(height: 16),
-
           _buildLabel('Company'),
           const SizedBox(height: 8),
           _buildTextField('Enter Company Home'),
           const SizedBox(height: 16),
-
           _buildLabel('From'),
           const SizedBox(height: 8),
           _buildDateField(context, _fromDateController),
           const SizedBox(height: 16),
-
           _buildLabel('To'),
           const SizedBox(height: 8),
           _buildDateField(context, _toDateController),
           const SizedBox(height: 16),
-
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
@@ -87,7 +81,7 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 backgroundColor: buttonColor,
-                side: BorderSide(color: buttonColor),
+                side: const BorderSide(color: buttonColor),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -103,12 +97,10 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
             ),
           ),
           const SizedBox(height: 24),
-
           _buildLabel('Previous Work'),
           const SizedBox(height: 8),
           _buildTextField('Enter summary of the above input', maxLines: 4),
           const SizedBox(height: 30),
-
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(

@@ -17,129 +17,129 @@ class _TermConditionPageState extends State<TermConditionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          // Header with waves
-          WaveBackground(
-            title: "Terms And Conditions",
-            onBack: () {
-              if (widget.onChildSelected != null) {
-                widget.onChildSelected!(
-                  SecurityPage(onChildSelected: widget.onChildSelected!),
-                );
-              } else {
-                Navigator.pop(context);
-              }
-            },
-            onNotification: () {},
-          ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header now scrolls with the content
+            WaveBackground(
+              title: "Terms And Conditions",
+              onBack: () {
+                if (widget.onChildSelected != null) {
+                  widget.onChildSelected!(
+                    SecurityPage(onChildSelected: widget.onChildSelected!),
+                  );
+                } else {
+                  Navigator.pop(context);
+                }
+              },
+              onNotification: () {},
+            ),
 
-          // Content
-          Expanded(
-            child: Padding(
+            // Content
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Terms and conditions",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Terms and conditions",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor "
+                    "Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor "
+                    "Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor.",
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    "1. Lorem ipsum dolor.\n"
+                    "2. Lorem ipsum dolor.\n"
+                    "3. Lorem ipsum dolor.\n"
+                    "4. Lorem ipsum dolor.\n",
+                  ),
+                  const Text(
+                    "Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor "
+                    "Lorem ipsum dolor Lorem ipsum dolor.",
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    "• Lorem ipsum dolor.\n"
+                    "• Lorem ipsum dolor Lorem ipsum dolor.\n",
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Checkbox
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _isChecked,
+                        onChanged: (value) {
+                          setState(() {
+                            _isChecked = value ?? false;
+                          });
+                        },
+                        activeColor: const Color.fromRGBO(142, 198, 214, 1),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      "Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor "
-                      "Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor "
-                      "Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor.",
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      "1. Lorem ipsum dolor.\n"
-                      "2. Lorem ipsum dolor.\n"
-                      "3. Lorem ipsum dolor.\n"
-                      "4. Lorem ipsum dolor.\n",
-                    ),
-                    const Text(
-                      "Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor "
-                      "Lorem ipsum dolor Lorem ipsum dolor.",
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      "• Lorem ipsum dolor.\n"
-                      "• Lorem ipsum dolor Lorem ipsum dolor.\n",
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Checkbox
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _isChecked,
-                          onChanged: (value) {
-                            setState(() {
-                              _isChecked = value ?? false;
-                            });
-                          },
-                          activeColor: const Color.fromRGBO(142, 198, 214, 1),
-                        ),
-                        const Expanded(
-                          child: Text(
-                            "I accept all the terms and conditions",
-                            style: TextStyle(fontSize: 14),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Accept button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _isChecked
-                            ? () {
-                                Navigator.of(context).pop();
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromRGBO(
-                            142,
-                            198,
-                            214,
-                            1,
-                          ),
-                          disabledBackgroundColor: const Color.fromRGBO(
-                            142,
-                            198,
-                            214,
-                            1,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        child: const Text(
-                          "Accept",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                      const Expanded(
+                        child: Text(
+                          "I accept all the terms and conditions",
+                          style: TextStyle(fontSize: 14),
                         ),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Accept button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _isChecked
+                          ? () {
+                              Navigator.of(context).pop();
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromRGBO(
+                          142,
+                          198,
+                          214,
+                          1,
+                        ),
+                        disabledBackgroundColor: const Color.fromRGBO(
+                          142,
+                          198,
+                          214,
+                          1,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text(
+                        "Accept",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 30),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 30),
+                ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -17,10 +17,10 @@ class CvHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color titleColor = Color(0xFF1D2433); // deep neutral for title
-    const Color subtitleColor = Color(0xFF8A94A6); // cool gray for subtitle
+    const Color titleColor = Color(0xFF1D2433);
+    const Color subtitleColor = Color(0xFF8A94A6);
     const Color cardBg = Colors.white;
-    const Color shadowColor = Color(0x11000000); // subtle shadow
+    const Color shadowColor = Color(0x11000000);
     const Color completedDot = Color.fromRGBO(138, 194, 210, 1);
     const Color activeDot = Color(0xFF7E3EA1);
     final Color upcomingDot = const Color(0xFFBFC7D4).withOpacity(0.5);
@@ -58,56 +58,53 @@ class CvHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // --- Replace top row with EmployeeHeader style menu ---
+        // --- Top Row with menu + welcome + notification ---
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
           child: Row(
             children: [
-              GestureDetector(
-                onTap: onMenuTap, // Trigger drawer or menu
-                child: const SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: UnevenHamburgerIcon(
-                    color: Color(0xFF111111),
-                    lineThickness: 2,
-                    gap: 5,
-                    topLength: 14,
-                    middleLength: 22,
-                    bottomLength: 16,
+              // --- Menu button fixed ---
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onMenuTap, // this now works via Builder
+                  borderRadius: BorderRadius.circular(8),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: UnevenHamburgerIcon(
+                        color: Color(0xFF111111),
+                        lineThickness: 2,
+                        gap: 5,
+                        topLength: 14,
+                        middleLength: 22,
+                        bottomLength: 16,
+                      ),
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Welcome,',
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF8E8E93),
-                      height: 1.15,
-                    ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    'Hanan', // You can replace with dynamic name
-                    style: TextStyle(
-                      fontSize: 17.5,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF111111),
-                      height: 1.15,
-                    ),
-                  ),
-                ],
-              ),
+
               const Spacer(),
-              const Icon(
-                Icons.notifications_none,
-                size: 22,
-                color: Color(0xFF111111),
+              // --- Notification button also tappable ---
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () {
+                    // TODO: Handle notification tap
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.notifications_none,
+                      size: 22,
+                      color: Color(0xFF111111),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -142,7 +139,7 @@ class CvHeader extends StatelessWidget {
         ),
         const SizedBox(height: 16),
 
-        // --- Card with steps (same as before) ---
+        // --- Steps Card ---
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Container(
@@ -162,6 +159,7 @@ class CvHeader extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
               child: Column(
                 children: [
+                  // Steps Row
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(visibleSteps.length, (index) {
@@ -174,16 +172,15 @@ class CvHeader extends StatelessWidget {
                           : isActive
                               ? activeDot
                               : upcomingDot;
-                      final Color dotTextColor = isActive
+                      final Color dotTextColor = (isActive || isCompleted)
                           ? Colors.white
-                          : isCompleted
-                              ? Colors.white
-                              : const Color(0xFF5B6472);
+                          : const Color(0xFF5B6472);
 
                       return Expanded(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            // Circle Step
                             Container(
                               width: 36,
                               height: 36,
@@ -208,6 +205,7 @@ class CvHeader extends StatelessWidget {
                                     ),
                             ),
                             const SizedBox(height: 8),
+                            // Step Label
                             Text(
                               visibleSteps[index],
                               textAlign: TextAlign.center,
@@ -225,24 +223,44 @@ class CvHeader extends StatelessWidget {
                                         : upcomingText,
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              curve: Curves.easeInOut,
-                              height: 4,
-                              width: isActive ? 48 : 0,
-                              decoration: BoxDecoration(
-                                color:
-                                    isActive ? activeDot : Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
                           ],
                         ),
                       );
                     }),
                   ),
+
                   const SizedBox(height: 12),
+
+                  // --- Continuous Underline (Progress Bar) ---
+                  Stack(
+                    children: [
+                      // Background line (gray)
+                      Container(
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: upcomingDot,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      // Foreground line (completed + active)
+                      FractionallySizedBox(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: clampedCurrent / clampedTotal,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: activeDot,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Percent Label
                   Text(
                     percentLabel,
                     style: const TextStyle(

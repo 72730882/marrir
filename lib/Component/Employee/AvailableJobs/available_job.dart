@@ -12,6 +12,9 @@ class _AvailableJobState extends State<AvailableJob> {
   int currentPage = 1;
   final int jobsPerPage = 5;
 
+  DateTime? fromDate;
+  DateTime? toDate;
+
   final List<Map<String, dynamic>> jobs = [
     {
       "title": "Mobile App Designer",
@@ -89,13 +92,120 @@ class _AvailableJobState extends State<AvailableJob> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // 🔹 Date Filter Row
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "From",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 6),
+                    InkWell(
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: fromDate ?? DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                        );
+                        if (picked != null) {
+                          setState(() => fromDate = picked);
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 14),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.white,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              fromDate == null
+                                  ? "dd-mm-yyyy"
+                                  : "${fromDate!.day.toString().padLeft(2, '0')}-${fromDate!.month.toString().padLeft(2, '0')}-${fromDate!.year}",
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.black87),
+                            ),
+                            const Icon(Icons.calendar_today_outlined,
+                                size: 18, color: Colors.grey),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "To",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 6),
+                    InkWell(
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: toDate ?? DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                        );
+                        if (picked != null) {
+                          setState(() => toDate = picked);
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 14),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.white,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              toDate == null
+                                  ? "dd-mm-yyyy"
+                                  : "${toDate!.day.toString().padLeft(2, '0')}-${toDate!.month.toString().padLeft(2, '0')}-${toDate!.year}",
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.black87),
+                            ),
+                            const Icon(Icons.calendar_today_outlined,
+                                size: 18, color: Colors.grey),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
           const Text(
             "Available Jobs",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
 
-          // Loop through jobsToShow and pass each job to jobCard
+          // Jobs list
           for (var job in jobsToShow) ...[
             jobCard(job: job),
             const SizedBox(height: 12),
@@ -214,22 +324,16 @@ class _AvailableJobState extends State<AvailableJob> {
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(
-                Icons.location_on_outlined,
-                size: 16,
-                color: Colors.grey,
-              ),
+              const Icon(Icons.location_on_outlined,
+                  size: 16, color: Colors.grey),
               const SizedBox(width: 4),
               Text(job['location'], style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 12),
               const Icon(Icons.attach_money, size: 16, color: Colors.grey),
               Text(job['salary'], style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 12),
-              const Icon(
-                Icons.people_alt_outlined,
-                size: 16,
-                color: Colors.grey,
-              ),
+              const Icon(Icons.people_alt_outlined,
+                  size: 16, color: Colors.grey),
               const SizedBox(width: 4),
               Text(job['positions'], style: const TextStyle(fontSize: 12)),
             ],
@@ -239,10 +343,8 @@ class _AvailableJobState extends State<AvailableJob> {
             spacing: 6,
             children: job['tags'].map<Widget>((tag) {
               return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.purple.shade50,
                   borderRadius: BorderRadius.circular(20),

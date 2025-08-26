@@ -11,6 +11,18 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
   final TextEditingController _fromDateController = TextEditingController();
   final TextEditingController _toDateController = TextEditingController();
 
+  String? selectedCountry; // ✅ store selected country
+
+  final List<String> countries = [
+    "Ethiopia",
+    "USA",
+    "UK",
+    "Canada",
+    "Germany",
+    "UAE",
+    "Other",
+  ];
+
   @override
   void dispose() {
     _fromDateController.dispose();
@@ -54,30 +66,39 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
             ),
           ),
           const SizedBox(height: 30),
+
+          // 🔹 Country Dropdown
           _buildLabel('Country'),
           const SizedBox(height: 8),
-          _buildTextField('Select Country'),
+          _buildCountryDropdown(),
           const SizedBox(height: 16),
+
           _buildLabel('City'),
           const SizedBox(height: 8),
           _buildTextField('Enter City'),
           const SizedBox(height: 16),
+
           _buildLabel('Company'),
           const SizedBox(height: 8),
           _buildTextField('Enter Company Home'),
           const SizedBox(height: 16),
+
           _buildLabel('From'),
           const SizedBox(height: 8),
           _buildDateField(context, _fromDateController),
           const SizedBox(height: 16),
+
           _buildLabel('To'),
           const SizedBox(height: 8),
           _buildDateField(context, _toDateController),
           const SizedBox(height: 16),
+
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
-              onPressed: () {},
+              onPressed: () {
+                debugPrint("Selected Country: $selectedCountry");
+              },
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 backgroundColor: buttonColor,
@@ -96,11 +117,15 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
               ),
             ),
           ),
+
           const SizedBox(height: 24),
+
           _buildLabel('Previous Work'),
           const SizedBox(height: 8),
           _buildTextField('Enter summary of the above input', maxLines: 4),
+
           const SizedBox(height: 30),
+
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -128,6 +153,7 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
     );
   }
 
+  // 🔹 Reusable Widgets
   Widget _buildLabel(String text) {
     return Text(
       text,
@@ -195,6 +221,37 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: Color(0xFFD1D1D6), width: 2),
         ),
+      ),
+    );
+  }
+
+  // 🔹 Country Dropdown Field
+  Widget _buildCountryDropdown() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFFD1D1D6)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: DropdownButton<String>(
+        value: selectedCountry,
+        hint: const Text(
+          "Select Country",
+          style: TextStyle(color: Color(0xFF8E8E93)),
+        ),
+        isExpanded: true,
+        underline: const SizedBox(),
+        items: countries
+            .map((country) => DropdownMenuItem(
+                  value: country,
+                  child: Text(country),
+                ))
+            .toList(),
+        onChanged: (value) {
+          setState(() {
+            selectedCountry = value;
+          });
+        },
       ),
     );
   }

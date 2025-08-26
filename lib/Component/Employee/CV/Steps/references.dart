@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
-class ReferencesForm extends StatelessWidget {
+class ReferencesForm extends StatefulWidget {
   const ReferencesForm({super.key});
+
+  @override
+  State<ReferencesForm> createState() => _ReferencesFormState();
+}
+
+class _ReferencesFormState extends State<ReferencesForm> {
+  DateTime? selectedDate;
 
   @override
   Widget build(BuildContext context) {
@@ -22,38 +29,93 @@ class ReferencesForm extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 30),
+
           _buildLabel('Name'),
           const SizedBox(height: 8),
           _buildTextField('Enter Name'),
           const SizedBox(height: 16),
+
           _buildLabel('Email'),
           const SizedBox(height: 8),
           _buildTextField('Enter Email'),
           const SizedBox(height: 16),
+
           _buildLabel('Phone Number'),
           const SizedBox(height: 8),
           _buildPhoneField(),
           const SizedBox(height: 16),
+
+          // 🔹 Date of Birth with Date Picker
           _buildLabel('Date of Birth'),
           const SizedBox(height: 8),
-          _buildTextField('mm/dd/yyyy', keyboardType: TextInputType.datetime),
+          GestureDetector(
+            onTap: () async {
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: selectedDate ?? DateTime.now(),
+                firstDate: DateTime(1900),
+                lastDate: DateTime(2100),
+              );
+              if (picked != null) {
+                setState(() {
+                  selectedDate = picked;
+                });
+              }
+            },
+            child: AbsorbPointer(
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: selectedDate == null
+                      ? "mm/dd/yyyy"
+                      : "${selectedDate!.month.toString().padLeft(2, '0')}/"
+                          "${selectedDate!.day.toString().padLeft(2, '0')}/"
+                          "${selectedDate!.year}",
+                  suffixIcon: const Icon(Icons.calendar_today_outlined,
+                      color: Color(0xFF8E8E93)), // ✅ calendar icon
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFFD1D1D6)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFFD1D1D6)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide:
+                        const BorderSide(color: Color(0xFFD1D1D6), width: 2),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           const SizedBox(height: 16),
+
           _buildLabel('Select Gender'),
           const SizedBox(height: 8),
           _buildDropdownField(['Male', 'Female', 'Other'], 'Select Gender'),
           const SizedBox(height: 16),
+
           _buildLabel('Country'),
           const SizedBox(height: 8),
           _buildDropdownField(['Ethiopia', 'USA', 'Other'], 'Select Country'),
           const SizedBox(height: 16),
+
           _buildLabel('City'),
           const SizedBox(height: 8),
           _buildTextField('Enter City'),
           const SizedBox(height: 16),
+
           _buildLabel('Sub City'),
           const SizedBox(height: 8),
           _buildTextField('Enter Sub City'),
           const SizedBox(height: 16),
+
           Row(
             children: [
               Expanded(
@@ -79,11 +141,15 @@ class ReferencesForm extends StatelessWidget {
               ),
             ],
           ),
+
           const SizedBox(height: 16),
+
           _buildLabel('Reference'),
           const SizedBox(height: 8),
           _buildTextField('Brief summary of the above input', maxLines: 4),
+
           const SizedBox(height: 30),
+
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -111,6 +177,7 @@ class ReferencesForm extends StatelessWidget {
     );
   }
 
+  // 🔹 Reusable Widgets
   Widget _buildLabel(String text) {
     return Text(
       text,

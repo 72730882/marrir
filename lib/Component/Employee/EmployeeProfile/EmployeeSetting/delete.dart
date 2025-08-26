@@ -15,9 +15,8 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
   final TextEditingController _passwordCtrl = TextEditingController();
   bool _obscure = true;
 
-  // Design colors approximated from screenshot
   final Color _primaryBlueDark = const Color(0xFF65B2C9);
-  final Color _cardBlue = const Color(0xFFE6F2F9); // light bluish background
+  final Color _cardBlue = const Color(0xFFE6F2F9);
   final Color _textPrimary = const Color(0xFF2C2C2C);
   final Color _textSecondary = const Color(0xFF6F7A86);
   final Color _chipGrey = const Color(0xFFE7EEF2);
@@ -32,7 +31,8 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: ListView(
+        padding: EdgeInsets.zero,
         children: [
           WaveBackground(
             title: "Delete Account",
@@ -47,157 +47,133 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
             },
             onNotification: () {},
           ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              height: 10,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // const SizedBox(height: 20),
-                    // Title centered and bold
-                    Text(
-                      'Are You Sure You Want To\nDelete Your Account?',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: _textPrimary,
-                        height: 1.35,
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-
-                    // Light blue rounded info card
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: _cardBlue,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'This action will permanently delete all of your data, and you will not be able to recover it. Please keep the following in mind before proceeding:',
-                            style: TextStyle(
-                              fontSize: 14,
-                              height: 1.45,
-                              color: _textSecondary,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          // Custom bullet list to match style
-                          _bullet(
-                            'All your expenses, income and associated transactions will be eliminated.',
-                          ),
-                          const SizedBox(height: 10),
-                          _bullet(
-                            'You will not be able to access your account or any related information.',
-                          ),
-                          const SizedBox(height: 10),
-                          _bullet('This action cannot be undone.'),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 22),
-
-                    // Section Title
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Please Enter Your Password To Confirm\nDeletion Of Your Account.',
-                        style: TextStyle(
-                          fontSize: 15.5,
-                          fontWeight: FontWeight.w700,
-                          color: _textPrimary,
-                          height: 1.35,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Rounded pill password field with eye chip
-                    _PasswordPillField(
-                      controller: _passwordCtrl,
-                      obscure: _obscure,
-                      onToggleObscure: () =>
-                          setState(() => _obscure = !_obscure),
-                      chipColor: _chipGrey,
-                      pillColor: const Color(0xFFE0EAEE),
-                      textColor: _textPrimary,
-                      hintDots: '••••••••',
-                    ),
-
-                    const SizedBox(height: 22),
-
-                    // Primary button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF65B2C9),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          elevation: 0,
-                          shape: const StadiumBorder(),
-                        ).copyWith(
-                          overlayColor: WidgetStatePropertyAll(
-                            _primaryBlueDark,
-                          ),
-                        ),
-                        child: const Text(
-                          'Yes, Delete Account',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // Secondary button (light gray)
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: () {
-                          if (widget.onChildSelected != null) {
-                            widget.onChildSelected!(
-                              SettingPage(
-                                onChildSelected: widget.onChildSelected!,
-                              ),
-                            );
-                          } else {
-                            Navigator.pop(context);
-                          }
-                        },
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: _pillGrey,
-                          foregroundColor: _textPrimary,
-                          side: BorderSide(color: _pillGrey),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: const StadiumBorder(),
-                        ),
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-                  ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Column(
+              children: [
+                Text(
+                  'Are You Sure You Want To\nDelete Your Account?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: _textPrimary,
+                    height: 1.35,
+                  ),
                 ),
-              ),
+                const SizedBox(height: 18),
+
+                // Info card
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: _cardBlue,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'This action will permanently delete all of your data, and you will not be able to recover it. Please keep the following in mind before proceeding:',
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 1.45,
+                          color: _textSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _bullet(
+                          'All your expenses, income and associated transactions will be eliminated.'),
+                      const SizedBox(height: 10),
+                      _bullet(
+                          'You will not be able to access your account or any related information.'),
+                      const SizedBox(height: 10),
+                      _bullet('This action cannot be undone.'),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 22),
+
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Please Enter Your Password To Confirm\nDeletion Of Your Account.',
+                    style: TextStyle(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w700,
+                      color: _textPrimary,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                _PasswordPillField(
+                  controller: _passwordCtrl,
+                  obscure: _obscure,
+                  onToggleObscure: () => setState(() => _obscure = !_obscure),
+                  chipColor: _chipGrey,
+                  pillColor: const Color(0xFFE0EAEE),
+                  textColor: _textPrimary,
+                  hintDots: '••••••••',
+                ),
+
+                const SizedBox(height: 22),
+
+                // Primary button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _primaryBlueDark,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      elevation: 0,
+                      shape: const StadiumBorder(),
+                    ),
+                    child: const Text(
+                      'Yes, Delete Account',
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Secondary button
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      if (widget.onChildSelected != null) {
+                        widget.onChildSelected!(
+                          SettingPage(onChildSelected: widget.onChildSelected!),
+                        );
+                      } else {
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: _pillGrey,
+                      foregroundColor: _textPrimary,
+                      side: BorderSide(color: _pillGrey),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: const StadiumBorder(),
+                    ),
+                    child: const Text(
+                      'Cancel',
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+              ],
             ),
           ),
         ],
@@ -209,7 +185,6 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // small circular bullet to match the mock
         Padding(
           padding: const EdgeInsets.only(top: 6),
           child: Container(
@@ -261,7 +236,6 @@ class _PasswordPillField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // The pill input
         Expanded(
           child: Container(
             decoration: BoxDecoration(
@@ -289,7 +263,6 @@ class _PasswordPillField extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        // The circular eye chip
         Container(
           height: 40,
           width: 40,

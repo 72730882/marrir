@@ -4,7 +4,6 @@ class PhotoAndLanguageForm extends StatefulWidget {
   const PhotoAndLanguageForm({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _PhotoAndLanguageFormState createState() => _PhotoAndLanguageFormState();
 }
 
@@ -16,201 +15,221 @@ class _PhotoAndLanguageFormState extends State<PhotoAndLanguageForm> {
     'Fluent',
   ];
 
-  // Selected levels for languages
   String? englishLevel;
   String? amharicLevel;
   String? arabicLevel;
 
   @override
   Widget build(BuildContext context) {
+    const Color primaryColor = Color(0xFF8EC6D6);
+    const Color borderColor = Color(0xFFD1D1D6);
     const Color textColor = Color(0xFF111111);
-    const Color borderColor = Color(0xFFD1D1D6);
-    const Color dividerColor = Color(0xFFE5E5EA);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 20),
-
-        const Text(
-          'Step 7: Photo and Language',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: textColor,
-          ),
-        ),
-
-        const SizedBox(height: 30),
-
-        // Photo Upload Section
-        _buildUploadSection('Upload Head Photo'),
-        const SizedBox(height: 16),
-        _buildUploadSection('Upload Full Body Photo'),
-        const SizedBox(height: 16),
-        _buildUploadSection('Upload Introductory Video'),
-
-        const SizedBox(height: 24),
-        const Divider(color: dividerColor, thickness: 1, height: 1),
-        const SizedBox(height: 24),
-
-        // Language Section
-        _buildDropdownField(
-          'English',
-          languageLevels,
-          englishLevel,
-          (value) => setState(() => englishLevel = value),
-        ),
-        const SizedBox(height: 12),
-        _buildDropdownField(
-          'Amharic',
-          languageLevels,
-          amharicLevel,
-          (value) => setState(() => amharicLevel = value),
-        ),
-        const SizedBox(height: 12),
-        _buildDropdownField(
-          'Arabic',
-          languageLevels,
-          arabicLevel,
-          (value) => setState(() => arabicLevel = value),
-        ),
-        const SizedBox(height: 12),
-
-        GestureDetector(
-          onTap: () {
-            // Handle add another language logic
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            decoration: BoxDecoration(
-              border: Border.all(color: borderColor),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Center(
-              child: Text(
-                'Add another Language',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Color.fromRGBO(142, 198, 214, 1),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 10),
+          const Text(
+            'Step 7: Photo and Language',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: textColor,
             ),
           ),
-        ),
+          const SizedBox(height: 20),
 
-        const SizedBox(height: 30),
-
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () {
-              print('English Level: $englishLevel');
-              print('Amharic Level: $amharicLevel');
-              print('Arabic Level: $arabicLevel');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromRGBO(142, 198, 214, 1),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text(
-              'Submit',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+          // Upload Sections
+          _buildUploadBox(
+            icon: Icons.photo_camera_outlined,
+            title: "Upload Head Photo",
           ),
-        ),
-        const SizedBox(height: 20),
-      ],
-    );
-  }
-
-  Widget _buildUploadSection(String title) {
-    const Color borderColor = Color(0xFFD1D1D6);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF111111),
+          const SizedBox(height: 16),
+          _buildUploadBox(
+            icon: Icons.person_outline,
+            title: "Upload Full Body Photo",
           ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-          decoration: BoxDecoration(
-            border: Border.all(color: borderColor),
-            borderRadius: BorderRadius.circular(8),
+          const SizedBox(height: 16),
+          _buildUploadBox(
+            icon: Icons.videocam_outlined,
+            title: "Upload Introductory Video",
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+          const SizedBox(height: 24),
+
+          // Language dropdowns
+          _buildDropdownField(
+            'English',
+            englishLevel,
+            (value) => setState(() => englishLevel = value),
+          ),
+          const SizedBox(height: 12),
+          _buildDropdownField(
+            'Amharic',
+            amharicLevel,
+            (value) => setState(() => amharicLevel = value),
+          ),
+          const SizedBox(height: 12),
+          _buildDropdownField(
+            'Arabic',
+            arabicLevel,
+            (value) => setState(() => arabicLevel = value),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Add Language Buttons
+          Row(
             children: [
-              const Text(
-                'Choose File',
-                style: TextStyle(fontSize: 14, color: Color(0xFF8E8E93)),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: primaryColor),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    alignment: Alignment.center,
+                  ),
+                  child: const Text(
+                    "Show another Language",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(142, 198, 214, 1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text(
-                  'Browse',
-                  style: TextStyle(fontSize: 12, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    alignment: Alignment.center,
+                  ),
+                  child: const Text(
+                    "Add another Language",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ],
           ),
-        ),
-      ],
+
+          const SizedBox(height: 20),
+
+          // Submit Button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                print("English: $englishLevel");
+                print("Amharic: $amharicLevel");
+                print("Arabic: $arabicLevel");
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                "Submit",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUploadBox({required IconData icon, required String title}) {
+    const Color borderColor = Color(0xFFD1D1D6);
+    const Color primaryColor = Color(0xFF8EC6D6);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: primaryColor, size: 32),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(
+                fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: 140,
+            child: ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              child: const Text(
+                "Choose File",
+                style: TextStyle(color: Colors.white, fontSize: 14),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildDropdownField(
-    String language,
-    List<String> options,
+    String label,
     String? selectedValue,
     ValueChanged<String?> onChanged,
   ) {
     const Color borderColor = Color(0xFFD1D1D6);
-    const Color mutedText = Color(0xFF8E8E93);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          language,
+          label,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF111111),
+            color: Colors.black,
           ),
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
           value: selectedValue,
           decoration: InputDecoration(
-            hintText: 'Select Level',
-            hintStyle: const TextStyle(color: mutedText),
+            hintText: "Select Level",
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 14,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: borderColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -221,8 +240,11 @@ class _PhotoAndLanguageFormState extends State<PhotoAndLanguageForm> {
               borderSide: const BorderSide(color: borderColor),
             ),
           ),
-          items: options
-              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+          items: languageLevels
+              .map((level) => DropdownMenuItem(
+                    value: level,
+                    child: Text(level),
+                  ))
               .toList(),
           onChanged: onChanged,
         ),

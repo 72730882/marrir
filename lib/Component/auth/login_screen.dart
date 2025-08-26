@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:marrir/Page/Employee/employee_page.dart';
 import 'register_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// import '../../Page/Agent/agent_page.dart';
+// import '../../Page/Recruitment/recruitment_page.dart';
+import '../../Page/Employer/employer_page.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -129,6 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               builder: (context) => const EmployeePage(),
                             ),
                           );
+                          // TODO: here you can add validation before navigation
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF65b2c9),

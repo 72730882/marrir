@@ -11,6 +11,7 @@ class OurImpact extends StatelessWidget {
           // FULL-WIDTH BACKGROUND (Who we are)
           Container(
             width: double.infinity,
+            height: 330,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -44,8 +45,8 @@ class OurImpact extends StatelessWidget {
                       children: [
                         TextSpan(
                           text:
-                              'marir is an all-encompassing electronic platform\n\n'
-                              'dedicated to assessing human capabilities and energies.\n\n'
+                              'marir is an all-encompassing electronic platform\n'
+                              'dedicated to assessing human capabilities and energies.\n'
                               'It functions as an effective link between qualified\n'
                               'professionals and employers, agents, staffing offices,\n'
                               'and recruitment firms.',
@@ -63,13 +64,13 @@ class OurImpact extends StatelessWidget {
                         vertical: 12,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(7),
+                        borderRadius: BorderRadius.circular(13),
                       ),
                     ),
                     child: const Text(
                       'Get Started',
                       style: TextStyle(
-                        color: Color.fromARGB(255, 145, 218, 240),
+                        color: Color(0xFF65b2c9),
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -99,7 +100,7 @@ class OurImpact extends StatelessWidget {
                   const SizedBox(height: 1),
                   const Text(
                     'Connecting talent with opportunities worldwide',
-                    style: TextStyle(fontSize: 16, color: Color(0xFF666666)),
+                    style: TextStyle(fontSize: 15, color: Color(0xFF666666)),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
@@ -131,8 +132,8 @@ class OurImpact extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color.fromARGB(255, 206, 231, 239),
-            Color.fromARGB(255, 203, 228, 237),
+            Color.fromARGB(255, 218, 244, 253),
+            Color.fromARGB(255, 236, 237, 237),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -164,7 +165,7 @@ class OurImpact extends StatelessWidget {
             label,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 12,
               color: Color.fromARGB(255, 102, 102, 102),
               height: 1.4,
             ),

@@ -25,18 +25,23 @@ class EmployeeHeader extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
-                    onTap: onMenuTap, // call the drawer toggle
-                    child: const SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: UnevenHamburgerIcon(
-                        color: _ink,
-                        lineThickness: 2,
-                        gap: 5,
-                        topLength: 14,
-                        middleLength: 22,
-                        bottomLength: 16,
+                  // Reliable tappable menu icon
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: onMenuTap,
+                      borderRadius: BorderRadius.circular(25),
+                      child: Padding(
+                        padding:
+                            const EdgeInsets.all(8.0), // extra tappable area
+                        child: const UnevenHamburgerIcon(
+                          color: _ink,
+                          lineThickness: 2,
+                          gap: 5,
+                          topLength: 14,
+                          middleLength: 22,
+                          bottomLength: 16,
+                        ),
                       ),
                     ),
                   ),
@@ -92,10 +97,8 @@ class EmployeeHeader extends StatelessWidget {
                     style: TextStyle(fontSize: 15, color: _ink),
                     decoration: InputDecoration(
                       isCollapsed: true,
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 12,
-                      ),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       prefixIcon: Icon(Icons.search, color: _hint, size: 20),
                       hintText: 'Search',
                       hintStyle: TextStyle(
@@ -124,7 +127,8 @@ class EmployeeHeader extends StatelessWidget {
   }
 }
 
-// ---------- Existing custom widgets remain unchanged ----------
+// ------------------- Existing custom widgets -------------------
+
 class UnevenHamburgerIcon extends StatelessWidget {
   final Color color;
   final double lineThickness;
@@ -180,16 +184,12 @@ class UnevenHamburgerIcon extends StatelessWidget {
   }
 }
 
-// ChatWithTranslateBadge & TwoLineFilterIcon remain the same as your original code
 class ChatWithTranslateBadge extends StatelessWidget {
   final double iconSize;
   final Color color;
 
-  const ChatWithTranslateBadge({
-    super.key,
-    required this.iconSize,
-    required this.color,
-  });
+  const ChatWithTranslateBadge(
+      {super.key, required this.iconSize, required this.color});
 
   @override
   Widget build(BuildContext context) {

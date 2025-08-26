@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
             Clienttalk(),
             SizedBox(height: 15),
             PaymentMethods(),
-            SizedBox(height: 5),
+            // SizedBox(height: 5),
             Footer()
           ],
         ),

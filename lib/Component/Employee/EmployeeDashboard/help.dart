@@ -12,23 +12,23 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   final List<Map<String, String>> _faqs = [
     {
       "q": "How do I add a new employee?",
-      "a": "Go to Dashboard > Add Employee.",
+      "a": "Go to Dashboard > Add Employee."
     },
     {
       "q": "How can I promote an employee profile?",
-      "a": "Navigate to Employee Profile > Promotion.",
+      "a": "Navigate to Employee Profile > Promotion."
     },
     {
       "q": "What is the difference between reserve and transfer?",
-      "a": "Reserve keeps the slot, transfer reassigns it.",
+      "a": "Reserve keeps the slot, transfer reassigns it."
     },
     {
       "q": "How do I track payments?",
-      "a": "Go to Payment section for full history.",
+      "a": "Go to Payment section for full history."
     },
     {
       "q": "Can I export employee data?",
-      "a": "Yes, from Settings > Export Data.",
+      "a": "Yes, from Settings > Export Data."
     },
   ];
 
@@ -63,10 +63,9 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             const Text(
               "Help Center",
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
-              ),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black),
             ),
             const SizedBox(height: 4),
             const Text(
@@ -75,30 +74,27 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Top Support Options
-            Row(
-              children: [
-                _supportOption(
-                  Icons.help_outline,
-                  "FAQ",
-                  "Find answers to common questions",
-                  Colors.purple,
-                ),
-                const SizedBox(width: 12),
-                _supportOption(
-                  Icons.email_outlined,
-                  "Email",
-                  "Email Support",
-                  Colors.pink,
-                ),
-                const SizedBox(width: 12),
-                _supportOption(
-                  Icons.phone_outlined,
-                  "Phone",
-                  "Phone Support",
-                  Colors.deepPurple,
-                ),
-              ],
+            // Top Support Options (equal height)
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: _supportOption(Icons.help_outline, "FAQ",
+                        "Find answers to common questions", Colors.purple),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _supportOption(Icons.email_outlined, "Email",
+                        "Email Support", Colors.pink),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _supportOption(Icons.phone_outlined, "Phone",
+                        "Phone Support", Colors.deepPurple),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
 
@@ -131,10 +127,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             const SizedBox(height: 10),
             ...List.generate(_faqs.length, (index) {
               return _buildFAQItem(
-                index,
-                _faqs[index]["q"]!,
-                _faqs[index]["a"]!,
-              );
+                  index, _faqs[index]["q"]!, _faqs[index]["a"]!);
             }),
             const SizedBox(height: 20),
 
@@ -146,19 +139,17 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black12.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
+                      color: Colors.black12.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4))
                 ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Still Need Help?",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-                  ),
+                  const Text("Still Need Help?",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                   const SizedBox(height: 6),
                   const Text(
                     "Can’t find what you’re looking for? Our support team is here to help.",
@@ -171,12 +162,9 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                       backgroundColor: const Color.fromRGBO(142, 198, 214, 1),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 16,
-                      ),
+                          vertical: 12, horizontal: 16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                     child: const Text("Contact Support"),
                   ),
@@ -185,36 +173,30 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Bottom Info Cards
-            Row(
-              children: [
-                Expanded(
-                  child: _infoCard(
-                    Icons.menu_book_outlined,
-                    "Documentation",
-                    "Detailed guides and API documentation",
-                    Colors.purple,
+            // Bottom Info Cards (equal height)
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: _infoCard(Icons.menu_book_outlined, "Documentation",
+                        "Detailed guides and API documentation", Colors.purple),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _infoCard(
-                    Icons.play_circle_outline,
-                    "Tutorials",
-                    "Step-by-step video tutorials and guides",
-                    Colors.pink,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _infoCard(Icons.play_circle_outline, "Tutorials",
+                        "Step-by-step video tutorials and guides", Colors.pink),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _infoCard(
-                    Icons.people_outline,
-                    "Community",
-                    "Join our community forums for discussions and support",
-                    Colors.deepPurple,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _infoCard(
+                        Icons.people_outline,
+                        "Community",
+                        "Join our community forums for discussions and support",
+                        Colors.deepPurple),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -224,35 +206,32 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
 
   // --- Support Option Card ---
   Widget _supportOption(
-    IconData icon,
-    String title,
-    String subtitle,
-    Color color,
-  ) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, size: 28, color: color),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, color: Colors.black54),
-            ),
-          ],
-        ),
+      IconData icon, String title, String subtitle, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(icon, size: 28, color: color),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 12, color: Colors.black54),
+          ),
+        ],
       ),
     );
   }
@@ -262,28 +241,21 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade300)),
       child: ExpansionTile(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Text(
-          question,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-        ),
+        title: Text(question,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
         iconColor: Colors.black,
         collapsedIconColor: Colors.black,
-        onExpansionChanged: (expanded) {
-          setState(() {});
-        },
+        onExpansionChanged: (expanded) => setState(() {}),
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
-            child: Text(
-              answer,
-              style: const TextStyle(fontSize: 13, color: Colors.black54),
-            ),
+            child: Text(answer,
+                style: const TextStyle(fontSize: 13, color: Colors.black54)),
           ),
         ],
       ),
@@ -300,12 +272,14 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: 26, color: color),
           const SizedBox(height: 8),
           Text(
             title,
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 4),
           Text(

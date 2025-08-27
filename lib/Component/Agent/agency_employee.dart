@@ -14,9 +14,9 @@ class AgencyEmployeePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ===== Employee Summary Card =====
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
+                children: [
                   Text(
                     "Employee",
                     style: TextStyle(
@@ -48,12 +48,11 @@ class AgencyEmployeePage extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         "Total Employees",
                         style: TextStyle(fontSize: 14, color: Colors.black),
@@ -68,9 +67,9 @@ class AgencyEmployeePage extends StatelessWidget {
                       Text(
                         "+0%",
                         style: TextStyle(
-                            fontSize: 19,
-                            color: Colors.green,
-                            ),
+                          fontSize: 19,
+                          color: Colors.green,
+                        ),
                       ),
                     ],
                   ),
@@ -109,7 +108,7 @@ class AgencyEmployeePage extends StatelessWidget {
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: "Search transfers...",
-                        hintStyle: TextStyle(color: Colors.grey.shade500), 
+                        hintStyle: TextStyle(color: Colors.grey.shade500),
                         prefixIcon: const Icon(Icons.search),
                         filled: true,
                         fillColor: Colors.white,
@@ -174,8 +173,8 @@ class AgencyEmployeePage extends StatelessWidget {
                   color: const Color(0xFF65B2C9), // header background color
                   borderRadius: BorderRadius.circular(10), // rounded corners
                 ),
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Expanded(
                       child: Text(
                         "Name",
@@ -223,8 +222,8 @@ class AgencyEmployeePage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           vertical: 12, horizontal: 8),
                       color: Colors.white,
-                      child: Row(
-                        children: const [
+                      child: const Row(
+                        children: [
                           Expanded(child: Text("Hanan")),
                           Expanded(child: Text("123456789")),
                           Expanded(child: Text("Email@abc.com")),
@@ -247,7 +246,7 @@ class AgencyEmployeePage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         border: Border.all(
-          color: Color.fromARGB(255, 207, 207, 207),
+          color: const Color.fromARGB(255, 207, 207, 207),
         ), // border color
         borderRadius: BorderRadius.circular(8),
         color: Colors.white,

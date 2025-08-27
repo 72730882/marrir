@@ -130,9 +130,9 @@ class TransferProfilePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               // Left side info
-                              Column(
+                              const Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
+                                children: [
                                   Text(
                                     "John Smith",
                                     style: TextStyle(
@@ -186,9 +186,9 @@ class TransferProfilePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               // Left side info
-                              Column(
+                              const Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
+                                children: [
                                   Text(
                                     "Sarah Johnson",
                                     style: TextStyle(
@@ -242,9 +242,9 @@ class TransferProfilePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               // Left side info
-                              Column(
+                              const Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
+                                children: [
                                   Text(
                                     "Mike Davis",
                                     style: TextStyle(
@@ -370,8 +370,7 @@ class TransferProfilePage extends StatelessWidget {
                         hintStyle: TextStyle(
                             color: Colors.grey.shade600,
                             fontSize: 14), // Grey hint and smaller
-                        
-                        
+
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6),
                         ),
@@ -386,55 +385,58 @@ class TransferProfilePage extends StatelessWidget {
           ),
           const SizedBox(height: 10),
 
-     // Search + Filter Row
-Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 0),
-  child: Row(
-    children: [
-      Expanded(
-        child: Container(
-          height: 40, // minimized height
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 240, 239, 239), // gray background
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey, width: 1),
-          ),
-          child: Row(
-            children: [
-              const SizedBox(width: 8),
-              const SizedBox(width: 4),
-              Expanded(
-                child: TextField(
-                  decoration: const InputDecoration(
-                    hintText: "Filter by",
-                    hintStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
+          // Search + Filter Row
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 40, // minimized height
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(
+                          255, 240, 239, 239), // gray background
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey, width: 1),
                     ),
-                    border: InputBorder.none, // remove inner borders
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(vertical: 10),
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 8),
+                        const SizedBox(width: 4),
+                        const Expanded(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: "Filter by",
+                              hintStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                              ),
+                              border: InputBorder.none, // remove inner borders
+                              isDense: true,
+                              contentPadding:
+                                  EdgeInsets.symmetric(vertical: 10),
+                            ),
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(right: 4),
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: Colors.grey, width: 1),
+                          ),
+                          child: const Icon(Icons.filter_list,
+                              size: 18, color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
-                  style: const TextStyle(fontSize: 12),
                 ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(right: 4),
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.grey, width: 1),
-                ),
-                child: const Icon(Icons.filter_list, size: 18, color: Colors.grey),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ),
-    ],
-  ),
-),
 
           const SizedBox(height: 8),
 

@@ -43,7 +43,7 @@ class PaymentsScreen extends StatelessWidget {
                 scrollDirection:
                     Axis.horizontal, // allow horizontal scroll for many columns
                 child: DataTable(
-                  headingRowColor: MaterialStateProperty.all(
+                  headingRowColor: WidgetStateProperty.all(
                     const Color.fromRGBO(142, 198, 214, 1),
                   ),
                   headingTextStyle: const TextStyle(

@@ -42,12 +42,12 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                   ),
                 ],
               ),
-              child: Row(
+              child: const Row(
                 children: [
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'Company Information',
                         style: TextStyle(
@@ -62,7 +62,6 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                         style: TextStyle(
                           fontSize: 15,
                           color: Colors.black54,
-                          
                         ),
                       ),
                     ],
@@ -102,7 +101,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                         onChanged: (value) => setState(() => year = value),
                         decoration: InputDecoration(
                           hintText: '2023',
-                          hintStyle: TextStyle(color: Colors.grey.shade500), 
+                          hintStyle: TextStyle(color: Colors.grey.shade500),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide: const BorderSide(
@@ -143,7 +142,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                         controller: tinController,
                         decoration: InputDecoration(
                           hintText: '123456789',
-                          hintStyle: TextStyle(color: Colors.grey.shade500), 
+                          hintStyle: TextStyle(color: Colors.grey.shade500),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide: const BorderSide(
@@ -261,13 +260,14 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+        Text(label,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
         const SizedBox(height: 7),
         TextField(
           controller: controller,
           decoration: InputDecoration(
             hintText: hint,
-             hintStyle: TextStyle(color: Colors.grey.shade500), // <-- light gray
+            hintStyle: TextStyle(color: Colors.grey.shade500), // <-- light gray
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(
@@ -316,7 +316,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.cloud_upload_outlined, color: Colors.grey),
+                const Icon(Icons.cloud_upload_outlined, color: Colors.grey),
                 const SizedBox(height: 10),
                 Text(hint),
                 const SizedBox(height: 10),
@@ -341,104 +341,103 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
     );
   }
 
-Widget _buildAgreementTable() {
-  return Container(
-    margin: const EdgeInsets.only(top: 12),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.15),
-          blurRadius: 8,
-          offset: const Offset(0, 4),
-        ),
-      ],
-    ),
-    child: Column(
-      children: [
-        // ==== TABLE HEADER ====
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: const BoxDecoration(
-            color: Color(0xFF65b2c9),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+  Widget _buildAgreementTable() {
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
-          child: Row(
-            children: const [
-              Expanded(
-                child: Center(
-                  child: Text(
-                    'Reserve Name',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Center(
-                  child: Text(
-                    'Status',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        // ==== TABLE ROWS ====
-        Column(
-          children: List.generate(5, (index) {
-            bool isActive = index % 2 == 0;
-            return Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
-              
-              child: Row(
-                children: [
-                  Expanded(
+        ],
+      ),
+      child: Column(
+        children: [
+          // ==== TABLE HEADER ====
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: const BoxDecoration(
+              color: Color(0xFF65b2c9),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+            ),
+            child: const Row(
+              children: [
+                Expanded(
+                  child: Center(
                     child: Text(
-                      'Hanan N',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
+                      'Reserve Name',
+                      style: TextStyle(
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
+                        fontSize: 14,
                       ),
                     ),
                   ),
-                  Container(
+                ),
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      'Status',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // ==== TABLE ROWS ====
+          Column(
+            children: List.generate(5, (index) {
+              bool isActive = index % 2 == 0;
+              return Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Hanan N',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: isActive
                             ? Colors.green.withOpacity(0.2)
-                            : const Color.fromARGB(255, 245, 221, 12).withOpacity(0.2),
+                            : const Color.fromARGB(255, 245, 221, 12)
+                                .withOpacity(0.2),
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Text(
                         isActive ? 'Active' : 'Pending',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: isActive ? Colors.green[800] : Colors.orange[800],
-                          
+                          color:
+                              isActive ? Colors.green[800] : Colors.orange[800],
                         ),
                       ),
                     ),
-                  
-                ],
-              ),
-            );
-          }),
-        ),
-      ],
-    ),
-  );
-}
+                  ],
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -24,51 +24,50 @@ class EmployerPage extends StatefulWidget {
 class _AgentPageState extends State<EmployerPage> {
   int _selectedIndex = 0;
 
-final List<Widget> _pages = const [
-  DashboardPage(),
-  CompanyInfoPage(),
-  EmployeePage(),
-  EmployeeRatingPage(), // Rating
-  PromotionPage(),      // Promote
-  TransferHistoryPage(),
-  TransferProfilePage(),
-  ReserveHistoryPage(),
-  JobsPage(),
-  PaymentPage(),
-  ReserveProfilePage(),
-  HelpPage(),
-];
+  final List<Widget> _pages = const [
+    DashboardPage(),
+    CompanyInfoPage(),
+    EmployeePage(),
+    EmployeeRatingPage(), // Rating
+    PromotionPage(), // Promote
+    TransferHistoryPage(),
+    TransferProfilePage(),
+    ReserveHistoryPage(),
+    JobsPage(),
+    PaymentPage(),
+    ReserveProfilePage(),
+    HelpPage(),
+  ];
 
-final List<String> _menuTitles = [
-  "Dashboard",
-  "Company Info",
-  "Employees",
-  "Rating",
-  "Promote",
-  "Transfer History",
-  "Transfer Profile",
-  "Reserve History",
-  "Jobs",
-  "Payment",
-  "Reserve Profile",
-  "Help",
-];
+  final List<String> _menuTitles = [
+    "Dashboard",
+    "Company Info",
+    "Employees",
+    "Rating",
+    "Promote",
+    "Transfer History",
+    "Transfer Profile",
+    "Reserve History",
+    "Jobs",
+    "Payment",
+    "Reserve Profile",
+    "Help",
+  ];
 
-final List<IconData> _menuIcons = [
-  Icons.dashboard,
-  Icons.business,
-  Icons.people,
-  Icons.star_rate,
-  Icons.trending_up,       // Promote
-  Icons.swap_horiz,
-  Icons.history,           // Transfer History
-  Icons.import_contacts,   // Reserve History
-  Icons.work,              // Jobs
-  Icons.payment,
-  Icons.bookmark,          // Reserve Profile
-  Icons.help_outline,
-];
-
+  final List<IconData> _menuIcons = [
+    Icons.dashboard,
+    Icons.business,
+    Icons.people,
+    Icons.star_rate,
+    Icons.trending_up, // Promote
+    Icons.swap_horiz,
+    Icons.history, // Transfer History
+    Icons.import_contacts, // Reserve History
+    Icons.work, // Jobs
+    Icons.payment,
+    Icons.bookmark, // Reserve Profile
+    Icons.help_outline,
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +142,7 @@ final List<IconData> _menuIcons = [
                       leading: Icon(
                         _menuIcons[index],
                         color: _selectedIndex == index
-                            ? Colors.blue
+                            ? const Color(0xFF65b2c9)
                             : Colors.black54,
                       ),
                       title: Text(
@@ -154,7 +153,7 @@ final List<IconData> _menuIcons = [
                               ? FontWeight.bold
                               : FontWeight.normal,
                           color: _selectedIndex == index
-                              ? Colors.blue
+                              ? const Color(0xFF65b2c9)
                               : Colors.black87,
                         ),
                       ),

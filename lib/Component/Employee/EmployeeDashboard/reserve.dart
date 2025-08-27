@@ -43,7 +43,7 @@ class ReservesScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             // Card for total employees
-            Container(
+            SizedBox(
               width: double.infinity,
               child: Card(
                 color: const Color.fromARGB(255, 255, 255, 255),

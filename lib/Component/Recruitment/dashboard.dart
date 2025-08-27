@@ -26,9 +26,9 @@ class DashboardPage extends StatelessWidget {
                 ),
               ],
             ),
-            child: Row(
+            child: const Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 24,
                   backgroundColor: Color(0xFFDDDDDD),
                   child: Text(
@@ -40,10 +40,10 @@ class DashboardPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       "Hi, Recruitment Firm Name",
                       style: TextStyle(
@@ -68,9 +68,9 @@ class DashboardPage extends StatelessWidget {
           const SizedBox(height: 20),
 
           // ==== DASHBOARD OVERVIEW HEADER ====
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               Text(
                 "Dashboard Overview",
                 style: TextStyle(
@@ -227,7 +227,6 @@ class DashboardPage extends StatelessWidget {
             section,
             style: const TextStyle(
               fontSize: 16,
-              
               color: Colors.black87,
             ),
           ),

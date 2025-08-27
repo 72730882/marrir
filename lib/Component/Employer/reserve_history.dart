@@ -8,15 +8,16 @@ class ReserveHistoryPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView( // make page scrollable
+        child: SingleChildScrollView(
+          // make page scrollable
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ===== Employee Summary Card =====
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
+                children: [
                   Text(
                     "Transfers",
                     style: TextStyle(
@@ -82,18 +83,18 @@ class ReserveHistoryPage extends StatelessWidget {
                 child: Column(
                   children: [
                     Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF65b2c9),
-                        borderRadius: const BorderRadius.only(
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF65b2c9),
+                        borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(10),
                           topRight: Radius.circular(10),
                         ),
                       ),
                       padding: const EdgeInsets.symmetric(
                           vertical: 15, horizontal: 16),
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
+                        children: [
                           Text(
                             "From",
                             style: TextStyle(
@@ -144,18 +145,18 @@ class ReserveHistoryPage extends StatelessWidget {
                 child: Column(
                   children: [
                     Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF65b2c9),
-                        borderRadius: const BorderRadius.only(
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF65b2c9),
+                        borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(10),
                           topRight: Radius.circular(10),
                         ),
                       ),
                       padding: const EdgeInsets.symmetric(
                           vertical: 15, horizontal: 16),
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
+                        children: [
                           Expanded(
                             child: Text(
                               "Batch No.",
@@ -289,8 +290,8 @@ class ReserveHistoryPage extends StatelessWidget {
               ),
             ],
           ),
-          child: Row(
-            children: const [
+          child: const Row(
+            children: [
               Text("5"),
               Icon(Icons.arrow_drop_down),
             ],

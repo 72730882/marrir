@@ -34,7 +34,7 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
   static const _bgWhite = Color(0xFFFFFFFF);
   static const _ink = Color(0xFF111111);
   static const _muted = Color(0xFF8E8E93);
-  static const _primary = const Color(0xFF65b2c9);
+  static const _primary = Color(0xFF65b2c9);
 
   @override
   void initState() {

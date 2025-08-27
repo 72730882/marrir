@@ -218,7 +218,7 @@ class ReservePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                 // Divider line
+                  // Divider line
                   Container(
                     height: 1,
                     color: Colors.grey.shade300,
@@ -241,9 +241,9 @@ class ReservePage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             // Left side info
-                            Column(
+                            const Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
+                              children: [
                                 Text(
                                   "Hanna",
                                   style: TextStyle(
@@ -296,9 +296,9 @@ class ReservePage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             // Left side info
-                            Column(
+                            const Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
+                              children: [
                                 Text(
                                   "Hanan",
                                   style: TextStyle(
@@ -351,9 +351,9 @@ class ReservePage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             // Left side info
-                            Column(
+                            const Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
+                              children: [
                                 Text(
                                   "John Doe",
                                   style: TextStyle(

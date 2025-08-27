@@ -42,16 +42,17 @@ class EmployeeRatingPage extends StatelessWidget {
                   children: [
                     // ===== Table Header =====
                     Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF65B2C9), // header color
-                        borderRadius: const BorderRadius.only(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 16),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF65B2C9), // header color
+                        borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(12),
                           topRight: Radius.circular(12),
                         ),
                       ),
-                      child: Row(
-                        children: const [
+                      child: const Row(
+                        children: [
                           Expanded(
                             child: Text(
                               "Reserve Name",
@@ -69,7 +70,8 @@ class EmployeeRatingPage extends StatelessWidget {
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),
-                              textAlign: TextAlign.right, // align rating to right
+                              textAlign:
+                                  TextAlign.right, // align rating to right
                             ),
                           ),
                         ],
@@ -87,11 +89,12 @@ class EmployeeRatingPage extends StatelessWidget {
                         color: Colors.grey,
                       ),
                       itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20), // vertical gap
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 28, horizontal: 20), // vertical gap
                           child: Row(
                             children: [
-                              const Expanded(
+                              Expanded(
                                 child: Text(
                                   "Hanan N",
                                   style: TextStyle(
@@ -99,11 +102,14 @@ class EmployeeRatingPage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 5), // horizontal gap between name and rating
+                              SizedBox(
+                                  width:
+                                      5), // horizontal gap between name and rating
                               Expanded(
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end, // align rating to right
-                                  children: const [
+                                  mainAxisAlignment: MainAxisAlignment
+                                      .end, // align rating to right
+                                  children: [
                                     Text(
                                       "4.4",
                                       style: TextStyle(

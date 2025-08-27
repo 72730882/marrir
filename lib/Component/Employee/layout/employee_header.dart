@@ -31,10 +31,9 @@ class EmployeeHeader extends StatelessWidget {
                     child: InkWell(
                       onTap: onMenuTap,
                       borderRadius: BorderRadius.circular(25),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(8.0), // extra tappable area
-                        child: const UnevenHamburgerIcon(
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0), // extra tappable area
+                        child: UnevenHamburgerIcon(
                           color: _ink,
                           lineThickness: 2,
                           gap: 5,

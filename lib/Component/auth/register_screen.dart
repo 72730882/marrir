@@ -249,7 +249,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 15),
 
-                    // ===== ACCOUNT TYPE =====
+                    // ===== ACCOUNT TYPE (BOX SELECTION) =====
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -260,35 +260,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 5),
-                        DropdownButtonFormField<String>(
-                          value: selectedAccountType,
-                          decoration: InputDecoration(
-                            hintText: "Select account type",
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 12),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide:
-                                  const BorderSide(color: Color(0xFF48C2E9)),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide:
-                                  const BorderSide(color: Color(0xFF48C2E9)),
-                            ),
-                          ),
-                          items: accountTypeOptions
-                              .map((type) => DropdownMenuItem(
-                                    value: type,
-                                    child: Text(type),
-                                  ))
-                              .toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              selectedAccountType = value;
-                            });
-                          },
+                        const SizedBox(height: 10),
+                        Column(
+                          children: accountTypeOptions.map((type) {
+                            bool isSelected = selectedAccountType == type;
+                            return Row(
+                              children: [
+                                Checkbox(
+                                  value: isSelected,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      // Only allow one selection
+                                      selectedAccountType = type;
+                                    });
+                                  },
+                                  activeColor: const Color(0xFF7B4BBA),
+                                ),
+                                Text(
+                                  type,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }).toList(),
                         ),
                       ],
                     ),

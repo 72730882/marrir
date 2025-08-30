@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../app.dart';
 
-
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -25,7 +24,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       'button': 'Get Started',
     },
     {
-      'image': 'assets/images/onboarding_images/ob1.jpg',
+      'image': 'assets/images/onboarding_images/onbording2.webp',
       'title': 'Job Posting',
       'desc':
           'Efficient and swift selection of candidates based on employers\' specified job descriptions.',
@@ -47,11 +46,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-       // Navigate to home (replace onboarding so user can't go back)
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const MyApp()),
-    );
+      // Navigate to home (replace onboarding so user can't go back)
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MyApp()),
+      );
     }
   }
 

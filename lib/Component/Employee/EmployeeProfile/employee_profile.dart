@@ -4,6 +4,7 @@ import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeHelp/help.dart
 import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSecurity/security.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSetting/setting.dart';
 import 'package:marrir/Component/Employee/wave_background.dart';
+import 'package:marrir/Component/onboarding/SplashScreen/splash_screen.dart';
 
 class ProfilePage extends StatelessWidget {
   final Function(Widget) onChildSelected;
@@ -159,7 +160,13 @@ class ProfilePage extends StatelessWidget {
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    // Add your logout logic here
+                    // Navigate back to login screen
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SplashScreen(),
+                      ),
+                    );
                   },
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFF65B2C9),

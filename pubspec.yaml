@@ -68,11 +68,6 @@ flutter:
     - assets/images/onboarding_images/
     - assets/images/OIP.jpeg
     - assets/images/OIP (1).jpeg
-    - assets/images/onboarding_images/shutterstock_2422865751.jpg
-    - assets/images/onboarding_images/CLEANER.jpg
-    - assets/images/onboarding_images/2 CLEANERS.jpg
-    - assets/images/onboarding_images/onbording2.webp
-    - assets/images/onboarding_images/onbording1.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

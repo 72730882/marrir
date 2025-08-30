@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:marrir/Page/Agent/agent_page.dart';
 import 'package:marrir/Page/Employee/employee_page.dart';
+import 'package:marrir/Page/Employer/employer_page.dart';
+import 'package:marrir/Page/Recruitment/recruitment_page.dart';
 import 'register_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-// import '../../Page/Agent/agent_page.dart';
-// import '../../Page/Recruitment/recruitment_page.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -117,21 +118,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 20),
 
-                    // Sign In button
-                    // Sign In button
+                    // ===== SIGN IN BUTTON =====
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Navigate to EmployeePage
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const EmployeePage(),
-                            ),
-                          );
-                          // TODO: here you can add validation before navigation
+                          _showAccountTypeDialog(context);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF65b2c9),
@@ -233,7 +226,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // ==== Helper Widget ====
+  // ==== HELPER METHODS ====
   Widget _buildTextField(String hint,
       {IconData? prefixIcon, bool obscure = false}) {
     return TextField(
@@ -258,6 +251,44 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
+  // ===== ACCOUNT TYPE DIALOG =====
+  void _showAccountTypeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            "Select Account Type",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _accountTypeOption(context, "Employee", const EmployeePage()),
+              _accountTypeOption(context, "Agent", const AgentPage()),
+              _accountTypeOption(context, "Employer", const EmployerPage()),
+              _accountTypeOption(
+                  context, "Recruitment", const RecruitmentPage()),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _accountTypeOption(BuildContext context, String title, Widget page) {
+    return ListTile(
+      title: Text(title),
+      onTap: () {
+        Navigator.pop(context); // Close dialog
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => page),
+        );
+      },
+    );
+  }
 }
 
 // ===== Custom Clipper for Header Curve =====
@@ -266,23 +297,18 @@ class HeaderClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     Path path = Path();
     path.lineTo(0, size.height - 60);
-
-    // First curve
     path.quadraticBezierTo(
       size.width * 0.25,
       size.height,
       size.width * 0.5,
       size.height - 50,
     );
-
-    // Second curve
     path.quadraticBezierTo(
       size.width * 0.75,
       size.height - 100,
       size.width,
       size.height - 40,
     );
-
     path.lineTo(size.width, 0);
     path.close();
     return path;

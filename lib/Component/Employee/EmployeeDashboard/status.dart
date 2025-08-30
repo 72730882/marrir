@@ -228,11 +228,9 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
                     );
-                    if (picked != null) {
-                      setState(() {
-                        _fromDate = picked;
-                      });
-                    }
+                    setState(() {
+                      _fromDate = picked;
+                    });
                   }),
                 ),
                 const SizedBox(width: 12),
@@ -244,11 +242,9 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
                     );
-                    if (picked != null) {
-                      setState(() {
-                        _toDate = picked;
-                      });
-                    }
+                    setState(() {
+                      _toDate = picked;
+                    });
                   }),
                 ),
               ],

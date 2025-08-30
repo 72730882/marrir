@@ -37,7 +37,7 @@ class ServicesScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "Choose the perfect plan for your needs",
+                  "We don’t just connect people to jobs. We connect the right people to the right jobs, with speed, transparency, and confidence. Marrir is your trusted recruitment companion in the GCC and beyond",
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white,

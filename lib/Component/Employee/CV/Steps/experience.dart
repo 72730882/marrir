@@ -41,10 +41,8 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
       lastDate: DateTime(2100),
     );
 
-    if (pickedDate != null) {
-      controller.text =
-          "${pickedDate.month}/${pickedDate.day}/${pickedDate.year}";
-    }
+    controller.text =
+        "${pickedDate?.month}/${pickedDate?.day}/${pickedDate?.year}";
   }
 
   @override

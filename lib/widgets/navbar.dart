@@ -62,25 +62,25 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
               onSelected: (value) {
                 // handle language change here
                 if (value == "am") {
-                  print("Amharic selected");
-                } else if (value == "en") {
                   print("English selected");
-                } else if (value == "ar") {
+                } else if (value == "en") {
                   print("Arabic selected");
+                } else if (value == "ar") {
+                  print("Amharic selected");
                 }
               },
               itemBuilder: (BuildContext context) => [
                 const PopupMenuItem(
-                  value: "am",
-                  child: Text("አማርኛ"), // Amharic letters
-                ),
-                const PopupMenuItem(
                   value: "en",
-                  child: Text("English"),
+                  child: Text("English"), // Amharic letters
                 ),
                 const PopupMenuItem(
                   value: "ar",
                   child: Text("العربية"), // Arabic letters
+                ),
+                const PopupMenuItem(
+                  value: "am",
+                  child: Text("አማርኛ"),
                 ),
               ],
             ),

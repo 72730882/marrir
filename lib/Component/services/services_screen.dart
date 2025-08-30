@@ -121,9 +121,9 @@ class ServicesScreen extends StatelessWidget {
 
                     // Right side price
                     Text(
-                      "\$59", // example price
+                      "AED 59", // updated price
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF65b2c9),
                       ),
@@ -180,9 +180,9 @@ class ServicesScreen extends StatelessWidget {
 
                     // Right side price
                     Text(
-                      "\$19", // example price
+                      "AED 19", // updated price
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF65b2c9),
                       ),
@@ -239,9 +239,9 @@ class ServicesScreen extends StatelessWidget {
 
                     // Right side price
                     Text(
-                      "\$59", // example price
+                      "AED 59", // updated price
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF65b2c9),
                       ),
@@ -337,9 +337,9 @@ class ServicesScreen extends StatelessWidget {
 
                     // Right side price
                     Text(
-                      "\$99", // example price
+                      "AED 99", // updated price
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF65b2c9),
                       ),
@@ -380,9 +380,9 @@ class ServicesScreen extends StatelessWidget {
 
                     // Right side price
                     Text(
-                      "\$99", // example price
+                      "AED 99", // updated price
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF65b2c9),
                       ),
@@ -423,9 +423,9 @@ class ServicesScreen extends StatelessWidget {
 
                     // Right side price
                     Text(
-                      "\$99", // example price
+                      "AED 99", // updated price
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF65b2c9),
                       ),
@@ -493,9 +493,9 @@ class ServicesScreen extends StatelessWidget {
 
                     // Right side price
                     Text(
-                      "\$9", // example price
+                      "AED 9", // updated price
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF65b2c9),
                       ),
@@ -536,9 +536,9 @@ class ServicesScreen extends StatelessWidget {
 
                     // Right side price
                     Text(
-                      "\$9", // example price
+                      "AED 9", // updated price
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF65b2c9),
                       ),
@@ -579,9 +579,9 @@ class ServicesScreen extends StatelessWidget {
 
                     // Right side price
                     Text(
-                      "\$59", // example price
+                      "AED 59", // updated price
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF65b2c9),
                       ),
@@ -649,9 +649,9 @@ class ServicesScreen extends StatelessWidget {
 
                     // Right side price
                     Text(
-                      "\$29", // example price
+                      "AED 29", // updated price
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF65b2c9),
                       ),
@@ -692,9 +692,9 @@ class ServicesScreen extends StatelessWidget {
 
                     // Right side price
                     Text(
-                      "\$29", // example price
+                      "AED 29", // updated price
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF65b2c9),
                       ),
@@ -762,9 +762,9 @@ class ServicesScreen extends StatelessWidget {
 
                     // Right side price
                     Text(
-                      "\$49", // example price
+                      "AED 49", // updated price
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF65b2c9),
                       ),

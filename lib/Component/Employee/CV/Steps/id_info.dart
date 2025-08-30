@@ -80,10 +80,8 @@ class _StepIDState extends State<StepID> {
       firstDate: DateTime(1900),
       lastDate: DateTime(2100),
     );
-    if (pickedDate != null) {
-      controller.text =
-          "${pickedDate.month}/${pickedDate.day}/${pickedDate.year}";
-    }
+    controller.text =
+        "${pickedDate?.month}/${pickedDate?.day}/${pickedDate?.year}";
   }
 
   @override
@@ -178,27 +176,26 @@ class _StepIDState extends State<StepID> {
           _fieldLabel("Nationality"),
           DropdownButtonFormField<String>(
             value: nationality,
-            items:
-                const [
-                      "Select Nationality",
-                      "Ethiopian",
-                      "American",
-                      "British",
-                      "Other",
-                    ]
-                    .map(
-                      (c) => DropdownMenuItem(
-                        value: c,
-                        child: Text(
-                          c,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: _sectionLabel,
-                          ),
-                        ),
+            items: const [
+              "Select Nationality",
+              "Ethiopian",
+              "American",
+              "British",
+              "Other",
+            ]
+                .map(
+                  (c) => DropdownMenuItem(
+                    value: c,
+                    child: Text(
+                      c,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: _sectionLabel,
                       ),
-                    )
-                    .toList(),
+                    ),
+                  ),
+                )
+                .toList(),
             onChanged: (v) => setState(() => nationality = v),
             decoration: _decor(
               hint: "Select Nationality",

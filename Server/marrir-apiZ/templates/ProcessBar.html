@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      td,
+      th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 10px;
+      }
+
+      tr:nth-child(even) {
+        background-color: #dddddd;
+      }
+    </style>
+    <title>Process BarCodes</title>
+  </head>
+  <body class="mx-5 my-3">
+    <div class="w-full flex justify-center">
+      <img
+        src="{{ base_url }}/images/pathsin_logo.png"
+        class="rounded w-40 object-cover"
+        alt="Pathsin Logo"
+      />
+    </div>
+    <table
+      class="table-fixed border-1 border-gray-800 w-full items-center justify-center text-center"
+    >
+      <thead>
+        <tr>
+          <th>Number</th>
+          <th>Full Name</th>
+          <th>Passport Number</th>
+          <th>QR Code</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for process in processes %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ process.name }}</td>
+          <td>{{ process.passport_number }}</td>
+          <td>
+            <div>
+              {% if process.qr_code %}
+              <img
+                style="width: 40px; height: 40px"
+                src="data:image/png;base64,{{ process.qr_code }}"
+                alt="QR Code"
+              />
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

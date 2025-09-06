@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     {% if user.english_full_name %}
+    <!-- <h1 class="print:text-sm" style="color: #65b3cb;"><strong>Full Name:</strong> {{ user.english_full_name }}</h1>-->
+  
+      <title> {{ user.english_full_name }} - Professional CV</title> 
+    {% endif %}
+   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ffffff, #e6f7ff);
+            color: #333;
+            line-height: 1.4;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cv-container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        /* Top Section - Clean White Background */
+        .top-section {
+            display: grid;
+            grid-template-columns: 120px 1fr 120px;
+            gap: 15px;
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        /* Photo Section */
+        .photo-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .photo-container {
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .name-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        /* Updated Gradient for Names */
+        .name {
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #65b3cb, #8f3e8d);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .arabic-name {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            direction: rtl;
+            background: linear-gradient(45deg, #65b3cb, #8f3e8d);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .amharic-name {
+            font-size: 16px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #65b3cb, #8f3e8d);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Minimalist Position & Skills Frame with New Colors */
+        .position-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 15px;
+            border-radius: 8px;
+            background: linear-gradient(to bottom, rgba(101, 179, 203, 0.1), rgba(143, 62, 141, 0.1));
+            border: 1px solid #65b3cb;
+            max-height: 150px;
+            max-width: 500px;
+            margin-top: 0px;
+        }
+        
+        .position {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #8f3e8d;
+        }
+        
+        .skills {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+        }
+        
+        .skill-item {
+            background: #65b3cb;
+            padding: 5px 3px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 10px;
+            color: white;
+            font-weight: 500;
+        }
+        
+        /* QR Code Section */
+        .qr-info-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qr-container {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .representeds_container {
+            width: 200px;
+            height: 100px;
+            
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          
+          
+        }
+        
+        
+        .qr-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .pathsin-info {
+            margin-top: 8px;
+            text-align: center;
+            font-size: 12px;
+            color: #555;
+        }
+        
+        .rating {
+            display: flex;
+            justify-content: space-between;
+            margin: 3px 0;
+            font-size: 11px;
+        }
+        
+        .stars {
+            color: #FFD700;
+        }
+        
+        .represented {
+            font-size: 11px;
+            margin-top: 8px;
+            padding: 6px;
+            background: rgba(143, 62, 141, 0.1);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            color: #8f3e8d;
+        }
+
+        .representeds {
+            font-size: 11px;
+            margin-top: 8px;
+            padding: 6px;
+           
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+                        
+        }
+        
+        /* Content Section */
+        .content-section {
+            padding: 20px;
+        }
+        
+        .section {
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .description {
+            font-size: 12px;
+            line-height: 1.5;
+            color: #555;
+            padding: 10px 0;
+        }
+        
+        .section-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #8f3e8d;
+            margin-bottom: 10px;
+            padding-bottom: 4px;
+            border-bottom: 2px solid rgba(101, 179, 203, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lang-rating-column {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            background-color: #333;
+            align-items: flex-start; /* Align to the left */
+        }
+
+        
+        .section-title i {
+            font-size: 14px;
+            color: #8f3e8d;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .detail-group {
+            margin-bottom: 10px;
+        }
+        
+        .detail-group-title {
+            font-weight: bold;
+            color: #8f3e8d;
+            margin-bottom: 6px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .detail-item {
+            display: flex;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            min-width: 100px;
+            color: #555;
+        }
+        
+        .detail-value {
+            color: #333;
+        }
+        
+        .experience-grid, .education-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        .experience-item, .education-item {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #65b3cb;
+            font-size: 12px;
+        }
+        
+        .job-title, .institution {
+            font-weight: bold;
+            color: #8f3e8d;
+            margin-bottom: 4px;
+        }
+        
+        .company, .degree {
+            color: #555;
+            margin-bottom: 4px;
+        }
+        
+        .date {
+            color: #777;
+            font-size: 11px;
+        }
+        
+        .skills-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .skill-tag {
+            background: rgba(101, 179, 203, 0.1);
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 11px;
+            color: black;
+            font-weight: 500;
+            border: 1px solid rgba(101, 179, 203, 0.3);
+        }
+        
+        .footer {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        .contact-icon {
+            margin-right: 8px;
+            color: #8f3e8d;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .language-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding: 5px;
+            font-size: 11px;
+            color: #777;
+            background: #ffffff;
+        }
+        .logo {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .info-layouts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  align-items: flex-start;
+}
+
+.personal-infos,
+.language-proficiencys {
+  flex: 1 1 300px;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  min-width: 280px;
+}
+
+.section-titles {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: #8f3e8d;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-items {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 14px;
+  color: #444;
+}
+
+.contact-icons {
+  color:#8f3e8d;
+  font-size: 14px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.language-entrys {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.language-labels {
+  color:#8f3e8d;
+  font-size: 13px;
+  font-weight: 500;
+  width: 120px; /* Align stars */
+  flex-shrink: 0;
+}
+
+.starss {
+  display: flex;
+  gap: 4px;
+}
+
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .top-section {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .photo-container, .qr-container {
+                margin: 0 auto;
+            }
+            
+            .position-info {
+                margin-top: 15px;
+            }
+            
+            .details-grid, .experience-grid, .education-grid, .footer {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer {
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .content-section {
+                padding: 15px;
+            }
+        }
+
+    .info-layouts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* Common styles for all columns */
+.personal-infos,
+.owner-infos,
+.language-proficiencys {
+  flex: 1 1 300px;
+  min-width: 280px;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+/* Title */
+.section-titles {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: #8f3e8d;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Info Items */
+.info-items {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 14px;
+  color: #444;
+}
+
+.contact-icon {
+  color: #8f3e8d;
+  font-size: 14px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* Language */
+.language-entrys {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.language-labels {
+  color: #8f3e8d;
+  font-size: 13px;
+  font-weight: 500;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.starss {
+  display: flex;
+  gap: 4px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .info-layouts {
+    flex-direction: column;
+  }
+}
+
+.a4-container {
+    width: 794px;   /* A4 width at 96 DPI */
+    height: 1123px; /* A4 height at 96 DPI */
+    border: 1px solid #ccc;
+    padding: 20px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    background-color: white;
+  }
+
+  .passport-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+  }
+
+    </style>
+</head>
+<body>
+    <div class="cv-container">
+        <!-- Top Section -->
+        <div class="top-section">
+            <div class="photo-info">
+                <div class="photo-container">
+                     {% if user.head_photo %}
+                <img src="{{ base_url }}/{{user.head_photo}}" class="rounded" alt="Head Image">
+                    {% else %}
+                <img src="{{ base_url }}/images/Profile.jpeg" class="rounded" alt="Head Image">
+                {% endif %}
+                </div>
+                <div class="name-section">
+
+                      {% if user.english_full_name %}
+                      
+                         <div class="name">{{ user.english_full_name }}</div>   
+                        {% endif %}
+
+                         {% if user.arabic_full_name %}             
+                            <div class="arabic-name">{{user.arabic_full_name}}</div>   
+                        {% endif %}
+
+                          {% if user.amharic_full_name %}  
+                            <div class="amharic-name">  {{user.amharic_full_name}} </div>     
+                            {% endif %}
+
+                   
+                    
+                    
+                </div>
+            </div>
+            
+            <!-- Minimalist Position & Skills Frame -->
+            <div class="position-info">
+                            {% if user.occupation %}
+                                <div class="position">{{ user.occupation }}</div>    
+                            {% endif %}
+                <div class="skills">
+                        {% if user.skills_one %}
+                            <div class="skill-item">{{ user.skills_one }}</div>
+                        {% endif %}
+                        {% if user.skills_two %}
+                            <div class="skill-item">{{ user.skills_two }} </div>    
+                        {% endif %}
+                        {% if user.skills_three %}
+                            <div class="skill-item">{{ user.skills_three }}</div> 
+                        {% endif %}
+                        {% if user.skills_four %}
+                            <div class="skill-item">{{ user.skills_four }}</div>   
+                        {% endif %}
+                        {% if user.skills_five %}
+                             <div class="skill-item">{{ user.skills_five }}</div>   
+                        {% endif %}
+                        {% if user.skills_six %}
+                             <div class="skill-item">{{ user.skills_six }}</div>    
+                        {% endif %}
+                  
+                </div>
+            </div>
+            
+
+
+            <div class="qr-info-section">
+                <div class="qr-container">
+                    <img src="data:image/png;base64,{{img_base64}}" alt="QR Code">
+                </div>
+                <div class="pathsin-info">
+                
+                   
+                <div>Marrir #1231231</div>
+                <div class="represented">
+     
+                    <div class="rating" style="display: flex; flex-direction: column; font-size: 11px; gap: 4px;">
+ 
+    <span>Profile Rating</span>
+    
+    <div style="display: flex; gap: 4px;">
+        {% set full_stars = rate | int %}
+        {% set has_half_star = (rate - full_stars) >= 0.5 %}
+        {% set empty_stars = 5 - full_stars - (1 if has_half_star else 0) %}
+
+        <!-- Full Stars -->
+        {% for _ in range(full_stars) %}
+        <svg class="w-5 h-5" style="color: #FFD700;" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+        </svg>
+        {% endfor %}
+
+        <!-- Half Star -->
+        {% if has_half_star %}
+        <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <defs>
+                <linearGradient id="halfStarGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="50%" stop-color="#FFD700" />
+                    <stop offset="50%" stop-color="#9CAFA3" />
+                </linearGradient>
+            </defs>
+            <path fill="url(#halfStarGradient)"
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+        </svg>
+        {% endif %}
+
+        <!-- Empty Stars -->
+        {% for _ in range(empty_stars) %}
+        <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+        </svg>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+
+                </div>
+                    
+                </div>
+            </div>
+        </div>
+
+
+
+      
+
+        
+        <!-- Content Section -->
+        <div class="content-section">
+            <!-- Description Section -->
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-file-alt"></i>Professional Summary
+                </div>
+                <div class="description">
+                  {{ description or "No description available" }}
+                    {% if user.description %}
+                          <div class="description">
+                            {{ description or "No description available" }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            
+            <!-- Details Section -->
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-info-circle"></i>Personal Details
+                </div>
+                <div class="details-grid">
+                    <div class="detail-group">
+                        <div class="detail-group-title">
+                            <i class="fas fa-user"></i>Details
+                        </div>
+                        <div class="detail-item">
+                            {% if user.nationality %}
+                            <!--  <h1 class="text-base print:text-sm" style="color: black;"><strong>Nationality:</strong> {{ user.nationality }}</h1> -->
+                             <span class="detail-label">Nationality</span>
+                            <span class="detail-value"> {{ user.nationality }}</span>
+                            {% endif %}
+                           
+                        </div>
+                        <div class="detail-item">
+                            {% if user.religion %}
+                                <span class="detail-label">Religion</span>
+                                <span class="detail-value"> {{ user.religion }}</span>     
+                            {% endif %}
+                           
+                        </div>
+
+                        <div class="detail-item">
+                            {% if user.date_of_birth %}
+                                <span class="detail-label">BirthDay</span>
+                                <span class="detail-value"> {{ user.date_of_birth.replace("T21:00:00.000Z", "") }}</span>     
+                            {% endif %}
+                           
+                        </div>
+                       
+                        <div class="detail-item">
+                              {% if age %}
+                               
+                                 <span class="detail-label">Age</span>
+                                <span class="detail-value"> {{ age }}</span>
+                                {% endif %}
+                           
+                        </div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-group-title">
+                            <i class="fas fa-passport"></i>Passport
+                        </div>
+                        <div class="detail-item">
+                             {% if user.passport_number %}
+                                 <span class="detail-label">Number</span>
+                                <span class="detail-value">  {{ user.passport_number }}</span>
+                                {% endif %}
+                           
+                        </div>
+                        <div class="detail-item">
+                          
+
+                              {% if user.place_issued %}
+                             <span class="detail-label">Date of Issue</span>
+                            <span class="detail-value">{{ user.place_issued}}</span>
+                            {% endif %}
+                        </div>
+                        <div class="detail-item">
+                             {% if user.date_issued %}
+                                 <span class="detail-label">Date Issued</span>
+                                <span class="detail-value"> {{ user.date_issued.replace("T21:00:00.000Z", "") }}</span>
+                            {% endif %}
+                           
+                        </div>
+                        <div class="detail-item">
+                            {% if user.date_of_expiry %}
+                             <span class="detail-label">Date Expired</span>
+                            <span class="detail-value">{{ user.date_of_expiry.replace("T21:00:00.000Z", "") }}</span>
+                            {% endif %}
+                           
+                        </div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-group-title">
+                            <i class="fas fa-address-card"></i>Personal Info
+                        </div>
+                        <div class="detail-item">
+                             {% if user.place_of_birth %}
+                                <span class="detail-label">Place of Birth</span>
+                                <span class="detail-value">{{ user.place_of_birth }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="detail-item">
+
+                            {% if user.address.city %}       
+                                <span class="detail-label">Living Town</span>
+                                <span class="detail-value"> {{ user.address.city }}</span>
+                            {% endif %}                           
+
+                        </div>
+                        <div class="detail-item">
+                            {% if user.marital_status %}
+                                <span class="detail-label">Marital Status</span>
+                                <span class="detail-value">{{ user.marital_status }}</span>
+                            {% endif %}
+
+                            
+                        </div>
+                        <div class="detail-item">
+                            {% if user.number_of_children %}
+                                <span class="detail-label">Children</span>
+                                <span class="detail-value"> {{ user.number_of_children }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="detail-item">
+
+                            {% if user.weight %}
+                                 <span class="detail-label">Weight</span>
+                            <span class="detail-value">{{ user.weight }}kg</span>
+                            {% endif %}
+
+                         
+                        </div>
+                        <div class="detail-item">
+                            {% if user.height %}
+                                <span class="detail-label">Height</span>
+                            <span class="detail-value"> {{ user.height }}cm</span>
+                            {% endif %}
+                            
+                           
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            
+              <!-- Experience Section -->
+           <div class="section">
+    <div class="section-title">
+        <i class="fas fa-briefcase"></i> Professional Experience
+    </div>
+    <div class="experience-grid">
+        {% if user.work_experiences %}
+            {% for work in user.work_experiences %}
+                <div class="experience-item">
+                    <div class="institution">{{ work.company_name }}</div>
+                    <div class="degree">{{ work.city }}, {{ work.country }}</div>
+
+                    <div class="date">
+                        {# Start Date #}
+                        {% if work.start_date %}
+                            {% set parts = work.start_date.split('-') %}
+                            {% if parts|length >= 2 %}
+                                {% set month = parts[1]|int %}
+                                {% set year = parts[0] %}
+                                {% set month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+                                {{ month_names[month-1] }} {{ year }}
+                            {% else %}
+                                {{ work.start_date }}
+                            {% endif %}
+                        {% else %}
+                            ''
+                        {% endif %}
+
+                        -
+                        {# End Date #}
+                        {% if work.end_date %}
+                            {% set parts = work.end_date.split('-') %}
+                            {% if parts|length >= 2 %}
+                                {% set month = parts[1]|int %}
+                                {% set year = parts[0] %}
+                                {% set month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+                                {{ month_names[month-1] }} {{ year }}
+                            {% else %}
+                                {{ work.end_date }}
+                            {% endif %}
+                        {% else %}
+                            Present
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+            
+            <!-- Education Section -->
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-graduation-cap"></i>Education & Training
+                </div>
+                <div class="education-grid">
+                    <div class="education-item">
+                           
+                        {% if  user.education.institution_name %}
+                                <div class="institution">{{ user.education.institution_name.replace("_", "").title() }}</div>
+                        {% endif %}
+                       
+                           {% if user.education.highest_level %}
+                                <div class="degree"> {{ user.education.highest_level.replace("_", "").title() }}</div>
+                        {% endif %}
+
+                          {% if user.education.country %}
+                                <div class="date"> {{ user.education.country }}</div>
+                        {% endif %}
+                          {% if user.education.city %}
+                                <div class="date"> {{ user.education.city }}</div>
+                        {% endif %}
+                    </div>                   
+                </div>
+            </div>
+
+              <div class="sections">
+</div>
+
+
+
+
+
+
+
+
+    <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-info-circle"></i>Personal Details
+                </div>
+                <div class="details-grid">
+                    <div class="detail-group">
+                        <div class="detail-group-title">
+                            <i class="fas fa-user"></i>Skills
+                        </div>
+                       
+                        <div class="skills-list">
+                        
+                              {% if user.skills_one %}
+                            <div class="skill-tag">{{ user.skills_one }}</div>
+                        {% endif %}
+                        {% if user.skills_two %}
+                            <div class="skill-tag">{{ user.skills_two }} </div>    
+                        {% endif %}
+                        {% if user.skills_three %}
+                            <div class="skill-tag">{{ user.skills_three }}</div> 
+                        {% endif %}
+                        {% if user.skills_four %}
+                            <div class="skill-tag">{{ user.skills_four }}</div>   
+                        {% endif %}
+                        {% if user.skills_five %}
+                             <div class="skill-tag">{{ user.skills_five }}</div>   
+                        {% endif %}
+                        {% if user.skills_six %}
+                             <div class="skill-tag">{{ user.skills_six }}</div>    
+                        {% endif %}
+                        </div>
+                      
+                       
+                       
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-group-title">
+                            <i class="fas fa-passport"></i>References
+                        </div>
+                         {% if user.references %}
+                         {% for reference in user.references %}
+                        <div class="detail-item">                         
+    <span class="contact-icon"><i class="fas fa-user"></i></span>
+    <span class="detail-value">{{ reference.name }}</span>
+</div>
+<div class="detail-item">
+    <span class="contact-icon"><i class="fas fa-envelope"></i></span>
+    <span class="detail-value">{{ reference.email }}</span>
+</div>
+<div class="detail-item">
+    <span class="contact-icon"><i class="fas fa-phone"></i></span>
+    <span class="detail-value">{{ reference.phone_number }}</span>
+</div>
+<div class="detail-item">
+    <span class="contact-icon"><i class="fas fa-globe"></i></span>
+    <span class="detail-value">{{ reference.country }}</span>
+</div>
+
+                           {% endfor %}
+                    {% endif %}
+                        
+                        
+                    </div>
+
+
+
+                       
+                    <div class="detail-group">
+                        <div class="detail-group-title">
+                            <i class="fas fa-passport"></i>Summary
+                        </div>
+                           {% if user.summary %}
+                        <div class="detail-item">                         
+                             <span class="contact-icon"><i class="fas fa-user"></i></span>
+                            <span class="detail-value">{{ user.summary }}</span>
+                                </div>
+                        {% endif %}
+                     {% if user.expected_salary %}
+                        <div class="detail-item">
+                            <span class="contact-icon"><i class="fas fa-money-bill-wave"></i></span>
+                            <span class="detail-value">Monthly salary: {{ user.expected_salary }} {{ user.currency }}</span>
+                    {% endif %}
+
+                     </div>
+
+                    {% if video_url %}
+                        <div class="detail-item">
+                            <span class="contact-icon"><i class="fas fa-video"></i></span>
+                            <span class="detail-value">
+                                <a href="{{ video_url }}" target="_blank" rel="noopener noreferrer">
+                                    Watch Intro Video
+                                </a>
+                            </span>
+                        </div>
+                        {% endif %}
+
+
+                    
+                       
+                    </div>      
+                </div>
+            </div>
+
+
+       <!-- Details Section -->
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-info-circle"></i>Info
+                </div>
+                <div class="details-grid">
+                    <div class="detail-group">
+                        <div class="detail-group-title">
+                            <i class="fas fa-user"></i>personal info
+                        </div>
+                        <div class="detail-item">
+                            {% if user.email %}
+                            <!--  <h1 class="text-base print:text-sm" style="color: black;"><strong>Nationality:</strong> {{ user.nationality }}</h1> -->
+                              <span class="contact-icon"><i class="fas fa-envelope"></i></span>
+                            <span class="detail-value"> {{ user.email }}</span>
+                            {% endif %}
+                           
+                        </div>
+                        <div class="detail-item">
+                            {% if user.x %}
+                                 <span class="contact-icon"><i class="fab fa-twitter"></i></span>
+                                <span class="detail-value"> {{ user.x }}</span>     
+                            {% endif %}
+                           
+                        </div>
+                       
+                        <div class="detail-item">
+                              {% if user.telegram %}
+                               <span class="contact-icon"><i class="fab fa-telegram-plane"></i></span>
+                                <span class="detail-value"> {{ user.telegram }}</span>
+                                {% endif %}
+                           
+                        </div>
+
+                                                <div class="detail-item">
+                              {% if user.facebook %}
+                               <span class="contact-icon"><i class="fab fa-facebook-f"></i></span>
+                                <span class="detail-value"> {{ user.facebook }}</span>
+                                {% endif %}
+                           
+                        </div>
+
+                           <div class="detail-item">
+                              {% if user.instagram %}
+                               <span class="contact-icon"><i class="fab fa-instagram"></i></span>
+                                <span class="detail-value"> {{ user.instagram }}</span>
+                                {% endif %}
+                           
+                        </div>
+
+                          <div class="detail-item">
+                              {% if user.phone_number %}
+                               <span class="contact-icon"><i class="fas fa-phone"></i></span>
+                                <span class="detail-value"> {{ user.phone_number }}</span>
+                                {% endif %}
+                           
+                        </div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-group-title">
+                            <i class="fas fa-passport"></i>Client Information
+                        </div>
+                        <div class="detail-item">
+                             {% if owner.email %}
+                              <span class="contact-icon"><i class="fas fa-envelope"></i></span>
+                                <span class="detail-value">  {{ owner.email }}</span>
+                                {% endif %}
+                           
+                        </div>
+                        
+                        <div class="detail-item">
+                            {% if owner.phone_number %}
+                             <span class="contact-icon"><i class="fas fa-phone"></i></span>
+                            <span class="detail-value">{{ owner.phone_number }}</span>
+                            {% endif %}
+                           
+                        </div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-group-title">
+                            <i class="fas fa-address-card"></i>Language Proficiency
+                        </div>
+
+                         {% for lang in additional_languages %}
+      <div class="language-entrys">
+        <div class="language-labels">{{ lang.language }}</div>
+        <div class="starss">
+          {% set proficiency = lang.proficiency %}
+          {% set rate = 5 if proficiency == "fluent" else 3.5 if proficiency == "intermediate" else 1 %}
+          {% set full_stars = rate | int %}
+          {% set has_half_star = (rate - full_stars) >= 0.5 %}
+          {% set empty_stars = 5 - full_stars - (1 if has_half_star else 0) %}
+
+          {% for _ in range(full_stars) %}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700">
+            <path
+              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z" />
+          </svg>
+          {% endfor %}
+
+          {% if has_half_star %}
+          <svg width="14" height="14" viewBox="0 0 24 24">
+            <defs>
+              <linearGradient id="halfStarGradient{{ loop.index }}" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="50%" stop-color="#FFD700" />
+                <stop offset="50%" stop-color="#9CAFA3" />
+              </linearGradient>
+            </defs>
+            <path fill="url(#halfStarGradient{{ loop.index }})"
+              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z" />
+          </svg>
+          {% endif %}
+
+          {% for _ in range(empty_stars) %}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#9CAFA3">
+            <path
+              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z" />
+          </svg>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}                     
+                    </div>
+                </div>
+            </div>
+
+            
+            <!-- Footer Section -->
+            <div class="section">
+                <div class="footer">
+                   
+                    
+             
+                    <!--
+                        <div class="languages-section">
+                       <div class="flex flex-col space-y-2">
+    <div class="section-title">
+                            <i class="fas fa-address-book"></i>Language Proficiency
+                        </div>
+    {% for lang in additional_languages %}
+    <div class="bg-blue-50 flex justify-between p-3 rounded">
+        <h1 class="print:text-sm" style="color: #65b3cb; font-size: 12px;">{{ lang.language }}</h1>
+
+        <div class="rating flex flex-row gap-x-[2px] items-start">
+            {% set proficiency = lang.proficiency %}
+            {% set rate = 5 if proficiency == "fluent" else 3.5 if proficiency == "intermediate" else 1 %}
+
+            {% set full_stars = rate | int %}
+            {% set has_half_star = (rate - full_stars) >= 0.5 %}
+            {% set empty_stars = 5 - full_stars - (1 if has_half_star else 0) %}
+
+          
+            {% for _ in range(full_stars) %}
+            <svg class="stars" width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+            </svg>
+            {% endfor %}
+
+            
+            {% if has_half_star %}
+            <svg class="stars" width="11" height="11" viewBox="0 0 24 24">
+                <defs>
+                    <linearGradient id="halfStarGradientLang" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="50%" stop-color="#FFD700" />
+                        <stop offset="50%" stop-color="#9CAFA3" />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#halfStarGradientLang)"
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+            </svg>
+            {% endif %}
+
+            
+            {% for _ in range(empty_stars) %}
+            <svg class="stars" width="11" height="11" viewBox="0 0 24 24" fill="#9CAFA3">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+            </svg>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+                    -->
+
+
+                    
+    
+         
+
+
+                </div>
+            </div>
+        </div>
+        
+      
+
+        <div class="copyright">
+           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+         {% if user.english_full_name %}
+            &copy; 2025 {{ user.english_full_name }} Professional CV | Represented by Marrir.com
+          {% endif %}
+           
+            <div class="logo">
+                <img src="data:image/png;base64,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" alt="Logo" width="80" >
+            </div>
+        </div>
+
+
+         {% if passport_url %}
+  <div class="a4-container">
+    <img src="{{ base_url }}/{{ passport_url }}" alt="Passport" class="passport-image">
+  </div>
+{% endif %}
+
+    </div>
+</body>
+</html> 
+          
+
+
+
+
+
+           
+
+           
+
+          
+            
+
+         

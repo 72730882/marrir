@@ -1,0 +1,41 @@
+version: "3.9"
+services:
+  ps_db:
+    container_name: ps_db
+    image: ps_db
+    build:
+      context: .
+      dockerfile:
+        db.dockerfile
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_USER=${DB_USER}
+    ports:
+      - "5433:5432"
+    networks:
+      - pathsin_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -h -ps_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 25
+
+  
+  ps_app:
+    container_name: ps_app
+    image: ps_app
+    build:
+      context: .
+      dockerfile:
+        api.dockerfile
+    depends_on:
+      ps_db:
+        condition: service_healthy
+    ports:
+      - "8001:8000"
+    networks:
+      - pathsin_network
+
+networks:
+  pathsin_network:
+    driver: bridge

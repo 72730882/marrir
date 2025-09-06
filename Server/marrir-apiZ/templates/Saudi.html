@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      td,
+      th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 10px;
+      }
+
+      tr:nth-child(even) {
+        background-color: #dddddd;
+      }
+    </style>
+
+    <title>Saudi Embassy</title>
+  </head>
+  <body>
+    <div class="mx-10">
+      <div class="flex justify-between mt-10">
+        <div class="flex flex-col space-y-2">
+          <div>
+            <svg
+              height="50px"
+              width="50px"
+              version="1.1"
+              id="Capa_1"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              viewBox="0 0 15.273 15.273"
+              xml:space="preserve"
+              fill="#000000"
+            >
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g
+                id="SVGRepo_tracerCarrier"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></g>
+              <g id="SVGRepo_iconCarrier">
+                <g>
+                  <path
+                    style="fill: #030104"
+                    d="M0,1.803h0.897V13.47H0V1.803z M1.446,13.47h0.505V1.803H1.446V13.47z M2.315,13.47h0.504V1.803 H2.315V13.47z M3.482,13.47h1.104V1.803H3.482V13.47z M5.47,13.47h0.552V1.803H5.47V13.47z M6.878,13.47h2.288V1.803H6.878V13.47z M12.84,13.47h0.752V1.803H12.84V13.47z M14.248,1.803V13.47h1.025V1.803H14.248z M10.084,13.47h0.492V1.803h-0.492V13.47z M11.281,13.47h0.492V1.803h-0.492V13.47z"
+                  ></path>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-sm">Visa Number:</h1>
+          </div>
+        </div>
+        <div class="flex flex-col justify-end items-end space-y-2">
+          <div>
+            <svg
+              height="50px"
+              width="50px"
+              version="1.1"
+              id="Capa_1"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              viewBox="0 0 15.273 15.273"
+              xml:space="preserve"
+              fill="#000000"
+            >
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g
+                id="SVGRepo_tracerCarrier"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></g>
+              <g id="SVGRepo_iconCarrier">
+                <g>
+                  <path
+                    style="fill: #030104"
+                    d="M0,1.803h0.897V13.47H0V1.803z M1.446,13.47h0.505V1.803H1.446V13.47z M2.315,13.47h0.504V1.803 H2.315V13.47z M3.482,13.47h1.104V1.803H3.482V13.47z M5.47,13.47h0.552V1.803H5.47V13.47z M6.878,13.47h2.288V1.803H6.878V13.47z M12.84,13.47h0.752V1.803H12.84V13.47z M14.248,1.803V13.47h1.025V1.803H14.248z M10.084,13.47h0.492V1.803h-0.492V13.47z M11.281,13.47h0.492V1.803h-0.492V13.47z"
+                  ></path>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-sm">{{user.passport_number}}</h1>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-between rounded mt-5">
+        <div>
+          {% if user.head_photo %}
+          <img
+            src="{{ base_url }}/{{user.head_photo}}"
+            class="rounded w-60 h-60 object-cover"
+            alt="Photo"
+          />
+          {% endif %}
+        </div>
+        <div>
+          <img
+            src="{{ base_url }}/images/Saudi.jpeg"
+            alt="Saudi Embassy"
+            class="h-48 w-full object-cover rounded"
+          />
+        </div>
+      </div>
+
+      <div class="border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">Full Name: {{user.english_full_name}}</h1>
+      </div>
+      <div class="border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">Mother Name:</h1>
+      </div>
+      <div class="flex justify-between border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">Date of Birth: {{user.date_of_birth}}</h1>
+        <h1 class="print:text-sm">Place of Birth: {{user.place_of_birth}}</h1>
+      </div>
+      <div class="flex justify-between border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">
+          Previous Nationality: {{user.nationality}}
+        </h1>
+        <h1 class="print:text-sm">Present Nationality: {{user.nationality}}</h1>
+      </div>
+      <div class="flex justify-between border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">Sex: {{user.sex}}</h1>
+        <h1 class="print:text-sm">Marital Status: {{user.marital_status}}</h1>
+      </div>
+      <div class="flex justify-between border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">Sec:</h1>
+        <h1 class="print:text-sm">Religion: {{user.religion}}</h1>
+      </div>
+      <div class="flex justify-between border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">Place of Issue:</h1>
+        <h1 class="print:text-sm">Qualification:</h1>
+        <h1 class="print:text-sm">Profession: {{user.occupation}}</h1>
+      </div>
+
+      <div class="flex justify-between border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">Home Address and Telephone No:</h1>
+      </div>
+
+      <div class="flex justify-between border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">Business Address and Telephone No:</h1>
+      </div>
+
+      <div class="flex justify-between border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">Purpose of Travel :</h1>
+
+        <div class="flex flex-cols items-center space-x-1">
+          <!-- Give background color for the selected option  -->
+          <div class="bg-gray-100 print:text-sm p-2">Work</div>
+          <div class="print:text-sm p-2">Transit</div>
+          <div class="print:text-sm p-2">Umrah</div>
+          <div class="print:text-sm p-2">Residence</div>
+          <div class="print:text-sm p-2">Haji</div>
+          <div class="print:text-sm p-2">Diplomacy</div>
+        </div>
+      </div>
+      <div class="flex justify-between border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">Place of Issue:</h1>
+        <h1 class="print:text-sm">Date Passport Issued:</h1>
+        <h1 class="print:text-sm">Passport No: {{user.passport_number}}</h1>
+        <h1 class="print:text-sm">Date of Passport's Expiry:</h1>
+      </div>
+      <div class="flex justify-between border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">Duration of Stay in the kingdom:</h1>
+        <h1 class="print:text-sm">Date of Arrival:</h1>
+        <h1 class="print:text-sm">Date of Departure:</h1>
+      </div>
+      <div class="flex justify-between border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">Mode of payment:</h1>
+        <h1 class="print:text-sm">Payment No:</h1>
+        <h1 class="print:text-sm">Date:</h1>
+      </div>
+
+      <div class="border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">Relationship:</h1>
+      </div>
+      <div class="flex justify-between border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">Destination:</h1>
+        <h1 class="print:text-sm">Dealer Name:</h1>
+      </div>
+      <div class="flex justify-between border-gray-800 pb-3 mt-3">
+        <h1 class="print:text-sm">Dependents Traveling in the same passport</h1>
+      </div>
+      <table
+        class="table-fixed border-1 border-gray-800 w-full items-center justify-center text-center"
+      >
+        <thead>
+          <tr>
+            <th>Relationship</th>
+            <th>Date of birth</th>
+            <th>Sex</th>
+            <th>Full Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="flex justify-between border-gray-800 border-b-2 pb-3 mt-3">
+        <h1 class="print:text-sm">
+          Name and Address of company or individual in the kingdom
+        </h1>
+      </div>
+      <div class="flex justify-between border-gray-800 pb-3 mt-3">
+        <h1 class="print:text-sm">
+          The undersigned hereby certify that all the information i have
+          provided are correct. I will abid by the laws of the kingdom during
+          the period of my resident in it.
+        </h1>
+      </div>
+
+      <div class="flex justify-between pb-3 mt-3">
+        <h1 class="print:text-sm">Date:</h1>
+        <h1 class="print:text-sm">Signature : ___________________</h1>
+        <h1 class="print:text-sm">Name: {{user.english_full_name}}</h1>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Graduate CV</title>
+    <style>    
+        @media print {
+            .bgColor{ 
+                background-color: #0000FF;
+            }
+
+        }
+    </style>
+</head>
+<body class="mx-5 my-3 print:mx-0">
+   
+  
+   <div class="grid grid-cols-2 gap-2 w-full">
+
+    <div class="grid grid-cols-2 gap-2 space-x-8 items-center justify-center mb-5">
+        <div class="space-y-2">
+            {% if user.head_photo %}
+                <img src="{{ base_url }}/{{user.head_photo}}" class="rounded" alt="Head Image">
+            {% else %}
+                <img src="{{ base_url }}/images/Profile.jpeg" class="rounded" alt="Head Image">
+            {% endif %}
+ 
+
+            {% if user.english_full_name %}
+                <h1 class="print:text-sm" style="color: #65b3cb;"><strong>Full Name:</strong> {{ user.english_full_name }}</h1>
+            {% endif %}
+
+
+            {% if user.amharic_full_name %}
+                <h1 class="print:text-sm" style="color: #65b3cb;"><strong>ሙሉ ስም: </strong> {{user.amharic_full_name}}</h1>
+            {% endif %}
+            {% if user.arabic_full_name %}
+                <h1 class="print:text-sm" style="color: #65b3cb;"><strong>الاسم بالعربية: </strong>{{user.arabic_full_name}}</h1>
+            {% endif %}
+            {% if user.expected_salary %}
+                <h1 class="print:text-sm" style="color: #65b3cb;"><strong>Expected Salary:</strong> {{user.expected_salary}}</h1>
+            {% endif %}
+        </div>
+    <!-- <div class="h-full w-full">
+           <div class="text-[1.2rem] font-normal mb-1" style="color: #65b3cb;">Position</div>
+<div class="text-[1.8rem] font-bold mb-4" style="color: #8f3e8d;">  {{ user.occupation}}</div>
+<div class="text-[1.2rem] font-normal mb-1" style="color: #65b3cb;">Skills</div>
+
+          
+            <div class="flex flex-wrap gap-2 mt-2 w-full">
+                <span
+                style="background-color: #65b3cb; color: #8f3e8d;"
+                class="font-bold px-4 py-2 text-sm text-center rounded min-w-[100px] max-w-[160px] truncate"
+                >
+                {{ user.skills_one }}
+                </span>
+
+  <span style="background-color: #65b3cb; color: #8f3e8d;"
+        class="font-bold  px-4 py-2 text-sm text-center rounded min-w-[100px] max-w-[160px] truncate">
+    {{ user.skills_two }}
+  </span>
+  <span style="background-color: #65b3cb; color: #8f3e8d;" 
+        class="font-bold  px-4 py-2 text-sm text-center rounded min-w-[100px] max-w-[160px] truncate">
+    {{ user.skills_three }}
+  </span>
+  <span style="background-color: #65b3cb;color: #8f3e8d;" 
+        class="font-bold  px-4 py-2 text-sm text-center rounded min-w-[100px] max-w-[160px] truncate">
+    {{ user.skills_four }}
+  </span>
+  <span style="background-color: #65b3cb; color: #8f3e8d;"
+        class="font-bold  px-4 py-2 text-sm text-center rounded min-w-[100px] max-w-[160px] truncate">
+    {{ user.skills_five }}
+  </span>
+  <span style="background-color: #65b3cb; color: #8f3e8d;"
+        class="font-bold  px-4 py-2 text-sm text-center rounded min-w-[100px] max-w-[160px] truncate">
+    {{ user.skills_six }}
+  </span>
+</div>
+
+
+ -->
+       <div class="h-full w-full">
+  <div class="text-[1.2rem] font-normal mb-1" style="color: #65b3cb;">Position</div>
+  <div class="text-[1.8rem] font-bold mb-4" style="color: #8f3e8d;">{{ user.occupation }}</div>
+
+  <div class="text-[1.2rem] font-normal mb-1" style="color: black;">Skills</div>
+
+  <!-- Grid with 2 columns on small screens -->
+  <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mt-2 w-full">
+    {% for skill in [user.skills_one, user.skills_two, user.skills_three, user.skills_four, user.skills_five, user.skills_six] %}
+      <span
+        style="background-color: #65b3cb; color:  black;"
+        class="font-bold px-4 py-2 text-sm text-center rounded w-full break-words"
+        >
+        {{ skill }}
+        </span>
+
+    {% endfor %}
+  </div>
+</div>
+
+        </div>
+    
+    <div class="flex flex-col space-y-3 items-end ">
+        {% if img_base64 %}
+            <img class="!h-[100px] !w-[100px]" src="data:image/png;base64,{{img_base64}}" alt="QR Code">
+            
+            {% endif %}
+            <div class="ml-auto max-w-md space-y-2 rounded-lg overflow-hidden">
+                <!-- Profile Rating -->
+                <div
+                    class="p-4 bg-blue-100 print:bg-blue-200 flex justify-between items-center"
+                >
+                    <span class="text-orange-500 font-extrabold mr-2">Profile Rating</span>
+                    <div class="flex space-x-1">
+                        {% set full_stars = rate | int %}
+                        {% set has_half_star = (rate - full_stars) >= 0.5 %}
+                        {% set empty_stars = 5 - full_stars - (1 if has_half_star else 0) %}
+                    
+                        <!-- Full Stars -->
+                        {% for _ in range(full_stars) %}
+                            <svg style="color: orange" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                            </svg>
+                        {% endfor %}
+                    
+                        <!-- Half Star -->
+                        {% if has_half_star %}
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <defs>
+                                <linearGradient id="halfStarGradient">
+                                    <stop offset="50%" stop-color="orange" />
+                                    <stop offset="50%" stop-color="#9CAFA3" />
+                                </linearGradient>
+                            </defs>
+                            <path fill="url(#halfStarGradient)"
+                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                        </svg>
+                        {% endif %}
+                    
+                        <!-- Empty Stars -->
+                        {% for _ in range(empty_stars) %}
+                            <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                            </svg>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Represented By -->
+                <div class="p-4 bg-blue-50 flex justify-between items-center">
+                    <span class="text-orange-500 font-extrabold">Represented By:</span>
+                    <span class="text-orange-500 font-medium">
+                        {% if owner %}
+                            {{owner.company_name}}
+                        {% else %}
+                            Herself
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+    </div>
+
+   </div>
+    
+<!-- Description -->
+
+   <div class="flex flex-col space-y-2">
+    <h1 class="text-2xl print:text-sm font-bold" style="color: #65b3cb;">Description</h1>
+    <p class="print:text-sm" style="color:  #65b3cb;">{{ description or "No description available" }}</p>
+    </div>
+
+
+<!-- Details -->
+
+<div class="flex flex-col space-y-2 mt-3">
+  <h1 class="text-2xl print:text-sm font-bold" style="color: #65b3cb;">Detail</h1>
+
+  <div class="grid grid-cols-3 bg-blue-50 rounded px-8 py-5 w-full">    
+    <!-- Column 1: Detail -->
+    <div class="space-y-2">
+      {% if user.nationality %}
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Nationality:</strong> {{ user.nationality }}</h1>
+      {% endif %}
+      {% if user.religion %}
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Religion:</strong> {{ user.religion }}</h1>
+      {% endif %}
+      {% if user.date_of_birth %}
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Date of Birth:</strong> {{ user.date_of_birth.replace("T21:00:00.000Z", "") }}</h1>
+      {% endif %}
+      {% if age %}
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Age:</strong> {{ age }}</h1>
+      {% endif %}
+    </div>
+
+    <!-- Column 2: Passport -->
+    <div class="space-y-2">
+      <h1 class="font-bold text-xl print:text-sm" style="color: black;">Passport</h1>
+      {% if user.passport_number %}
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Number:</strong> {{ user.passport_number }}</h1>
+      {% endif %}
+      {% if user.passport_date_issued %}
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Date Issued:</strong> {{ user.passport_date_issued }}</h1>
+      {% endif %}
+      {% if user.passport_date_expired %}
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Date of Expiry:</strong> {{ user.passport_date_expired }}</h1>
+      {% endif %}
+      {% if user.passport_place_issued %}
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Place Issued:</strong> {{ user.passport_place_issued }}</h1>
+      {% endif %}
+    </div>
+
+    <!-- Column 3: Personal Information -->
+    <div class="space-y-2">
+      <h1 class="font-bold text-xl print:text-sm" style="color: black;">Personal Information</h1>
+      {% if user.place_of_birth %}
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Place of Birth:</strong> {{ user.place_of_birth }}</h1>
+      {% endif %}
+      {% if user.address.city %}
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Living Town:</strong> {{ user.address.city }}</h1>
+      {% endif %}
+      {% if user.marital_status %}
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Marital Status:</strong> {{ user.marital_status }}</h1>
+      {% endif %}
+      {% if user.number_of_children %}
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Number of Children:</strong> {{ user.number_of_children }}</h1>
+      {% endif %}
+      {% if user.weight %}
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Weight:</strong> {{ user.weight }}kg</h1>
+      {% endif %}
+      {% if user.height %}
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Height:</strong> {{ user.height }}m</h1>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+
+
+  
+
+<!-- Experience -->
+ 
+<div class="flex flex-col space-y-2 mt-1">
+    {% if user.work_experiences %}
+     <h1 class="text-2xl print:text-sm font-bold" style="color: #65b3cb;">Experience</h1> 
+    <div class="grid grid-cols-3 w-full gap-2 bg-blue-50" >
+      {% for work in user.work_experiences %}
+        <div class=" px-5 py-4 rounded">
+             <h1 class="font-bold text-2xl print:text-sm" style="color: black;">{{ work.company_name }}</h1>
+          <h1 class="text-xl print:text-sm" style="color: black;">{{ work.city }} {{ work.country }}</h1>
+            <h1 class="font-light text-xl print:text-sm"   style="color: black;">
+                {% if work.start_date %}
+                    {% set parts = work.start_date.split('-') %}
+                    {% if parts|length >= 2 %}
+                        {% set month = parts[1]|int %}
+                        {% set year = parts[0] %}
+                        {% set month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+                        {{ month_names[month-1] }} {{ year }}
+                    {% else %}
+                        {{ work.start_date }}
+                    {% endif %}
+                {% else %}
+                    ''
+                {% endif %}
+                - 
+                {% if work.end_date %}
+                    {% set parts = work.end_date.split('-') %}
+                    {% if parts|length >= 2 %}
+                        {% set month = parts[1]|int %}
+                        {% set year = parts[0] %}
+                        {% set month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+                        {{ month_names[month-1] }} {{ year }}
+                    {% else %}
+                        {{ work.end_date }}
+                    {% endif %}
+                {% else %}
+                    Present
+                {% endif %}
+            </h1>  
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+
+
+
+
+
+<div class="flex flex-col space-y-2 mt-1">
+  {% if user.references %}
+    {% for reference in user.references %}
+     <h1 class="text-2xl print:text-sm font-bold" style="color: #65b3cb;">Reference</h1>
+      <div class="px-5 py-4 rounded bg-blue-50">
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Name:</strong> {{ reference.name }}</h1>
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Email:</strong> {{ reference.email }}</h1>
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Phone:</strong> {{ reference.phone_number }}</h1>
+        <h1 class="text-base print:text-sm" style="color: black;"><strong>Country:</strong> {{ reference.country }}</h1>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+
+<!-- Experience -->
+<div class="flex flex-col space-y-2 mt-3">
+  {% if user.education %}
+    <h1 class="text-2xl print:text-sm font-bold" style="color: #65b3cb;">Education</h1>
+    <div class="px-5 py-4 rounded bg-blue-50">
+      <h1 class="font-bold text-2xl print:text-sm" style="color: black;">
+        {{ user.education.institution_name.replace("_", "").title() }}
+      </h1>
+      <h1 class="text-xl print:text-sm" style="color: black;">
+        {{ user.education.highest_level.replace("_", "").title() }}
+      </h1>
+    </div>
+  {% endif %}
+</div>
+
+
+
+
+<!-- Contact Information and Rating -->
+ 
+
+<div class="flex flex-col space-y-2 mt-3">
+    <div class="grid grid-cols-3 rounded px-8 py-5 w-full bg-blue-50">
+        
+                <div class="flex flex-col space-y-2">
+            <h1 class="font-bold text-xl print:text-sm"  style="color: #65b3cb;">Client Contacts</h1>
+            <p class="print:text-sm flex flex-row space-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="#65b3cb" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="64" stroke-dashoffset="64" d="M4 5h16c0.55 0 1 0.45 1 1v12c0 0.55 -0.45 1 -1 1h-16c-0.55 0 -1 -0.45 -1 -1v-12c0 -0.55 0.45 -1 1 -1Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0"/></path><path stroke-dasharray="24" stroke-dashoffset="24" d="M3 6.5l9 5.5l9 -5.5"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="24;0"/></path></g></svg>
+                    <a class="print:text-sm underline text-black-500" href="mailto:{{user.email}}">{{user.email}}</a>
+               
+            </p>
+            <p class="print:text-sm flex flex-row space-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#65b3cb" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24c1.12.37 2.33.57 3.57.57c.55 0 1 .45 1 1V20c0 .55-.45 1-1 1c-9.39 0-17-7.61-17-17c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1c0 1.25.2 2.45.57 3.57c.11.35.03.74-.25 1.02z"/></svg>
+               
+                    <a class="print:text-sm underline text-black-500" href="tel:{{user.phone_number}}">{{user.phone_number}}</a>
+                
+            </p>
+              <p class="print:text-sm flex flex-row space-x-1">
+               <p class="print:text-sm flex flex-row space-x-1">
+                <a class="print:text-sm underline text-blue-500 flex items-center space-x-1" href="https://facebook.com/{{user.facebook}}" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#65b3cb">
+                    <path d="M22.675 0H1.325C.593 0 0 .593 0 1.326v21.348C0 23.406.593 24 1.325 24h11.495v-9.294H9.691v-3.622h3.129V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.31h3.587l-.467 3.622h-3.12V24h6.116C23.406 24 24 23.407 24 22.674V1.326C24 .593 23.407 0 22.675 0z"/>
+                    </svg>
+                   <a class="print:text-sm underline text-black-500" href="tel:{{user.facebook}}">{{user.facebook}}</a>        
+                </a>
+                </p>                  
+            </p>
+            
+
+           <p class="print:text-sm flex flex-row space-x-1">
+  <a class="print:text-sm underline text-black-500 flex items-center space-x-1" href="https://www.tiktok.com/@{{user.tiktok}}" target="_blank" rel="noopener noreferrer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#65b3cb">
+      <path d="M9.003 2.001h3.002v10.001a3 3 0 01-3.002-3v-7zM12.001 0c-4.963 0-9.001 4.04-9.001 9.003 0 3.726 2.418 6.907 5.789 8.047v-2.787c-2.054-.97-3.309-3.08-3.309-5.26a5.01 5.01 0 015.002-5.002v7.002a4.5 4.5 0 01-4.498 4.499c-2.48 0-4.5-2.02-4.5-4.5H1c0 4.963 4.04 9.003 9.001 9.003a9.005 9.005 0 009-9.003V0h-6z"/>
+    </svg>
+    <span>{{user.tiktok}}</span>
+  </a>
+</p>
+
+
+
+    <p class="print:text-sm flex flex-row space-x-1">
+  <a class="print:text-sm underline text-black-500 flex items-center space-x-1" href="https://t.me/{{user.telegram}}" target="_blank" rel="noopener noreferrer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#65b3cb">
+      <path d="M9.504 15.144c-.123 0-.18-.056-.31-.2l-2.005-1.92-3.217-1.005c-.552-.17-.564-.552.118-.81l12.507-4.69c.573-.176 1.098.127.91.98l-2.484 11.55c-.192.89-.7 1.114-1.42.69l-3.333-2.46-1.44 1.386c-.16.157-.294.29-.606.29zm9.018-7.22c-.07-.25-.276-.37-.588-.28L3.32 11.77c-.446.146-.44.36-.078.46l3.47 1.068 8.176-5.425c.378-.25.723-.128.531.164l-6.22 7.008c-.264.297-.048.458.138.304l3.8-3.414 3.528 2.645c.657.5 1.125.235 1.302-.6l1.518-7.793c.123-.638-.243-1.046-.613-1.246z"/>
+    </svg>
+    {{user.telegram}}
+  </a>
+</p>
+      
+             
+            <p class="print:text-sm flex flex-row space-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <g fill="#65b3cb">
+    <path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/>
+    <path fill="#65b3cb" d="M12 2a9 9 0 0 1 9 9c0 3.074-1.676 5.59-3.442 7.395a20.4 20.4 0 0 1-2.876 2.416l-.426.29l-.2.133l-.377.24l-.336.205l-.416.242a1.87 1.87 0 0 1-1.854 0l-.416-.242l-.52-.32l-.192-.125l-.41-.273a20.6 20.6 0 0 1-3.093-2.566C4.676 16.589 3 14.074 3 11a9 9 0 0 1 9-9m0 6a3 3 0 1 0 0 6a3 3 0 0 0 0-6"/>
+  </g>
+</svg>
+                    {{user.address.city}}, {{user.address.country}}
+            </p>
+        </div>
+
+
+           <div class="flex flex-col space-y-2">
+            <h1 class="font-bold text-xl print:text-sm"  style="color: #65b3cb;">Owner Contacts</h1>
+            <p class="print:text-sm flex flex-row space-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="#65b3cb" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="64" stroke-dashoffset="64" d="M4 5h16c0.55 0 1 0.45 1 1v12c0 0.55 -0.45 1 -1 1h-16c-0.55 0 -1 -0.45 -1 -1v-12c0 -0.55 0.45 -1 1 -1Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0"/></path><path stroke-dasharray="24" stroke-dashoffset="24" d="M3 6.5l9 5.5l9 -5.5"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="24;0"/></path></g></svg>
+                    <a class="print:text-sm underline text-black-500" href="mailto:{{owner.email}}">{{owner.email}}</a>               
+            </p>
+            <p class="print:text-sm flex flex-row space-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#65b3cb" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24c1.12.37 2.33.57 3.57.57c.55 0 1 .45 1 1V20c0 .55-.45 1-1 1c-9.39 0-17-7.61-17-17c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1c0 1.25.2 2.45.57 3.57c.11.35.03.74-.25 1.02z"/></svg>
+                    <a class="print:text-sm underline text-black-500" href="tel:{{owner.phone_number}}">{{owner.phone_number}}</a>
+            </p>
+        </div>
+        <div class="flex flex-col space-y-2">
+            <h1 class="font-bold text-xl print:text-sm" style="color: #65b3cb;">Languages</h1>
+            {% for lang in additional_languages %}
+            
+                <div class="bg-blue-50 flex justify-between p-3 rounded">
+                        <h1 class="print:text-sm" style="color: #65b3cb;">{{lang.language}}</h1>
+                        {% if lang.proficiency == "fluent" %}
+                            <div class="flex flex-row space-x-1">
+                                <svg style="color: orange" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                                <svg style="color: orange" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                                <svg style="color: orange" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                                <svg style="color: orange" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                                <svg style="color: orange" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                            </div>
+                        {% endif %}
+                        {% if lang.proficiency == "intermediate" %}
+                            <div class="flex flex-row space-x-1">
+
+                                <svg style="color: orange" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                                <svg style="color: orange" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                                <svg class="w-5 h-5" viewBox="0 0 24 24">
+                                    <defs>
+                                        <linearGradient id="halfStarGradient">
+                                            <stop offset="50%" stop-color="orange" />
+                                            <stop offset="50%" stop-color="#9CAFA3" />
+                                        </linearGradient>
+                                    </defs>
+                                    <path fill="url(#halfStarGradient)"
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                                <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                                <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>   
+                            </div>
+                        {% endif %}
+                        {% if lang.proficiency == "basic" %}
+                            <div class="flex flex-row space-x-1">
+                                <svg style="color: orange" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                                <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                                <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>                
+                                <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>                
+                                <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                            </div>
+                        {% endif %}
+                        {% if lang.proficiency == None %}
+                            <div class="flex flex-row space-x-1">
+                                <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                                <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                                <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>                
+                                <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>                
+                                <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z"/>
+                                </svg>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% if passport_url %}
+    <img src="{{base_url}}/{{passport_url}}" alt="Passport">
+{% endif %}
+
+<div class="w-full flex justify-center">
+        
+          <img
+          src="https://api.marrir.com/static/images/pathsin_logo.png"
+          class="rounded w-40 object-cover"
+          alt="Marrir Logo"
+        />
+      
+      </div>
+
+</body>
+</html>

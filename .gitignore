@@ -1,0 +1,18 @@
+# Flutter build
+build/
+.dart_tool/
+*.apk
+*.so
+*.dill
+*.log
+
+# VSCode / IDE
+.vscode/
+.idea/
+*.iml
+
+# Others
+*.zip
+*.jar
+*.mp4
+

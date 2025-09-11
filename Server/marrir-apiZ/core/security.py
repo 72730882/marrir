@@ -46,6 +46,7 @@ class Settings(BaseSettings):
     FACEBOOK_CLIENT_ID: str
     FACEBOOK_CLIENT_SECRET: str
     FACEBOOK_REDIRECT_URI: str
+    FACEBOOK_CONFIG_ID: str
 
     TELR_RETURN_URL: str = "http://localhost:5173/replace/payments"
     TELR_TRANSFER_RETURN_URL: str = "http://localhost:5173/replace/transfer-history"

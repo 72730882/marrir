@@ -1,3 +1,11 @@
+from uuid import UUID
+from fastapi import Request
+from fastapi.staticfiles import StaticFiles
+import shutil
+from fastapi.responses import JSONResponse
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException
+import logging
+from sqlalchemy.orm import Session
 from http.client import HTTPException
 from typing import Any, List, Optional, Annotated
 from urllib import response
@@ -57,8 +65,6 @@ user_router_prefix = version_prefix + "user"
 user_router = APIRouter(prefix=user_router_prefix)
 
 
-
-
 oauth.register(
     name='facebook',
     client_id=os.getenv("FACEBOOK_CLIENT_ID"),
@@ -87,7 +93,7 @@ async def login_user(
     db = get_db_session()
     user_repo = UserRepository(entity=UserModel)
     user_token = user_repo.authenticate(db, user_in)
-     # If authentication failed, return early
+    # If authentication failed, return early
     if not user_token:
         response.status_code = 404
         return {
@@ -113,7 +119,7 @@ async def login_user(
         response.status_code = 200
         return {
             "status_code": 200,
-            "message": "Admin login successful.",
+            "message": "login successful.",
             "error": False,
             "data": user_token,
         }
@@ -130,7 +136,6 @@ async def login_user(
             "data": user_token,
         }
 
-    
     if user.role == "employee":  # or use UserRole.ADMIN if using enums
         response.status_code = 200
         return {
@@ -139,7 +144,6 @@ async def login_user(
             "error": False,
             "data": user_token,
         }
-
 
     if not user.is_uploaded:
         response.status_code = 428  # Precondition Required
@@ -184,6 +188,7 @@ async def login_via_google(request: Request):
         "url": f"https://accounts.google.com/o/oauth2/auth?response_type=code&client_id={settings.OAUTH_CLIENT_ID}&redirect_uri={settings.OAUTH_REDIRECT_URI}&scope=openid%20profile%20email"
     }
 
+
 @user_router.post("/login/facebook")
 async def login_via_facebook(request: Request):
     return {
@@ -214,7 +219,6 @@ async def auth_google(
     )
     user_tokens = user_repo.user_handling_logic(db, user_info.json())
     return user_tokens
-
 
 
 @user_router.post("/auth/facebook")
@@ -267,8 +271,10 @@ async def refresh_token_user(
     res_data = context_set_response_code_message.get()
     response.status_code = res_data.status_code
     if user_token_data:
-        response.headers.__setitem__("x-access-token", user_token_data.access_token)
-        response.headers.__setitem__("x-refresh-token", user_token_data.refresh_token)
+        response.headers.__setitem__(
+            "x-access-token", user_token_data.access_token)
+        response.headers.__setitem__(
+            "x-refresh-token", user_token_data.refresh_token)
     return {
         "status_code": res_data.status_code,
         "message": res_data.message,
@@ -338,7 +344,6 @@ async def verify_otp(
     }
 
 
-
 @user_router.post("/reset-password")
 async def reset_password(
     data: PasswordResetRequest,
@@ -358,14 +363,7 @@ async def reset_password(
     }
 
 
-import os
-from sqlalchemy.orm import Session
-import logging
 logging.basicConfig(level=logging.DEBUG)
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException
-from fastapi.responses import JSONResponse
-import shutil
-from fastapi.staticfiles import StaticFiles
 
 
 '''
@@ -402,6 +400,7 @@ async def upload_terms(email: str = Form(...), terms_file: UploadFile = File(...
         raise HTTPException(status_code=500, detail=f"Error processing file: {str(e)}")
 '''
 
+
 @user_router.post("/upload-terms")
 async def upload_terms(
     email: str = Form(...),
@@ -425,7 +424,8 @@ async def upload_terms(
 
     try:
         # Save file
-        file_location = os.path.join(upload_directory, f"{uuid.uuid4()}_{terms_file.filename}")
+        file_location = os.path.join(
+            upload_directory, f"{uuid.uuid4()}_{terms_file.filename}")
         with open(file_location, "wb") as buffer:
             shutil.copyfileobj(terms_file.file, buffer)
 
@@ -458,7 +458,8 @@ async def upload_terms(
 
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error processing file: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error processing file: {str(e)}")
 
 
 '''
@@ -481,7 +482,6 @@ async def get_pending_approval_users(
     return users
 '''
 
-from fastapi import Request
 
 @user_router.get("/pending-approvals")
 async def get_pending_approval_users(
@@ -504,21 +504,19 @@ async def get_pending_approval_users(
             "phone_number": user.phone_number,
             "is_uploaded": user.is_uploaded,
             "is_approved": user.is_admin_approved,
-            "is_rejected":user.is_admin_rejected,
+            "is_rejected": user.is_admin_rejected,
             "terms_file_path": f"{base_url}{user.terms_file_path}" if user.terms_file_path else None,
             # include other fields as needed
         })
 
     return result
 
-from uuid import UUID
-
 
 @user_router.put("/approve/{user_id}")
-async def approve_user(user_id: UUID, 
-        request: Request,                  
-        db: Session = Depends(get_db)
-    ):
+async def approve_user(user_id: UUID,
+                       request: Request,
+                       db: Session = Depends(get_db)
+                       ):
 
     user = db.query(UserModel).filter(UserModel.id == user_id).first()
 
@@ -528,25 +526,23 @@ async def approve_user(user_id: UUID,
     user.is_admin_approved = True
     user.is_admin_rejected = False
 
-           # ✅ Send confirmation email after user is fully created
+    # ✅ Send confirmation email after user is fully created
     try:
-            # User welcome email
-            user_email = user.email  # ✅ send to the user's registered email
-            subject_user = "Welcome to Marri Platform!"
-            body_user = (
-                f"Welcome to Marri, {user.first_name}!\n\n"
-                "Please visit our platform your account has been approved and ready to go!\n\n"
-                "You can log in and get started here: https://marrir.com/\n\n"
-                "Your account has been created successfully.\n\nThanks!"
-            )
-            send_emails(to_email=user_email, subject=subject_user, body=body_user)
+        # User welcome email
+        user_email = user.email  # ✅ send to the user's registered email
+        subject_user = "Welcome to Marri Platform!"
+        body_user = (
+            f"Welcome to Marri, {user.first_name}!\n\n"
+            "Please visit our platform your account has been approved and ready to go!\n\n"
+            "You can log in and get started here: https://marrir.com/\n\n"
+            "Your account has been created successfully.\n\nThanks!"
+        )
+        send_emails(to_email=user_email, subject=subject_user, body=body_user)
 
     except Exception as e:
-            # Optionally log this error
-            print(f"Failed to send email: {e}")
+        # Optionally log this error
+        print(f"Failed to send email: {e}")
 
-
-    
     db.commit()
 
     return {
@@ -556,12 +552,11 @@ async def approve_user(user_id: UUID,
     }
 
 
-
 @user_router.put("/reject/{user_id}")
-async def reject_user(user_id: UUID, 
-        request: Request,                  
-        db: Session = Depends(get_db)
-    ):
+async def reject_user(user_id: UUID,
+                      request: Request,
+                      db: Session = Depends(get_db)
+                      ):
 
     user = db.query(UserModel).filter(UserModel.id == user_id).first()
 
@@ -605,9 +600,6 @@ async def create_user(
     }
 
 
-from fastapi.security import HTTPBearer
-
-
 @user_router.post("/bulk", status_code=201)
 async def bulk_create_user(
     *,
@@ -632,6 +624,7 @@ async def bulk_create_user(
         "error": res_data.error,
         "data": user_created,
     }
+
 
 @user_router.post(
     "/paginated",
@@ -680,6 +673,7 @@ async def read_users(
         "data": users_read,
         "count": res_data.count,
     }
+
 
 @user_router.post(
     "/paginated/non-employee",
@@ -987,7 +981,8 @@ async def generate_user_report(
     """
     db = get_db_session()
     user_repo = UserRepository(entity=UserModel)
-    user_created = user_repo.export_to_pdf(db, title="User Info", filters=filters)
+    user_created = user_repo.export_to_pdf(
+        db, title="User Info", filters=filters)
     res_data = context_set_response_code_message.get()
     response.status_code = res_data.status_code
     return {
@@ -1052,6 +1047,7 @@ async def verify_user(
         "data": user,
     }
 
+
 @user_router.post(
     "/profile/view", status_code=200, response_model=None
 )
@@ -1066,6 +1062,7 @@ async def view_user_profile(
     user_repo = UserRepository(entity=UserModel)
     user_repo.increment_profile_views(db, filters)
     return
+
 
 @user_router.delete(
     "/", response_model=GenericSingleResponse[UserReadSchema], status_code=200

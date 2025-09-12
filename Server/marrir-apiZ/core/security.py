@@ -46,6 +46,7 @@ class Settings(BaseSettings):
     FACEBOOK_CLIENT_ID: str
     FACEBOOK_CLIENT_SECRET: str
     FACEBOOK_REDIRECT_URI: str
+    FACEBOOK_CONFIG_ID: str
 
     TELR_RETURN_URL: str = "http://localhost:5173/replace/payments"
     TELR_TRANSFER_RETURN_URL: str = "http://localhost:5173/replace/transfer-history"
@@ -118,7 +119,8 @@ def decode_user_access_token(token: str) -> Optional[UserTokenSchema]:
             raise jwt.JWTError("token is invalid")
 
         access_token = UserTokenSchema(
-            id=id, email=email, phone_number=phone_number, role=UserRoleSchema(role)
+            id=id, email=email, phone_number=phone_number, role=UserRoleSchema(
+                role)
         )
         return access_token
     except Exception as e:

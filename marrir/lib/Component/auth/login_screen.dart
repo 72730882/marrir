@@ -5,6 +5,8 @@ import 'package:marrir/Page/Employer/employer_page.dart';
 import 'package:marrir/Page/Recruitment/recruitment_page.dart';
 import 'register_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../services/api_service.dart'; // make sure this file exists
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,6 +16,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   bool rememberMe = false;
 
   @override
@@ -52,10 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 25),
-
-              // ===== TITLE =====
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
@@ -67,16 +68,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 30),
-
               // ===== FORM =====
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Email
                     const Text(
                       "Email",
                       style: TextStyle(
@@ -85,11 +83,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    _buildTextField("Email address", prefixIcon: Icons.email),
-
+                    _buildTextField(
+                      "Email address",
+                      prefixIcon: Icons.email,
+                      controller: emailController,
+                    ),
                     const SizedBox(height: 15),
-
-                    // Password
                     const Text(
                       "Password",
                       style: TextStyle(
@@ -98,11 +97,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    _buildTextField(" Password", obscure: true),
-
+                    _buildTextField(
+                      "Password",
+                      obscure: true,
+                      controller: passwordController,
+                    ),
                     const SizedBox(height: 5),
-
-                    // Forgot password
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
@@ -115,17 +115,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 20),
-
                     // ===== SIGN IN BUTTON =====
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {
-                          _showAccountTypeDialog(context);
-                        },
+                        onPressed: _loginUser,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF65b2c9),
                           shape: RoundedRectangleBorder(
@@ -143,9 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 15),
-
                     // Sign in with Google
                     SizedBox(
                       width: double.infinity,
@@ -172,9 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 25),
-
                     // Footer: Register link
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -202,8 +194,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                     const SizedBox(height: 15),
-
-                    // Logo at bottom left
                     Align(
                       alignment: Alignment.bottomLeft,
                       child: Padding(
@@ -228,8 +218,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // ==== HELPER METHODS ====
   Widget _buildTextField(String hint,
-      {IconData? prefixIcon, bool obscure = false}) {
+      {IconData? prefixIcon,
+      bool obscure = false,
+      TextEditingController? controller}) {
     return TextField(
+      controller: controller,
       obscureText: obscure,
       decoration: InputDecoration(
         hintText: hint,
@@ -252,42 +245,63 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // ===== ACCOUNT TYPE DIALOG =====
-  void _showAccountTypeDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            "Select Account Type",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _accountTypeOption(context, "Employee", const EmployeePage()),
-              _accountTypeOption(context, "Agent", const AgentPage()),
-              _accountTypeOption(context, "Employer", const EmployerPage()),
-              _accountTypeOption(
-                  context, "Recruitment", const RecruitmentPage()),
-            ],
-          ),
-        );
-      },
-    );
-  }
+  // ===== LOGIN USER FUNCTION =====
+  Future<void> _loginUser() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
-  Widget _accountTypeOption(BuildContext context, String title, Widget page) {
-    return ListTile(
-      title: Text(title),
-      onTap: () {
-        Navigator.pop(context); // Close dialog
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => page),
-        );
-      },
-    );
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter email and password")),
+      );
+      return;
+    }
+
+    try {
+      // Call backend login
+      final userData = await ApiService.loginUser(
+        email: email,
+        password: password,
+      );
+
+      // Save token and user info
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString("access_token", userData["access_token"]);
+      await prefs.setString("user_role", userData["role"]);
+      await prefs.setString("user_email", userData["email"]);
+      await prefs.setString("user_id", userData["user_id"]);
+
+      // Navigate to dashboard based on role
+      Widget page;
+      switch (userData["role"].toLowerCase()) {
+        case "employee":
+          page = const EmployeePage();
+          break;
+        case "agent":
+          page = const AgentPage();
+          break;
+        case "employer":
+          page = const EmployerPage();
+          break;
+        case "recruitment":
+          page = const RecruitmentPage();
+          break;
+        default:
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Unknown role: ${userData["role"]}")),
+          );
+          return;
+      }
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => page),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Login failed: $e")),
+      );
+    }
   }
 }
 

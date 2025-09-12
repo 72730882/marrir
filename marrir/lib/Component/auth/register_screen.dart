@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
 import 'package:country_picker/country_picker.dart';
+import '../../services/api_service.dart'; // <-- make sure you created this file
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -15,20 +16,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? selectedCountry;
   String? selectedAccountType;
 
-  List<String> get accountTypeOptions {
-    if (isCompany) {
-      return [
-        "Foreign Employment Agencies",
-        "Employer",
-        "Recruitment Firms",
-      ];
-    } else {
-      return [
-        "Employee",
-        "Employer",
-      ];
-    }
-  }
+  // ===== Controllers =====
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+
+  final Map<String, String> accountTypeLabels = {
+  "agent": "Foreign Employment Agent",
+  "recruitment": "Recruitment Firm",
+  "sponsor": "Employer",
+  "employee": "Employee",
+  "selfsponsor": "Self Sponsor",
+};
+
+List<String> get accountTypeOptions {
+  return isCompany
+      ? ["agent", "recruitment", "sponsor"]
+      : ["employee", "selfsponsor"];
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // ===== HEADER WITH CURVES =====
+              // ===== HEADER =====
               Stack(
                 children: [
                   ClipPath(
@@ -68,18 +78,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
 
               const SizedBox(height: 25),
-
-              // ===== TITLE =====
               const Text(
                 "Create Account",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
 
-              // ===== TOGGLE BUTTONS =====
+              // ===== Toggle Company / Individual =====
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
@@ -126,206 +131,106 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ===== NAME FIELDS =====
+                    // First + Last Name
                     Row(
                       children: [
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "First Name",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              _buildTextField("Enter first name"),
-                            ],
+                          child: _buildLabeledField(
+                            "First Name",
+                            controller: firstNameController,
                           ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Last Name",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              _buildTextField("Enter last name"),
-                            ],
+                          child: _buildLabeledField(
+                            "Last Name",
+                            controller: lastNameController,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 15),
 
-                    // ===== EMAIL =====
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Email Address",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                    _buildLabeledField("Email Address",
+                        controller: emailController),
+                    const SizedBox(height: 15),
+
+                    _buildLabeledField("Phone Number",
+                        controller: phoneController, prefixIcon: Icons.flag),
+                    const SizedBox(height: 15),
+
+                    // Country picker
+                    const Text("Country",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 5),
+                    GestureDetector(
+                      onTap: () {
+                        showCountryPicker(
+                          context: context,
+                          showPhoneCode: false,
+                          onSelect: (Country country) {
+                            setState(() {
+                              selectedCountry = country.name;
+                            });
+                          },
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 15),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: const Color(0xFF48C2E9)),
                         ),
-                        const SizedBox(height: 5),
-                        _buildTextField("Enter email address"),
-                      ],
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(selectedCountry ?? "Select country",
+                                style: const TextStyle(fontSize: 16)),
+                            const Icon(Icons.arrow_drop_down),
+                          ],
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 15),
 
-                    // ===== PHONE =====
+                    // Account type checkboxes
+                    const Text("Account Type",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Phone Number",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        _buildTextField("Enter phone number",
-                            prefixIcon: Icons.flag),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-
-                    // ===== COUNTRY DROPDOWN =====
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Country",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        GestureDetector(
-                          onTap: () {
-                            showCountryPicker(
-                              context: context,
-                              showPhoneCode: false,
-                              onSelect: (Country country) {
+                      children: accountTypeOptions.map((type) {
+                        bool isSelected = selectedAccountType == type;
+                        return Row(
+                          children: [
+                            Checkbox(
+                              value: isSelected,
+                              onChanged: (val) {
                                 setState(() {
-                                  selectedCountry = country.name;
+                                  selectedAccountType = type;
                                 });
                               },
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 15),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border:
-                                  Border.all(color: const Color(0xFF48C2E9)),
+                              activeColor: const Color(0xFF7B4BBA),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  selectedCountry ?? "Select country",
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                                const Icon(Icons.arrow_drop_down),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                            Text(accountTypeLabels[type] ?? type, style: const TextStyle(fontSize: 16))
+,
+                          ],
+                        );
+                      }).toList(),
                     ),
                     const SizedBox(height: 15),
 
-                    // ===== ACCOUNT TYPE (BOX SELECTION) =====
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Account Type",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Column(
-                          children: accountTypeOptions.map((type) {
-                            bool isSelected = selectedAccountType == type;
-                            return Row(
-                              children: [
-                                Checkbox(
-                                  value: isSelected,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      // Only allow one selection
-                                      selectedAccountType = type;
-                                    });
-                                  },
-                                  activeColor: const Color(0xFF7B4BBA),
-                                ),
-                                Text(
-                                  type,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
-
+                    _buildLabeledField("Password",
+                        controller: passwordController, obscure: true),
                     const SizedBox(height: 15),
 
-                    // ===== PASSWORD =====
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Password",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        _buildTextField("Enter password", obscure: true),
-                      ],
-                    ),
+                    _buildLabeledField("Confirm Password",
+                        controller: confirmPasswordController, obscure: true),
                     const SizedBox(height: 15),
 
-                    // ===== CONFIRM PASSWORD =====
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Confirm Password",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        _buildTextField("Confirm password", obscure: true),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-
-                    // ===== TERMS CHECKBOX =====
+                    // Terms
                     Row(
                       children: [
                         Checkbox(
@@ -334,80 +239,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               setState(() => agreeTerms = val ?? false),
                         ),
                         const Expanded(
-                          child: Text(
-                            "I agree to the terms and conditions",
-                            style: TextStyle(fontSize: 14),
-                          ),
+                          child: Text("I agree to the terms and conditions"),
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
 
-                    // ===== SIGN UP BUTTON =====
+                    // Sign Up button
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: _registerUser,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF65b2c9),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 3,
+                              borderRadius: BorderRadius.circular(12)),
                         ),
                         child: const Text(
                           "Sign Up",
                           style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
                         ),
                       ),
                     ),
                     const SizedBox(height: 25),
 
-                    // ===== FOOTER =====
-                    Column(
+                    // Footer
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text("Already have an account?"),
-                            const SizedBox(width: 5),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LoginScreen(),
-                                  ),
-                                );
-                              },
-                              child: const Text(
-                                "Log in",
-                                style: TextStyle(
-                                  color: Colors.purple,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 15),
-                        Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 0, bottom: 20.0),
-                            child: Image.asset(
-                              'assets/images/onboarding_images/logo2.png',
-                              width: 70,
-                              height: 40,
-                              fit: BoxFit.contain,
-                            ),
+                        const Text("Already have an account?"),
+                        const SizedBox(width: 5),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginScreen()),
+                            );
+                          },
+                          child: const Text(
+                            "Log in",
+                            style: TextStyle(
+                                color: Colors.purple,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline),
                           ),
                         ),
                       ],
@@ -422,34 +301,79 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // ===== HELPER WIDGETS =====
-  Widget _buildTextField(String hint,
-      {IconData? prefixIcon, bool obscure = false}) {
-    return TextField(
-      obscureText: obscure,
-      decoration: InputDecoration(
-        hintText: hint,
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF48C2E9)),
+  // ===== Helper widget with label =====
+  Widget _buildLabeledField(String label,
+      {TextEditingController? controller,
+      IconData? prefixIcon,
+      bool obscure = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 5),
+        TextField(
+          controller: controller,
+          obscureText: obscure,
+          decoration: InputDecoration(
+            hintText: label,
+            prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+            border:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          ),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF48C2E9)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF7B4BBA), width: 2),
-        ),
-      ),
+      ],
     );
+  }
+
+  // ===== API Call =====
+  Future<void> _registerUser() async {
+    if (!agreeTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("You must agree to terms")),
+      );
+      return;
+    }
+
+    if (passwordController.text != confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Passwords do not match")),
+      );
+      return;
+    }
+
+    final data = {
+      "first_name": firstNameController.text,
+      "last_name": lastNameController.text,
+      "email": emailController.text,
+      "phone_number": phoneController.text,
+      "country": selectedCountry,
+      "role": selectedAccountType,
+      "password": passwordController.text,
+    };
+
+    try {
+      final response = await ApiService.registerUser(data);
+      print("✅ Registered: $response");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Registration successful")),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    } catch (e) {
+      print("❌ Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed: $e")),
+      );
+    }
   }
 }
 
-// ===== CUSTOM CLIPPER FOR HEADER CURVE =====
+// ===== Custom header clipper =====
 class HeaderClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

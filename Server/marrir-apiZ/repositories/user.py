@@ -1,3 +1,7 @@
+from enum import Enum
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
 from datetime import datetime, timedelta
 from http.client import HTTPException
 from io import BytesIO
@@ -79,17 +83,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
-
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
 def send_emails(to_email: str, subject: str, body: str):
-    #from_email = "muktarabdulmelik9@gmail.com"
-    #app_password = "ppaz whzx xsxz indm"  # 16-character app password
-    from_email = 'portalmarrir@gmail.com'
-    app_password = "otta bmgi xqez hzmu"
+    # from_email = "muktarabdulmelik9@gmail.com"
+    # app_password = "ppaz whzx xsxz indm"  # 16-character app password
+    # from_email = 'portalmarrir@gmail.com'
+    # app_password = "otta bmgi xqez hzmu"
 
     msg = MIMEMultipart()
     msg["From"] = from_email
@@ -106,7 +104,6 @@ def send_emails(to_email: str, subject: str, body: str):
     except Exception as e:
         print(f"Failed to send email: {e}")
 
-from enum import Enum
 
 class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchema]):
     def get_by_id(self, db: Session, entity_id: int) -> EntityType:
@@ -177,7 +174,7 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
                 "country": user.country,
                 "role": user.role,
                 "cv": user.cv,
-                "status":status,
+                "status": status,
                 "process": user.process,
                 "profile": user.profile,
                 "company": user.company,
@@ -251,7 +248,8 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
 
         if cv:
             education = (
-                db.query(EducationModel).filter(EducationModel.cv_id == cv.id).first()
+                db.query(EducationModel).filter(
+                    EducationModel.cv_id == cv.id).first()
             )
             work_experiences = (
                 db.query(WorkExperienceModel)
@@ -296,8 +294,10 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
         sponsor_rating_values = [rating.value for rating in sponsor_rating]
 
         rating = UserRatingSchema(
-            admin_rating=sum(admin_rating_values) / max(1, len(admin_rating_values)),
-            self_rating=sum(test_rating_values) / max(1, len(test_rating_values)),
+            admin_rating=sum(admin_rating_values) /
+            max(1, len(admin_rating_values)),
+            self_rating=sum(test_rating_values) /
+            max(1, len(test_rating_values)),
             sponsor_rating=sum(sponsor_rating_values)
             / max(1, len(sponsor_rating_values)),
         )
@@ -610,7 +610,6 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
 
             return {"OTP": user.otp, "expiry_time": user.otp_expiry}
 
-
         otp = str(random.randint(100000, 999999))
         otp_expiry = current_time + timedelta(minutes=5)
         user.otp = otp
@@ -618,7 +617,6 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
         subject = "Your OTP for Password Reset"
         body = f"Here is your OTP: {otp}"
         send_email(email=user.email, title=subject, description=body)
-
 
         context_set_response_code_message.set(
             BaseGenericResponse(
@@ -711,7 +709,7 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
                 status_code=200,
             )
         )
-       
+
     '''
     def create(self, db: Session, *, obj_in: UserCreateSchema) -> EntityType | None:
         obj_in_data = jsonable_encoder(obj_in)
@@ -781,7 +779,8 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
         db.refresh(db_obj)
 
         qr_code_data = generate_qr_code(db_obj.id)
-        new_user_profile = UserProfileModel(user_id=db_obj.id, qr_code=qr_code_data)
+        new_user_profile = UserProfileModel(
+            user_id=db_obj.id, qr_code=qr_code_data)
         user = context_actor_user_data.get()
         db.add(new_user_profile)
 
@@ -802,7 +801,7 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
 
         # ✅ Send confirmation email after user is fully created
         try:
-                # Admin notification
+            # Admin notification
             admin_email = "ejtiazportal@gmail.com"
             subject_admin = "New User Registration Notification"
             body_admin = (
@@ -811,7 +810,8 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
                 f"Click the link below to review:\nhttps://marrir.com/\n\n"
                 "Thanks!"
             )
-            send_emails(to_email=admin_email, subject=subject_admin, body=body_admin)
+            send_emails(to_email=admin_email,
+                        subject=subject_admin, body=body_admin)
 
             # User welcome email
             user_email = db_obj.email  # ✅ send to the user's registered email
@@ -822,7 +822,8 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
                 "You can log in and get started here: https://marrir.com/\n\n"
                 "Your account has been created successfully.\n\nThanks!"
             )
-            send_emails(to_email=user_email, subject=subject_user, body=body_user)
+            send_emails(to_email=user_email,
+                        subject=subject_user, body=body_user)
 
         except Exception as e:
             # Optionally log this error
@@ -860,7 +861,8 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
             return None
 
         update_data = (
-            obj_in if isinstance(obj_in, dict) else obj_in.dict(exclude_unset=True)
+            obj_in if isinstance(obj_in, dict) else obj_in.dict(
+                exclude_unset=True)
         )
 
         if "email" in update_data or "phone_number" in update_data:
@@ -869,7 +871,8 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
                 .filter(
                     or_(
                         self.entity.email == update_data.get("email"),
-                        self.entity.phone_number == update_data.get("phone_number"),
+                        self.entity.phone_number == update_data.get(
+                            "phone_number"),
                     ),
                     self.entity.id != entity.id,
                 )
@@ -901,7 +904,6 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
         )
 
         return entity
-    
 
     def updateTerms(
         self,
@@ -922,7 +924,8 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
             return None
 
         update_data = (
-            obj_in if isinstance(obj_in, dict) else obj_in.dict(exclude_unset=True)
+            obj_in if isinstance(obj_in, dict) else obj_in.dict(
+                exclude_unset=True)
         )
 
         for key, value in update_data.items():
@@ -960,7 +963,8 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
 
             # ✅ Read excel file safely
             contents = file.file.read()   # Read uploaded file as bytes
-            df = pd.read_excel(io.BytesIO(contents), dtype={"passport_number": str, "phone_number": str})
+            df = pd.read_excel(io.BytesIO(contents), dtype={
+                               "passport_number": str, "phone_number": str})
             df = df.map(lambda x: None if pd.isna(x) or x == "" else x)
 
             for index, row in df.iterrows():
@@ -979,24 +983,28 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
                 full_name = entity.get("english_full_name", "")
                 if full_name and isinstance(full_name, str):
                     parts = full_name.strip().split(" ", 1)
-                    entity["first_name"] = self.capitalize_string(parts[0]) if parts else None
-                    entity["last_name"] = self.capitalize_string(parts[1]) if len(parts) > 1 else None
+                    entity["first_name"] = self.capitalize_string(
+                        parts[0]) if parts else None
+                    entity["last_name"] = self.capitalize_string(
+                        parts[1]) if len(parts) > 1 else None
                 else:
                     entity["first_name"], entity["last_name"] = None, None
 
                 # ✅ Normalize other fields
                 entity["date_of_birth"] = (
-                    pd.to_datetime(entity.get("date_of_birth"), errors="coerce").date()
+                    pd.to_datetime(entity.get("date_of_birth"),
+                                   errors="coerce").date()
                     if entity.get("date_of_birth")
                     else None
                 )
-                entity["passport_number"] = str(entity.get("passport_number")) if entity.get("passport_number") else None
-                entity["nationality"] = self.capitalize_string(entity.get("nationality")) if entity.get("nationality") else None
+                entity["passport_number"] = str(entity.get(
+                    "passport_number")) if entity.get("passport_number") else None
+                entity["nationality"] = self.capitalize_string(entity.get(
+                    "nationality")) if entity.get("nationality") else None
 
                 # ✅ Build User schema
 
-
-                                # ✅ Build User schema
+                # ✅ Build User schema
                 obj_in = UserCreateSchema(**entity)
 
                 # Remove keys that UserModel doesn’t support
@@ -1004,7 +1012,6 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
 
                 # Create DB object
                 db_obj = self.entity(**user_data)
-
 
                 # ✅ Conflict check
                 exists = self.check_conflict(db, entity=db_obj)
@@ -1043,7 +1050,8 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
 
                 new_cv = CVModel(
                     user_id=db_obj.id,
-                    english_full_name=(db_obj.first_name + " " + db_obj.last_name) if db_obj.first_name else None,
+                    english_full_name=(
+                        db_obj.first_name + " " + db_obj.last_name) if db_obj.first_name else None,
                     email=db_obj.email,
                     phone_number=db_obj.phone_number,
                     sex=db_obj.sex,
@@ -1071,7 +1079,6 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
                 )
             )
             return None
-
 
     def check_conflict(self, db: Session, entity: EntityType):
         return super().check_conflict(db, entity)
@@ -1196,11 +1203,12 @@ class UserRepository(BaseRepository[UserModel, UserCreateSchema, UserUpdateSchem
             UserTokenSchema(id=user.id, email=user.email, role=user.role)
         )
         return UserTokenResponseSchema(
-        user_id=user.id,
-        email=user.email,
-        role=user.role.value if isinstance(user.role, Enum) else str(user.role),
-        access_token=access_token,
-        refresh_token=refresh_token,
+            user_id=user.id,
+            email=user.email,
+            role=user.role.value if isinstance(
+                user.role, Enum) else str(user.role),
+            access_token=access_token,
+            refresh_token=refresh_token,
         )
 
     def refresh(

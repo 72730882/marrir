@@ -94,7 +94,7 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
             "zip_code",
             "house_no",
             "po_box",
-        
+
         ]
 
         education_info_fields = [
@@ -185,7 +185,8 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
             )
         )
 
-        employee = db.query(EmployeeModel).filter_by(user_id=filters.user_id).first()
+        employee = db.query(EmployeeModel).filter_by(
+            user_id=filters.user_id).first()
 
         if (
             employee
@@ -210,7 +211,7 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
             reference_progress=round(reference_progress),
             contact_progress=round(contact_progress),
         )
-    
+
     '''
     def upsert(
         self,
@@ -440,9 +441,12 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
         try:
             print("\n=== Incoming CV Data ===")
             print(f"CV Data JSON: {cv_data_json}")
-            print(f"Head Photo: {'Provided' if head_photo else 'Not provided'}")
-            print(f"Full Body Photo: {'Provided' if full_body_photo else 'Not provided'}")
-            print(f"Intro Video: {'Provided' if intro_video else 'Not provided'}")
+            print(
+                f"Head Photo: {'Provided' if head_photo else 'Not provided'}")
+            print(
+                f"Full Body Photo: {'Provided' if full_body_photo else 'Not provided'}")
+            print(
+                f"Intro Video: {'Provided' if intro_video else 'Not provided'}")
             print("========================\n")
 
             # Parse JSON data
@@ -460,7 +464,8 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
                 return None
 
             # Normalize user_id
-            cv_data["user_id"] = None if cv_data.get("user_id") is None else cv_data["user_id"]
+            cv_data["user_id"] = None if cv_data.get(
+                "user_id") is None else cv_data["user_id"]
 
             # Log parsed CV data
             print("\n=== Parsed CV Data ===")
@@ -478,7 +483,6 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
 
             # Check for duplicate passport number
             passport_number = cv_data.get("passport_number")
-           
 
             try:
                 # Convert to schema
@@ -503,49 +507,54 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
                         new_user.role = UserRoleSchema.EMPLOYEE
                         db.add(new_user)
                         db.flush()
-                        
+
                         obj_in.user_id = new_user.id
-                        
+
                         # Create user profile
                         qr_code_data = generate_qr_code(new_user.id)
                         new_user_profile = UserProfileModel(
                             user_id=new_user.id,
                             qr_code=qr_code_data
                         )
-                        
+
                         # Create employee record
                         user_id = context_actor_user_data.get().id
                         employee = EmployeeModel(
                             user_id=new_user.id,
                             manager_id=user_id,
                         )
-                        
+
                         db.add(new_user_profile)
                         db.add(employee)
                         db.flush()
 
                     # Check for existing CV
-                    existing_cv = db.query(CVModel).filter_by(user_id=obj_in.user_id).first()
+                    existing_cv = db.query(CVModel).filter_by(
+                        user_id=obj_in.user_id).first()
 
                     if existing_cv:
-                        print(f"Updating existing CV for user {obj_in.user_id}")
-                        
+                        print(
+                            f"Updating existing CV for user {obj_in.user_id}")
+
                         # Update basic fields
                         for field, value in obj_in.dict(
                             exclude_unset=True,
-                            exclude=["address", "education", "work_experiences", "references"],
+                            exclude=["address", "education",
+                                     "work_experiences", "references"],
                         ).items():
                             setattr(existing_cv, field, value)
 
                         # Update address
                         if obj_in.address:
                             try:
-                                existing_address = db.query(AddressModel).filter_by(id=existing_cv.address_id).first()
+                                existing_address = db.query(AddressModel).filter_by(
+                                    id=existing_cv.address_id).first()
                                 if existing_address:
                                     for field, value in obj_in.address.dict(exclude_unset=True).items():
                                         setattr(existing_address, field, value)
                                 else:
-                                    new_address = AddressModel(**obj_in.address.dict())
+                                    new_address = AddressModel(
+                                        **obj_in.address.dict())
                                     existing_cv.address = new_address
                                     db.add(new_address)
                             except Exception as e:
@@ -553,7 +562,8 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
                                 raise
                         if obj_in.education:
                             existing_education = (
-                                db.query(EducationModel).filter_by(cv_id=existing_cv.id).first()
+                                db.query(EducationModel).filter_by(
+                                    cv_id=existing_cv.id).first()
                             )
                             if existing_education:
                                 for field, value in obj_in.education.dict(
@@ -561,23 +571,27 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
                                 ).items():
                                     setattr(existing_education, field, value)
                             else:
-                                new_education = EducationModel(**obj_in.education.dict())
+                                new_education = EducationModel(
+                                    **obj_in.education.dict())
                                 existing_cv.education = new_education
                                 db.add(new_education)
 
                         # Handle file uploads
                         if head_photo:
-                            existing_cv.head_photo = uploadFileToLocal(head_photo)
+                            existing_cv.head_photo = uploadFileToLocal(
+                                head_photo)
                         elif cv_data.get("remove_head_photo"):
                             existing_cv.head_photo = None
 
                         if full_body_photo:
-                            existing_cv.full_body_photo = uploadFileToLocal(full_body_photo)
+                            existing_cv.full_body_photo = uploadFileToLocal(
+                                full_body_photo)
                         elif cv_data.get("remove_full_body_photo"):
                             existing_cv.full_body_photo = None
 
                         if intro_video:
-                            existing_cv.intro_video = uploadFileToLocal(intro_video)
+                            existing_cv.intro_video = uploadFileToLocal(
+                                intro_video)
                         elif cv_data.get("remove_intro_video"):
                             existing_cv.intro_video = None
 
@@ -595,7 +609,8 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
                             for ref in existing_cv.references:
                                 db.delete(ref)
                             for ref_data in obj_in.references:
-                                reference = ReferenceModel(**ref_data.dict(), cv_id=existing_cv.id)
+                                reference = ReferenceModel(
+                                    **ref_data.dict(), cv_id=existing_cv.id)
                                 db.add(reference)
 
                         db.flush()
@@ -610,7 +625,7 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
 
                     else:
                         print(f"Creating new CV for user {obj_in.user_id}")
-                        
+
                         # Create new CV
                         new_cv = CVModel(
                             **obj_in.dict(
@@ -629,7 +644,8 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
                         # Create address
                         if obj_in.address:
                             try:
-                                new_address = AddressModel(**obj_in.address.dict())
+                                new_address = AddressModel(
+                                    **obj_in.address.dict())
                                 new_cv.address = new_address
                                 db.add(new_address)
                             except Exception as e:
@@ -638,7 +654,8 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
 
                         # Create education
                         if obj_in.education:
-                            new_education = EducationModel(**obj_in.education.dict())
+                            new_education = EducationModel(
+                                **obj_in.education.dict())
                             new_cv.education = new_education
                             db.add(new_education)
 
@@ -665,7 +682,8 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
                             new_cv.head_photo = uploadFileToLocal(head_photo)
 
                         if full_body_photo:
-                            new_cv.full_body_photo = uploadFileToLocal(full_body_photo)
+                            new_cv.full_body_photo = uploadFileToLocal(
+                                full_body_photo)
 
                         if intro_video:
                             new_cv.intro_video = uploadFileToLocal(intro_video)
@@ -702,8 +720,6 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
                 )
             )
             return None
-        
-
 
     def delete(self, db: Session, filters: FilterSchemaType) -> EntityType:
         return super().delete(db, filters)
@@ -750,38 +766,33 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
     '''
 
     def upload_passport(
-            self, db: Session, user_id: Optional[uuid.UUID], file: UploadFile
-        ):
-            try:
-                file_path = uploadFileToLocal(file)
-                
-                cv = dict()
-                cv["user_id"] = str(user_id) if user_id is not None else None
-                cv["passport_url"] = file_path
+        self, db: Session, user_id: Optional[uuid.UUID], file: UploadFile
+    ):
+        try:
+            file_path = uploadFileToLocal(file)
 
-                print("File saved to:", file_path)
-                print("CV data before upsert:", cv)
+            cv = dict()
+            cv["user_id"] = str(user_id) if user_id is not None else None
+            cv["passport_url"] = file_path
 
-                return self.upsert(db, cv_data_json=json.dumps(cv))
+            print("File saved to:", file_path)
+            print("CV data before upsert:", cv)
 
-            except Exception as e:
-                import traceback
-                print("Upload error:", str(e))
-                traceback.print_exc()
+            return self.upsert(db, cv_data_json=json.dumps(cv))
 
-                context_set_response_code_message.set(
-                    BaseGenericResponse(
-                        error=True,
-                        message=f"Unable to upload the passport image: {str(e)}",
-                        status_code=400,
-                    )
+        except Exception as e:
+            import traceback
+            print("Upload error:", str(e))
+            traceback.print_exc()
+
+            context_set_response_code_message.set(
+                BaseGenericResponse(
+                    error=True,
+                    message=f"Unable to upload the passport image: {str(e)}",
+                    status_code=400,
                 )
+            )
 
-
-            
-
-
-                
     def bulk_upload(self, db: Session, file: BytesIO):
         try:
             df = pd.read_excel(
@@ -866,7 +877,6 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
             )
             return None
 
-        
     '''
     def export_to_pdf(
         self, db: Session, *, request: Request, title: str, filters: CVFilterSchema
@@ -972,7 +982,6 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
             print(e)
         return content
     '''
-
 
     '''
     def export_to_pdf(
@@ -1100,18 +1109,16 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
         
     '''
 
-
-
     def export_to_pdf(
         self, db: Session, *, request: Request, title: str, filters: CVFilterSchema
     ):
         logger = logging.getLogger(__name__)
         logger.info(f"Starting PDF export for CV with filters: {filters}")
-        
+
         templates = Jinja2Templates(directory="templates")
         entity = db.query(CVModel).filter_by(user_id=filters.user_id).first()
         qr_code = my_qr_code(f"{settings.FRONTEND_PUBLIC_CV_URL}/{entity.id}")
-        
+
         if not entity:
             logger.warning(f"CV not found for user_id: {filters.user_id}")
             context_set_response_code_message.set(
@@ -1123,7 +1130,8 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
             )
             return None
 
-        logger.info(f"Found CV for user_id: {filters.user_id}, proceeding with PDF generation")
+        logger.info(
+            f"Found CV for user_id: {filters.user_id}, proceeding with PDF generation")
 
         owner_data = {}
 
@@ -1133,16 +1141,17 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
                 if hasattr(entity.user, 'employees') and entity.user.employees:
                     # Get the first employee's manager_id
                     manager_id = entity.user.employees[0].manager_id
-                    
+
                     # Query the manager
-                    manager = db.query(UserModel).filter(UserModel.id == manager_id).first()
-                    
+                    manager = db.query(UserModel).filter(
+                        UserModel.id == manager_id).first()
+
                     if manager is not None:
                         # Check manager role
                         if hasattr(manager, 'role') and manager.role in ["agent", "recruitment", "sponsor"]:
                             # Safely get company data
                             company = getattr(manager, 'company', None)
-                            
+
                             # Build owner data with safe defaults
                             owner_data = {
                                 "company_name": getattr(company, 'company_name', '') if company else '',
@@ -1151,7 +1160,8 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
                                 "email": getattr(manager, 'email', ''),
                                 "location": getattr(company, 'location', '') if company else ''
                             }
-                            logger.debug(f"Added owner data for manager: {manager.id}")
+                            logger.debug(
+                                f"Added owner data for manager: {manager.id}")
         except Exception as e:
             logger.warning(f"Error processing manager data: {str(e)}")
             # Continue with empty owner_data if there's an error
@@ -1209,8 +1219,9 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
 
         # Safely check education level
         education = getattr(entity, 'education', None)
-        education_level = getattr(education, 'highest_level', None) if education else None
-        
+        education_level = getattr(
+            education, 'highest_level', None) if education else None
+
         if education_level in ["bsc", "msc", "phd"]:
             template = templates.get_template("cv.html")
             logger.debug("Using graduate CV template")
@@ -1228,26 +1239,25 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
         except Exception as e:
             logger.error(f"Error calculating age: {str(e)}")
             print(e)
-        
+
         def build_video_url(entity) -> str:
             try:
                 if hasattr(entity, 'intro_video') and entity.intro_video:
                     return f"{settings.BASE_URL}/static/videos/uploads/{entity.intro_video.strip('/')}"
             except Exception as e:
-                logging.getLogger(__name__).error(f"Error building video URL: {str(e)}")
+                logging.getLogger(__name__).error(
+                    f"Error building video URL: {str(e)}")
             return ""
 
-
         video_url = build_video_url(entity)
-
 
         try:
             content = template.render(
                 request=request,
-                user=entity, 
-                img_base64=qr_code, 
+                user=entity,
+                img_base64=qr_code,
                 passport_url=getattr(entity, 'passport_url', ''),
-               
+
                 base_url=f"{settings.BASE_URL}/static",
                 rate=rate,
                 additional_languages=additional_languages,
@@ -1256,13 +1266,14 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
                 age=age,
                 video_url=video_url
             )
-            
-            logger.info(f"Successfully generated PDF content for CV: {entity.id}")
+
+            logger.info(
+                f"Successfully generated PDF content for CV: {entity.id}")
 
         except Exception as e:
             logger.error(f"Error generating PDF content: {str(e)}")
             print(e)
-            
+
         return content
 
     def export_to_pdf_saudi(
@@ -1302,7 +1313,8 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
             )
             return None
 
-        languages = db.query(AdditionalLanguageModel).filter_by(cv_id=filters.id).all()
+        languages = db.query(AdditionalLanguageModel).filter_by(
+            cv_id=filters.id).all()
 
         if len(languages) == 0:
             context_set_response_code_message.set(
@@ -1360,7 +1372,8 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
     def delete_language(
         self, db: Session, filters: AdditionalLanguageReadSchema
     ) -> EntityType:
-        language = db.query(AdditionalLanguageModel).filter_by(id=filters.id).first()
+        language = db.query(AdditionalLanguageModel).filter_by(
+            id=filters.id).first()
         if not language:
             context_set_response_code_message.set(
                 BaseGenericResponse(

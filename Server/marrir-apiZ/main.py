@@ -34,6 +34,8 @@ from routers.assignagent import assign_agent_router
 from seed import seed_promotion_package
 from utils.exceptions import AppException
 from cron_jobs import inactive_expired_promotion, scheduler, delete_declined_and_cancelled_reserves
+from fastapi.middleware.cors import CORSMiddleware
+
 
 tags_metadata = [
     {"name": "user", "description": "user routes"},
@@ -72,14 +74,22 @@ settings = Settings()
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
-@app.middleware("http")
-async def cors_middleware(request: Request, call_next):
-    response = await call_next(request)
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    response.headers["Access-Control-Allow-Methods"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "*"
-    return response
+# @app.middleware("http")
+# async def cors_middleware(request: Request, call_next):
+#     response = await call_next(request)
+#     response.headers["Access-Control-Allow-Origin"] = "*"
+#     response.headers["Access-Control-Allow-Credentials"] = "true"
+#     response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
+#     response.headers["Access-Control-Allow-Headers"] = "Authorization,Content-Type"
+#     return response
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.api_route("/{path_name:path}", methods=["OPTIONS"])
@@ -113,7 +123,8 @@ async def application_exception_handler(request, exc):
     )
     return JSONResponse(
         status_code=exc.status_code,
-        content={"message": exc.message, "error": True, "status_code": exc.status_code},
+        content={"message": exc.message, "error": True,
+                 "status_code": exc.status_code},
     )
 
 
@@ -128,13 +139,16 @@ async def get_session(request: Request):
     value = request.session.get("key", "Not set")
     return {"session_value": value}
 
+
 async def con_job_event():
     logger.info("initializing database")
     init_db()
     db = SessionLocal()
     if db:
-        scheduler.add_job(delete_declined_and_cancelled_reserves, 'interval', hours=24, args=[db])
-        scheduler.add_job(inactive_expired_promotion, 'interval', hours=24, args=[db])
+        scheduler.add_job(delete_declined_and_cancelled_reserves,
+                          'interval', hours=24, args=[db])
+        scheduler.add_job(inactive_expired_promotion,
+                          'interval', hours=24, args=[db])
         seed_promotion_package(db)
     else:
         print("Failed to get a valid database session.")
@@ -143,7 +157,8 @@ app.add_event_handler("startup", con_job_event)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 # ✅ Mount the static directory here
-app.mount("/uploaded_terms", StaticFiles(directory="uploaded_terms"), name="uploaded_terms")
+app.mount("/uploaded_terms", StaticFiles(directory="uploaded_terms"),
+          name="uploaded_terms")
 
 app.include_router(user_router, tags=["user"])
 app.include_router(notification_router, tags=["notification"])

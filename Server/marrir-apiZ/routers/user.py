@@ -1,3 +1,4 @@
+from fastapi import Response
 from uuid import UUID
 from fastapi import Request
 from fastapi.staticfiles import StaticFiles
@@ -13,6 +14,7 @@ import uuid
 
 from fastapi import APIRouter, Depends, Response, Header, UploadFile
 from fastapi.security import HTTPBearer
+
 from pydantic import EmailStr
 import requests
 from starlette.requests import Request
@@ -26,7 +28,7 @@ from models.db import build_request_context, get_db, get_db_session, authenticat
 from models.usermodel import UserModel
 from repositories.user import UserRepository, send_emails
 from routers import version_prefix
-from schemas.base import GenericSingleResponse, GenericMultipleResponse
+from schemas.base import GenericSingleResponse, GenericMultipleResponse, BaseGenericResponse
 from schemas.cvschema import CVSearchSchema
 from schemas.userschema import (
     AdminUsersSearchSchema,

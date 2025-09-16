@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:marrir/services/Employee/cv_service.dart'; // <-- service import
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddressInformationStep extends StatefulWidget {
-  const AddressInformationStep({super.key});
+  final VoidCallback onSuccess;
+  final VoidCallback onNextStep;
+  const AddressInformationStep(
+      {super.key, required this.onSuccess, required this.onNextStep});
 
   @override
   State<AddressInformationStep> createState() => _AddressInformationStepState();
@@ -10,7 +15,7 @@ class AddressInformationStep extends StatefulWidget {
 class _AddressInformationStepState extends State<AddressInformationStep> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers...
+  // Controllers
   final _regionCtrl = TextEditingController();
   final _cityCtrl = TextEditingController();
   final _streetCtrl = TextEditingController();
@@ -77,6 +82,48 @@ class _AddressInformationStepState extends State<AddressInformationStep> {
         ),
       ),
     );
+  }
+
+  Future<void> _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        // Get userId and token from SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        final userId = prefs.getString("user_id");
+        final token = prefs.getString("access_token");
+
+        if (userId == null || token == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("User not logged in")),
+          );
+          return;
+        }
+
+        // Call the service
+        final data = await CVService.submitAddressInfo(
+          userId: userId,
+          token: token,
+          country: _country ?? "",
+          region: _regionCtrl.text,
+          city: _cityCtrl.text,
+          street: _streetCtrl.text,
+          street2: _street2Ctrl.text.isNotEmpty ? _street2Ctrl.text : null,
+          street3: _street3Ctrl.text.isNotEmpty ? _street3Ctrl.text : null,
+          zipCode: _zipCtrl.text.isNotEmpty ? _zipCtrl.text : null,
+          houseNumber:
+              _houseNumberCtrl.text.isNotEmpty ? _houseNumberCtrl.text : null,
+          poBox: _poBoxCtrl.text.isNotEmpty ? _poBoxCtrl.text : null,
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Address information submitted!")),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: $e")),
+        );
+      }
+    }
   }
 
   @override
@@ -232,13 +279,7 @@ class _AddressInformationStepState extends State<AddressInformationStep> {
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Form submitted!")),
-                  );
-                }
-              },
+              onPressed: _submitForm,
               child: const Text(
                 "Submit",
                 style: TextStyle(

@@ -5,7 +5,7 @@ import 'package:marrir/Page/Employer/employer_page.dart';
 import 'package:marrir/Page/Recruitment/recruitment_page.dart';
 import 'register_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../services/api_service.dart'; // make sure this file exists
+import '../../services/user.dart'; // make sure this file exists
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -271,20 +271,20 @@ class _LoginScreenState extends State<LoginScreen> {
       await prefs.setString("user_email", userData["email"]);
       await prefs.setString("user_id", userData["user_id"]);
 
-      // Navigate to dashboard based on role
+      // Navigate to dashboard based on role, passing token
       Widget page;
       switch (userData["role"].toLowerCase()) {
         case "employee":
-          page = const EmployeePage();
+          page = EmployeePage(token: userData["access_token"]); // ✅ pass token
           break;
         case "agent":
-          page = const AgentPage();
+          page = const AgentPage(); // If needed
           break;
         case "employer":
-          page = const EmployerPage();
+          page = const EmployerPage(); // If needed
           break;
         case "recruitment":
-          page = const RecruitmentPage();
+          page = const RecruitmentPage(); // If needed
           break;
         default:
           ScaffoldMessenger.of(context).showSnackBar(

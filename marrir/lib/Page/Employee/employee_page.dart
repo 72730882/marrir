@@ -6,7 +6,9 @@ import 'package:marrir/Component/Employee/PostedJobs/posted_job.dart';
 import 'package:marrir/Component/Employee/layout/layout.dart';
 
 class EmployeePage extends StatefulWidget {
-  const EmployeePage({super.key});
+  final String token; // 👈 Add token
+
+  const EmployeePage({super.key, required this.token}); // 👈 require token
 
   @override
   State<EmployeePage> createState() => _EmployeePageState();
@@ -16,11 +18,17 @@ class _EmployeePageState extends State<EmployeePage> {
   int _currentIndex = 0;
   Widget? _childPage; // currently active child page
 
-  final List<Widget> _pages = [
-    const RecentlyPostedJobs(),
-    const AvailableJob(),
-    const CVMain(), // CV section
-  ];
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      const RecentlyPostedJobs(),
+      const AvailableJob(),
+      CVMain(token: widget.token), // 👈 Pass token to CVMain
+    ];
+  }
 
   void _onTabSelected(int index) {
     setState(() {
@@ -38,6 +46,7 @@ class _EmployeePageState extends State<EmployeePage> {
   @override
   Widget build(BuildContext context) {
     return EmployeeLayout(
+      token: widget.token, // 👈 Pass token to EmployeeLayout
       currentIndex: _currentIndex,
       onTabSelected: _onTabSelected,
       // Hide header for ProfilePage (index 3) and CVMain (index 2)

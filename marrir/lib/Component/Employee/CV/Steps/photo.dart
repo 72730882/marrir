@@ -1,23 +1,110 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:marrir/services/Employee/cv_service.dart';
 
 class PhotoAndLanguageForm extends StatefulWidget {
   const PhotoAndLanguageForm({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _PhotoAndLanguageFormState createState() => _PhotoAndLanguageFormState();
 }
 
 class _PhotoAndLanguageFormState extends State<PhotoAndLanguageForm> {
   final List<String> languageLevels = [
-    'Beginner',
-    'Intermediate',
-    'Advanced',
-    'Fluent',
+    "none",
+    "basic",
+    "intermediate",
+    "fluent"
   ];
 
   String? englishLevel;
   String? amharicLevel;
   String? arabicLevel;
+
+  File? headPhoto;
+  File? fullBodyPhoto;
+  File? introVideo;
+
+  bool isSubmitting = false;
+
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickFile(bool isHead, bool isFullBody, bool isVideo) async {
+    if (isVideo) {
+      final XFile? video = await _picker.pickVideo(source: ImageSource.gallery);
+      if (video != null) {
+        setState(() => introVideo = File(video.path));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Introductory video selected ✅")),
+        );
+      }
+    } else {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        setState(() {
+          if (isHead) headPhoto = File(image.path);
+          if (isFullBody) fullBodyPhoto = File(image.path);
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(isHead
+                ? "Head photo selected ✅"
+                : "Full body photo selected ✅"),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _submitForm() async {
+    setState(() => isSubmitting = true);
+
+    final prefs = await SharedPreferences.getInstance();
+    // ✅ use same keys as StepID
+    final token = prefs.getString("access_token");
+    final userId = prefs.getString("user_id");
+
+    if (token == null || userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Missing authentication")),
+      );
+      setState(() => isSubmitting = false);
+      return;
+    }
+
+    try {
+      final res = await CVService.submitCVForm(
+        nationalId: "",
+        passportNumber: "",
+        dateIssued: "",
+        placeIssued: "",
+        dateExpiry: "",
+        nationality: "",
+        userId: userId,
+        token: token,
+        headPhoto: headPhoto,
+        fullBodyPhoto: fullBodyPhoto,
+        introVideo: introVideo,
+        english: englishLevel,
+        amharic: amharicLevel,
+        arabic: arabicLevel,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("CV Submitted: ${res['id'] ?? 'Success'}")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    } finally {
+      setState(() => isSubmitting = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,16 +131,19 @@ class _PhotoAndLanguageFormState extends State<PhotoAndLanguageForm> {
           _buildUploadBox(
             icon: Icons.photo_camera_outlined,
             title: "Upload Head Photo",
+            onPick: () => _pickFile(true, false, false),
           ),
           const SizedBox(height: 16),
           _buildUploadBox(
             icon: Icons.person_outline,
             title: "Upload Full Body Photo",
+            onPick: () => _pickFile(false, true, false),
           ),
           const SizedBox(height: 16),
           _buildUploadBox(
             icon: Icons.videocam_outlined,
             title: "Upload Introductory Video",
+            onPick: () => _pickFile(false, false, true),
           ),
 
           const SizedBox(height: 24),
@@ -79,63 +169,11 @@ class _PhotoAndLanguageFormState extends State<PhotoAndLanguageForm> {
 
           const SizedBox(height: 20),
 
-          // Add Language Buttons
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: primaryColor),
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    alignment: Alignment.center,
-                  ),
-                  child: const Text(
-                    "Show another Language",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: primaryColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    alignment: Alignment.center,
-                  ),
-                  child: const Text(
-                    "Add another Language",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 20),
-
           // Submit Button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                print("English: $englishLevel");
-                print("Amharic: $amharicLevel");
-                print("Arabic: $arabicLevel");
-              },
+              onPressed: isSubmitting ? null : _submitForm,
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -143,10 +181,12 @@ class _PhotoAndLanguageFormState extends State<PhotoAndLanguageForm> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text(
-                "Submit",
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
+              child: isSubmitting
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text(
+                      "Submit",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
             ),
           ),
 
@@ -156,7 +196,11 @@ class _PhotoAndLanguageFormState extends State<PhotoAndLanguageForm> {
     );
   }
 
-  Widget _buildUploadBox({required IconData icon, required String title}) {
+  Widget _buildUploadBox({
+    required IconData icon,
+    required String title,
+    required VoidCallback onPick,
+  }) {
     const Color borderColor = Color(0xFFD1D1D6);
     const Color primaryColor = Color(0xFF8EC6D6);
 
@@ -180,7 +224,7 @@ class _PhotoAndLanguageFormState extends State<PhotoAndLanguageForm> {
           SizedBox(
             width: 140,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: onPick,
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 padding: const EdgeInsets.symmetric(vertical: 12),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:marrir/services/Employee/cv_service.dart'; // import your service
 
 class PreviousExperienceForm extends StatefulWidget {
   const PreviousExperienceForm({super.key});
@@ -10,8 +12,12 @@ class PreviousExperienceForm extends StatefulWidget {
 class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
   final TextEditingController _fromDateController = TextEditingController();
   final TextEditingController _toDateController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _companyController = TextEditingController();
+  final TextEditingController _summaryController = TextEditingController();
 
   String? selectedCountry; // ✅ store selected country
+  bool isSubmitting = false;
 
   final List<String> countries = [
     "Ethiopia",
@@ -27,6 +33,9 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
   void dispose() {
     _fromDateController.dispose();
     _toDateController.dispose();
+    _cityController.dispose();
+    _companyController.dispose();
+    _summaryController.dispose();
     super.dispose();
   }
 
@@ -41,8 +50,58 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
       lastDate: DateTime(2100),
     );
 
-    controller.text =
-        "${pickedDate?.month}/${pickedDate?.day}/${pickedDate?.year}";
+    if (pickedDate != null) {
+      controller.text =
+          "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+    }
+  }
+
+  Future<void> _submitExperience() async {
+    if (selectedCountry == null ||
+        _cityController.text.isEmpty ||
+        _companyController.text.isEmpty ||
+        _fromDateController.text.isEmpty ||
+        _toDateController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill all fields")),
+      );
+      return;
+    }
+
+    setState(() => isSubmitting = true);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString("token");
+      final userId = prefs.getString("userId");
+
+      if (token == null || userId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Authentication required")),
+        );
+        return;
+      }
+
+      final res = await CVService.submitWorkExperience(
+        userId: userId,
+        token: token,
+        companyName: _companyController.text,
+        country: selectedCountry!,
+        city: _cityController.text,
+        startDate: _fromDateController.text,
+        endDate: _toDateController.text,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Experience submitted: ${res['id'] ?? 'OK'}")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    } finally {
+      setState(() => isSubmitting = false);
+    }
   }
 
   @override
@@ -64,39 +123,30 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
             ),
           ),
           const SizedBox(height: 30),
-
-          // 🔹 Country Dropdown
           _buildLabel('Country'),
           const SizedBox(height: 8),
           _buildCountryDropdown(),
           const SizedBox(height: 16),
-
           _buildLabel('City'),
           const SizedBox(height: 8),
-          _buildTextField('Enter City'),
+          _buildTextField('Enter City', controller: _cityController),
           const SizedBox(height: 16),
-
           _buildLabel('Company'),
           const SizedBox(height: 8),
-          _buildTextField('Enter Company Home'),
+          _buildTextField('Enter Company Name', controller: _companyController),
           const SizedBox(height: 16),
-
           _buildLabel('From'),
           const SizedBox(height: 8),
           _buildDateField(context, _fromDateController),
           const SizedBox(height: 16),
-
           _buildLabel('To'),
           const SizedBox(height: 8),
           _buildDateField(context, _toDateController),
           const SizedBox(height: 16),
-
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
-              onPressed: () {
-                debugPrint("Selected Country: $selectedCountry");
-              },
+              onPressed: isSubmitting ? null : _submitExperience,
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 backgroundColor: buttonColor,
@@ -105,29 +155,31 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text(
-                'Add Experience',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child: isSubmitting
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text(
+                      'Add Experience',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
             ),
           ),
-
           const SizedBox(height: 24),
-
           _buildLabel('Previous Work'),
           const SizedBox(height: 8),
-          _buildTextField('Enter summary of the above input', maxLines: 4),
-
+          _buildTextField(
+            'Enter summary of the above input',
+            maxLines: 4,
+            controller: _summaryController,
+          ),
           const SizedBox(height: 30),
-
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: isSubmitting ? null : _submitExperience,
               style: ElevatedButton.styleFrom(
                 backgroundColor: buttonColor,
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -163,8 +215,13 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
     );
   }
 
-  Widget _buildTextField(String placeholder, {int maxLines = 1}) {
+  Widget _buildTextField(
+    String placeholder, {
+    int maxLines = 1,
+    TextEditingController? controller,
+  }) {
     return TextField(
+      controller: controller,
       maxLines: maxLines,
       decoration: InputDecoration(
         hintText: placeholder,
@@ -223,7 +280,6 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
     );
   }
 
-  // 🔹 Country Dropdown Field
   Widget _buildCountryDropdown() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),

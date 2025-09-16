@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/Page/Employee/employee_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ReservesScreen extends StatelessWidget {
   const ReservesScreen({super.key});
@@ -13,11 +14,23 @@ class ReservesScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const EmployeePage()),
-            );
+          onPressed: () async {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            String? token = prefs.getString("access_token");
+
+            if (token != null) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EmployeePage(token: token),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text("Token not found, please login again.")),
+              );
+            }
           },
         ),
         title: const Text(

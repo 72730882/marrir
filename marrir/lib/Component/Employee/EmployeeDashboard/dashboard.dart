@@ -1,25 +1,92 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/Page/Employee/employee_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:marrir/services/user.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  String employeeName = "Loading..."; // placeholder
+  String employeeInitials = "JD"; // fallback initials
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEmployeeName();
+  }
+
+  Future<void> _loadEmployeeName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString("access_token");
+    String? email = prefs.getString("user_email"); // ✅ store this during login
+
+    if (token != null && email != null) {
+      try {
+        final userData = await ApiService.getUserInfo(
+          email: email,
+          Token: token,
+        );
+
+        setState(() {
+          final fullName =
+              "${userData["first_name"] ?? ""} ${userData["last_name"] ?? ""}"
+                  .trim();
+          employeeName = fullName.isNotEmpty ? fullName : "Unknown";
+          employeeInitials = _getInitials(employeeName);
+        });
+      } catch (e) {
+        setState(() {
+          employeeName = "Unknown";
+          employeeInitials = "U";
+        });
+      }
+    } else {
+      setState(() {
+        employeeName = "Unknown";
+        employeeInitials = "U";
+      });
+    }
+  }
+
+  String _getInitials(String name) {
+    final parts = name.trim().split(" ");
+    if (parts.length >= 2) {
+      return "${parts[0][0]}${parts[1][0]}".toUpperCase();
+    }
+    return name.isNotEmpty ? name[0].toUpperCase() : "?";
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
-      // AppBar
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const EmployeePage()),
-            );
+          onPressed: () async {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            String? token = prefs.getString("access_token");
+
+            if (token != null) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EmployeePage(token: token),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text("Token not found, please login again.")),
+              );
+            }
           },
         ),
         title: const Text(
@@ -28,14 +95,11 @@ class DashboardScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-
-      // Body
       body: SingleChildScrollView(
-        // padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Profile Header with Gradient
+            // Profile Header
             Container(
               width: double.infinity,
               height: 150,
@@ -48,33 +112,33 @@ class DashboardScreen extends StatelessWidget {
                   end: Alignment.bottomRight,
                 ),
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   CircleAvatar(
                     radius: 26,
                     backgroundColor: Colors.white,
                     child: Text(
-                      "JD",
-                      style: TextStyle(
+                      employeeInitials,
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Color.fromRGBO(142, 198, 214, 1),
                       ),
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Hanan N",
-                        style: TextStyle(
+                        employeeName,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 4),
-                      Text(
+                      const SizedBox(height: 4),
+                      const Text(
                         "Created: March 15, 2024",
                         style: TextStyle(fontSize: 13, color: Colors.white70),
                       ),

@@ -15,12 +15,14 @@ class EmployeeLayout extends StatefulWidget {
   final int currentIndex;
   final Function(int) onTabSelected;
   final bool showHeader;
+  final String token; // 👈 Add token here
 
   const EmployeeLayout({
     super.key,
     required this.child,
     required this.currentIndex,
     required this.onTabSelected,
+    required this.token, // 👈 Require token
     this.showHeader = true,
   });
 
@@ -84,7 +86,7 @@ class _EmployeeLayoutState extends State<EmployeeLayout> {
                     ),
                 ];
               },
-              body: _getSelectedScreen(), // ✅ screens work normally
+              body: _getSelectedScreen(),
             ),
           ),
           if (_isDrawerOpen)
@@ -106,6 +108,7 @@ class _EmployeeLayoutState extends State<EmployeeLayout> {
                 closeDrawer: _toggleDrawer,
                 onMenuSelected: _onMenuSelected,
                 selectedIndex: _selectedMenuIndex,
+                token: widget.token, // 👈 Pass token to drawer
               ),
             ),
           ),

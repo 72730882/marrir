@@ -37,7 +37,7 @@ class ServicesScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "We don’t just connect people to jobs. We connect the right people to the right jobs, with speed, transparency, and confidence. Marrir is your trusted recruitment companion in the GCC and beyond",
+                  "We don't just connect people to jobs. We connect the right people to the right jobs. with speed, transparency, ans confidence. marrir is your trusted recruitment companion in the GCC and beyond.",
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white,
@@ -58,6 +58,7 @@ class ServicesScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
+                color: Color(0xFF65b2c9),
               ),
             ),
           ),
@@ -65,10 +66,10 @@ class ServicesScreen extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              "Boost profile visibility",
+              "Select the appropriate package to promote Profiles/CVs",
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.black54,
+                color: Colors.black,
               ),
             ),
           ),
@@ -290,6 +291,7 @@ class ServicesScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
+                 color: Color(0xFF65b2c9)
               ),
             ),
           ),
@@ -297,10 +299,10 @@ class ServicesScreen extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              "Secure Candidates",
+              "Reserve the Profiles/CVs that match your needs.",
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.black54,
+                color: Colors.black,
               ),
             ),
           ),
@@ -446,6 +448,7 @@ class ServicesScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
+                 color: Color(0xFF65b2c9)
               ),
             ),
           ),
@@ -456,7 +459,7 @@ class ServicesScreen extends StatelessWidget {
               "Move profiles",
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.black54,
+                color: Colors.black,
               ),
             ),
           ),
@@ -602,6 +605,7 @@ class ServicesScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
+                 color: Color(0xFF65b2c9)
               ),
             ),
           ),
@@ -609,10 +613,10 @@ class ServicesScreen extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              "advertise your job openings",
+              "Start Posting jobs fot to allow jop seekers and recruitment Firms to view your request",
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.black54,
+                color: Colors.black,
               ),
             ),
           ),
@@ -711,10 +715,11 @@ class ServicesScreen extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 30, 16, 2),
             child: Text(
-              "Accept Employer Request",
+              "Assigning Recruitment Firms to import workers",
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
+                 color: Color(0xFF65b2c9)
               ),
             ),
           ),
@@ -722,10 +727,10 @@ class ServicesScreen extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              "Manage employer requests",
+              "Start assigning a Recruitment firms to process importing yout selected candidates",
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.black54,
+                color: Colors.black,
               ),
             ),
           ),
@@ -790,12 +795,14 @@ class ServicesScreen extends StatelessWidget {
 
               // Email
               const Text(
-                "info@marrrir.com",
-                style: TextStyle(
-                  fontSize: 13,
-                ),
-                textAlign: TextAlign.center,
-              ),
+  "EJITIAZ PORTAL LLC",
+  textAlign: TextAlign.center,
+  style: TextStyle(
+    fontSize: 13,
+    color: Color(0xFF65b2c9),
+  ),
+),
+
               const SizedBox(height: 15),
 
               // Address

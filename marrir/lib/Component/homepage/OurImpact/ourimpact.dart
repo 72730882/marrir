@@ -28,9 +28,9 @@ class OurImpact extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Who we are?',
+                    'Welcome to Marrir',
                     style: TextStyle(
-                      fontSize: 44,
+                      fontSize: 35,
                       fontWeight: FontWeight.bold,
                       color: Color.fromARGB(255, 255, 255, 255),
                     ),
@@ -39,17 +39,13 @@ class OurImpact extends StatelessWidget {
                   const Text.rich(
                     TextSpan(
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 13,
                         color: Color.fromARGB(255, 255, 255, 255),
                       ),
                       children: [
                         TextSpan(
                           text:
-                              'marir is an all-encompassing electronic platform\n'
-                              'dedicated to assessing human capabilities and energies.\n'
-                              'It functions as an effective link between qualified\n'
-                              'professionals and employers, agents, staffing offices,\n'
-                              'and recruitment firms.',
+                             'We are a modern technology solution that aims to enhance the RECRUITMENT FIRMS matching activities via our platform Marrir.com. Marrir.com is an all-encompassing ONLINE PLATFORM dedicated to assessing human capabilities and energies. It functions as an effective link between qualified professionals and employers, agency Firms, staffing Offices, and RECRUITMENT FIRMS.'
                         ),
                       ],
                     ),

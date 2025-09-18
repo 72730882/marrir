@@ -147,7 +147,7 @@ async def login_user(
             "data": user_token,
         }
 
-<<<<<<< HEAD
+
 
     # if not user.is_uploaded:
     #     response.status_code = 428  # Precondition Required
@@ -157,16 +157,8 @@ async def login_user(
     #         "error": True,
     #         "data": user_token,
     #     }
-=======
-    if not user.is_uploaded:
-        response.status_code = 428  # Precondition Required
-        return {
-            "status_code": 428,
-            "message": "Please upload your agreement form before logging in.",
-            "error": True,
-            "data": user_token,
-        }
->>>>>>> 14462122199f8c7ed53ab24d330300076fa5af41
+
+   
 
     if user.is_admin_rejected:
         response.status_code = 403  # Forbidden

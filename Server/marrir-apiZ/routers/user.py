@@ -135,20 +135,20 @@ async def login_user(
         response.status_code = 200
         return {
             "status_code": 200,
-            "message": "Admin login successful.",
+            "message": "Employee login successful.",
             "error": False,
             "data": user_token,
         }
 
 
-    if not user.is_uploaded:
-        response.status_code = 428  # Precondition Required
-        return {
-            "status_code": 428,
-            "message": "Please upload your agreement form before logging in.",
-            "error": True,
-            "data": user_token,
-        }
+    # if not user.is_uploaded:
+    #     response.status_code = 428  # Precondition Required
+    #     return {
+    #         "status_code": 428,
+    #         "message": "Please upload your agreement form before logging in.",
+    #         "error": True,
+    #         "data": user_token,
+    #     }
 
     if user.is_admin_rejected:
         response.status_code = 403  # Forbidden
@@ -159,14 +159,14 @@ async def login_user(
             "data": user_token,
         }
 
-    if not user.is_admin_approved:
-        response.status_code = 409  # Conflict
-        return {
-            "status_code": 409,
-            "message": "Your account is pending admin approval.",
-            "error": True,
-            "data": user_token,
-        }
+    # if not user.is_admin_approved:
+    #     response.status_code = 409  # Conflict
+    #     return {
+    #         "status_code": 409,
+    #         "message": "Your account is pending admin approval.",
+    #         "error": True,
+    #         "data": user_token,
+    #     }
 
     # User is approved and all checks passed
     response.status_code = res_data.status_code
@@ -434,21 +434,21 @@ async def upload_terms(
         user.is_uploaded = True
         db.commit()
 
-        # ✅ Send email to admin after successful commit
-        try:
-            subject = "User Terms Uploaded - Approval Required"
-            admin_email = "ejtiazportal@gmail.com"
-            body = (
-                f"Hello Admin,\n\n"
-                f"The user {user.first_name} {user.last_name} ({user.email}) "
-                f"has uploaded their Terms file.\n\n"
-                f"Please review and approve it in the system.\n\n"
-                f"File Path: {file_location}\n\n"
-                f"Thanks,\nMarri Platform"
-            )
-            send_emails(to_email=admin_email, subject=subject, body=body)
-        except Exception as e:
-            print(f"⚠️ Failed to send notification email: {e}")
+        # # ✅ Send email to admin after successful commit
+        # try:
+        #     subject = "User Terms Uploaded - Approval Required"
+        #     admin_email = "ejtiazportal@gmail.com"
+        #     body = (
+        #         f"Hello Admin,\n\n"
+        #         f"The user {user.first_name} {user.last_name} ({user.email}) "
+        #         f"has uploaded their Terms file.\n\n"
+        #         f"Please review and approve it in the system.\n\n"
+        #         f"File Path: {file_location}\n\n"
+        #         f"Thanks,\nMarri Platform"
+        #     )
+        #     send_emails(to_email=admin_email, subject=subject, body=body)
+        # except Exception as e:
+        #     print(f"⚠️ Failed to send notification email: {e}")
 
         return {
             "message": "Terms uploaded successfully",

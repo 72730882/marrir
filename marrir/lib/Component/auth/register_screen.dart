@@ -30,13 +30,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   "recruitment": "Recruitment Firm",
   "sponsor": "Employer",
   "employee": "Employee",
-  "selfsponsor": "Self Sponsor",
+  
 };
 
 List<String> get accountTypeOptions {
   return isCompany
       ? ["agent", "recruitment", "sponsor"]
-      : ["employee", "selfsponsor"];
+      : ["employee", "sponsor"];
 }
 
 

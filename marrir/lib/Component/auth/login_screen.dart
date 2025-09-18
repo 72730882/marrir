@@ -5,8 +5,16 @@ import 'package:marrir/Page/Employer/employer_page.dart';
 import 'package:marrir/Page/Recruitment/recruitment_page.dart';
 import 'register_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../services/api_service.dart'; // make sure this file exists
+import '../../services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+// Social login packages
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:marrir/Component/auth/ForgotPassword/forgot_password_screen.dart';
+import 'package:marrir/providers/user_provider.dart';
+import 'package:provider/provider.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,7 +26,14 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  bool rememberMe = false;
+  String? _selectedAccountType;
+
+  final Map<String, String> _accountTypes = {
+    "agent": "Foreign Employment Agent",
+    "recruitment": "Recruitment Firm",
+    "sponsor": "Employer",
+    "employee": "Employee",
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  "Welcome Back\n Login to continue to Marrir",
+                  "Welcome Back\nLogin to continue to Marrir",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20,
@@ -69,6 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 30),
+
               // ===== FORM =====
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -76,11 +92,39 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Email",
+                      "Select Role",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    const SizedBox(height: 5),
+                    DropdownButtonFormField<String>(
+                      value: _selectedAccountType,
+                      items: _accountTypes.entries.map((entry) {
+                        return DropdownMenuItem<String>(
+                          value: entry.key,
+                          child: Text(entry.value),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedAccountType = value;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 12),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    const Text(
+                      "Email",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
                     _buildTextField(
@@ -91,10 +135,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 15),
                     const Text(
                       "Password",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
                     _buildTextField(
@@ -106,17 +148,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ForgotPasswordScreen(),
+                            ),
+                          );
+                        },
                         child: const Text(
                           "Forgot Password?",
-                          style: TextStyle(
-                            color: Color(0xFF65b2c9),
-                          ),
+                          style: TextStyle(color: Color(0xFF65b2c9)),
                         ),
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // ===== SIGN IN BUTTON =====
                     SizedBox(
                       width: double.infinity,
                       height: 50,
@@ -140,34 +187,54 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    // Sign in with Google
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: OutlinedButton.icon(
-                        onPressed: () {},
-                        icon: const FaIcon(
-                          FontAwesomeIcons.google,
-                          color: Colors.red,
-                        ),
-                        label: const Text(
-                          "Sign-in with Google",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
+                    if (_selectedAccountType == 'employee') ...[
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: OutlinedButton.icon(
+                          onPressed: _handleGoogleLogin,
+                          icon: const FaIcon(
+                            FontAwesomeIcons.google,
+                            color: Color(0xFF4285F4),
                           ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          side: const BorderSide(color: Colors.grey),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                          label: const Text(
+                            "Sign-in with Google",
+                            style: TextStyle(fontSize: 14, color: Colors.black),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(color: Colors.grey),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 25),
-                    // Footer: Register link
+                      const SizedBox(height: 15),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: OutlinedButton.icon(
+                          onPressed: _handleFacebookLogin,
+                          icon: const FaIcon(
+                            FontAwesomeIcons.facebook,
+                            color: Color(0xFF1877F2),
+                          ),
+                          label: const Text(
+                            "Sign-in with Facebook",
+                            style: TextStyle(fontSize: 14, color: Colors.black),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(color: Colors.grey),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                    ],
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -216,7 +283,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // ==== HELPER METHODS ====
   Widget _buildTextField(String hint,
       {IconData? prefixIcon,
       bool obscure = false,
@@ -231,24 +297,22 @@ class _LoginScreenState extends State<LoginScreen> {
             const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF48C2E9)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF48C2E9)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF7B4BBA), width: 2),
         ),
       ),
     );
   }
 
-  // ===== LOGIN USER FUNCTION =====
+  // ===== LOGIN with role & email check =====
   Future<void> _loginUser() async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
+
+    if (_selectedAccountType == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select your account type")),
+      );
+      return;
+    }
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -258,54 +322,147 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     try {
-      // Call backend login
       final userData = await ApiService.loginUser(
         email: email,
         password: password,
       );
 
-      // Save token and user info
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("access_token", userData["access_token"]);
-      await prefs.setString("user_role", userData["role"]);
-      await prefs.setString("user_email", userData["email"]);
-      await prefs.setString("user_id", userData["user_id"]);
+      final apiRole = (userData['role'] ?? '').toString().toLowerCase();
+      final apiEmail = (userData['email'] ?? '').toString().toLowerCase();
+      final selectedRole = _selectedAccountType!.toLowerCase();
 
-      // Navigate to dashboard based on role
-      Widget page;
-      switch (userData["role"].toLowerCase()) {
-        case "employee":
-          page = const EmployeePage();
-          break;
-        case "agent":
-          page = const AgentPage();
-          break;
-        case "employer":
-          page = const EmployerPage();
-          break;
-        case "recruitment":
-          page = const RecruitmentPage();
-          break;
-        default:
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Unknown role: ${userData["role"]}")),
-          );
-          return;
+      if (apiRole.isEmpty || apiEmail.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text("Invalid user data returned from server")),
+        );
+        return;
       }
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => page),
-      );
+      if (apiRole != selectedRole || apiEmail != email.toLowerCase()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Invalid login. Make sure you're using the correct email and role you registered with.",
+            ),
+          ),
+        );
+        return;
+      }
+
+      await _saveAndRedirect(userData);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Login failed: $e")),
       );
     }
   }
+
+  Future<void> _handleGoogleLogin() async {
+    try {
+      // Initialize GoogleSignIn with serverClientId (Web Client ID from Google Cloud)
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        scopes: ['email', 'profile'],
+        serverClientId:
+            "1007744408168-lqifcb5ffoc8bfauogjuse1meu78elk7.apps.googleusercontent.com",
+      );
+
+      // Start the Google sign-in flow
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) return; // User cancelled login
+
+      // Get authentication details
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Get the authorization code (backend expects this)
+      final String? authCode = googleAuth.serverAuthCode;
+      if (authCode == null)
+        throw Exception("No authorization code returned by Google");
+
+      // Call your backend API with the authCode
+      final userData = await ApiService.loginWithGoogle(authCode);
+
+      // Save token and redirect to proper page
+      await _saveAndRedirect(userData);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Google login failed: $e")),
+      );
+    }
+  }
+
+  Future<void> _handleFacebookLogin() async {
+    try {
+      // Trigger the Facebook sign-in
+      final LoginResult result = await FacebookAuth.instance.login(
+        permissions: ['email', 'public_profile'],
+      );
+
+      if (result.status == LoginStatus.success) {
+        final String accessToken = result.accessToken!.token;
+
+        // Send accessToken to backend (like Google login uses authCode)
+        final Map<String, dynamic> userData =
+            await ApiService.loginWithFacebook(accessToken);
+
+        // Save token and redirect user based on role
+        await _saveAndRedirect(userData);
+      } else if (result.status == LoginStatus.cancelled) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Facebook login cancelled by user")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Facebook login failed: ${result.message}")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Facebook login error: $e")),
+      );
+    }
+  }
+
+  Future<void> _saveAndRedirect(Map<String, dynamic> userData) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("access_token", userData["access_token"]);
+    await prefs.setString("user_role", userData["role"]);
+    await prefs.setString("user_email", userData["email"]);
+    await prefs.setString("user_id", userData["user_id"]);
+
+    // ✅ Update the provider so app knows user is logged in
+  final userProvider = Provider.of<UserProvider>(context, listen: false);
+  await userProvider.login(userData['role']);
+
+    Widget page;
+    switch (userData["role"].toLowerCase()) {
+      case "employee":
+        page = const EmployeePage();
+        break;
+      case "agent":
+        page = const AgentPage();
+        break;
+      case "sponsor":
+        page = const EmployerPage();
+        break;
+      case "recruitment":
+        page = const RecruitmentPage();
+        break;
+      default:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Unknown role: ${userData["role"]}")),
+        );
+        return;
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => page),
+    );
+  }
 }
 
-// ===== Custom Clipper for Header Curve =====
 class HeaderClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

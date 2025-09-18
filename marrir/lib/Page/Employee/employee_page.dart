@@ -4,6 +4,13 @@ import 'package:marrir/Component/Employee/CV/cv.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/employee_profile.dart';
 import 'package:marrir/Component/Employee/PostedJobs/posted_job.dart';
 import 'package:marrir/Component/Employee/layout/layout.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/providers/user_provider.dart';
+import 'package:marrir/Component/onboarding/SplashScreen/splash_screen.dart';
+import '../../services/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../Component/auth/login_screen.dart'; // <-- make sure this import is correct
 
 class EmployeePage extends StatefulWidget {
   const EmployeePage({super.key});

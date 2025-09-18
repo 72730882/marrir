@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:marrir/services/Employee/cv_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StepID extends StatefulWidget {
-  const StepID({super.key});
+  final VoidCallback onSuccess;
+  final VoidCallback onNextStep;
+  const StepID({
+    super.key,
+    required this.onSuccess,
+    required this.onNextStep,
+  });
 
   @override
   State<StepID> createState() => _StepIDState();
@@ -28,6 +36,7 @@ class _StepIDState extends State<StepID> {
     super.dispose();
   }
 
+  // ---------------------- Colors & UI Helpers ----------------------
   static const _titleColor = Color(0xFF1D2433);
   static const _sectionLabel = Color(0xFF3C4555);
   static const _hintColor = Color(0xFF9AA3B2);
@@ -80,169 +89,217 @@ class _StepIDState extends State<StepID> {
       firstDate: DateTime(1900),
       lastDate: DateTime(2100),
     );
-    controller.text =
-        "${pickedDate?.month}/${pickedDate?.day}/${pickedDate?.year}";
+    if (pickedDate != null) {
+      controller.text =
+          "${pickedDate.month}/${pickedDate.day}/${pickedDate.year}";
+    }
+  }
+
+  // --------------------- Submit Form ---------------------
+  Future<void> _submitForm() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      // Retrieve logged-in user ID and token
+      final prefs = await SharedPreferences.getInstance();
+      final String? userId = prefs.getString("user_id");
+      final String? token = prefs.getString("access_token");
+
+      if (userId == null || token == null) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("User not logged in!")),
+        );
+        return;
+      }
+
+      // Prepare CV data
+      final res = await CVService.submitCVForm(
+        nationalId: nationalIDController.text.trim(),
+        passportNumber: passportController.text.trim(),
+        dateIssued: dateIssuedController.text.trim(),
+        placeIssued: placeIssuedController.text.trim(),
+        dateExpiry: dateExpiryController.text.trim(),
+        nationality: nationality!,
+        token: token,
+        // Pass userId to ensure it's linked to the logged-in user
+        userId: userId,
+      );
+
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(res['message'] ?? "CV submitted successfully!")),
+      );
+    } catch (e) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Submission failed: ${e.toString()}")),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Step 2: ID Information",
-            style: TextStyle(
-              fontSize: 16,
-              color: _titleColor,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 14),
-          const Text(
-            "ID Information",
-            style: TextStyle(
-              fontSize: 13,
-              color: _sectionLabel,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // National ID
-          _fieldLabel("National ID"),
-          TextFormField(
-            controller: nationalIDController,
-            decoration: _decor(hint: "Enter National ID"),
-          ),
-          const SizedBox(height: 12),
-
-          // Passport Number
-          _fieldLabel("Passport Number"),
-          TextFormField(
-            controller: passportController,
-            decoration: _decor(hint: "Enter Passport Number"),
-          ),
-          const SizedBox(height: 12),
-
-          // Date Issued
-          _fieldLabel("Date Issued"),
-          TextFormField(
-            controller: dateIssuedController,
-            readOnly: true,
-            decoration: _decor(
-              hint: "Select Date Issued",
-              suffixIcon: IconButton(
-                icon: const Icon(
-                  Icons.calendar_today,
-                  color: _iconMuted,
-                  size: 20,
-                ),
-                onPressed: () => _pickDate(dateIssuedController),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Step 2: ID Information",
+              style: TextStyle(
+                fontSize: 16,
+                color: _titleColor,
+                fontWeight: FontWeight.w700,
               ),
             ),
-          ),
-          const SizedBox(height: 12),
-
-          // Place Issued
-          _fieldLabel("Place Issued"),
-          TextFormField(
-            controller: placeIssuedController,
-            decoration: _decor(hint: "Enter Place Issued"),
-          ),
-          const SizedBox(height: 12),
-
-          // Date of Expiry
-          _fieldLabel("Date of Expiry"),
-          TextFormField(
-            controller: dateExpiryController,
-            readOnly: true,
-            decoration: _decor(
-              hint: "Select Expiry Date",
-              suffixIcon: IconButton(
-                icon: const Icon(
-                  Icons.calendar_today,
-                  color: _iconMuted,
-                  size: 20,
-                ),
-                onPressed: () => _pickDate(dateExpiryController),
+            const SizedBox(height: 14),
+            const Text(
+              "ID Information",
+              style: TextStyle(
+                fontSize: 13,
+                color: _sectionLabel,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          // Nationality
-          _fieldLabel("Nationality"),
-          DropdownButtonFormField<String>(
-            value: nationality,
-            items: const [
-              "Select Nationality",
-              "Ethiopian",
-              "American",
-              "British",
-              "Other",
-            ]
-                .map(
-                  (c) => DropdownMenuItem(
-                    value: c,
-                    child: Text(
-                      c,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: _sectionLabel,
-                      ),
-                    ),
+            // National ID
+            _fieldLabel("National ID"),
+            TextFormField(
+              controller: nationalIDController,
+              decoration: _decor(hint: "Enter National ID"),
+              validator: (value) =>
+                  value!.isEmpty ? "National ID is required" : null,
+            ),
+            const SizedBox(height: 12),
+
+            // Passport Number
+            _fieldLabel("Passport Number"),
+            TextFormField(
+              controller: passportController,
+              decoration: _decor(hint: "Enter Passport Number"),
+              validator: (value) =>
+                  value!.isEmpty ? "Passport Number is required" : null,
+            ),
+            const SizedBox(height: 12),
+
+            // Date Issued
+            _fieldLabel("Date Issued"),
+            TextFormField(
+              controller: dateIssuedController,
+              readOnly: true,
+              decoration: _decor(
+                hint: "Select Date Issued",
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.calendar_today,
+                      color: _iconMuted, size: 20),
+                  onPressed: () => _pickDate(dateIssuedController),
+                ),
+              ),
+              validator: (value) =>
+                  value!.isEmpty ? "Date Issued is required" : null,
+            ),
+            const SizedBox(height: 12),
+
+            // Place Issued
+            _fieldLabel("Place Issued"),
+            TextFormField(
+              controller: placeIssuedController,
+              decoration: _decor(hint: "Enter Place Issued"),
+              validator: (value) =>
+                  value!.isEmpty ? "Place Issued is required" : null,
+            ),
+            const SizedBox(height: 12),
+
+            // Date of Expiry
+            _fieldLabel("Date of Expiry"),
+            TextFormField(
+              controller: dateExpiryController,
+              readOnly: true,
+              decoration: _decor(
+                hint: "Select Expiry Date",
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.calendar_today,
+                      color: _iconMuted, size: 20),
+                  onPressed: () => _pickDate(dateExpiryController),
+                ),
+              ),
+              validator: (value) =>
+                  value!.isEmpty ? "Expiry Date is required" : null,
+            ),
+            const SizedBox(height: 12),
+
+            // Nationality
+            _fieldLabel("Nationality"),
+            DropdownButtonFormField<String>(
+              value: nationality,
+              items: const [
+                "Select Nationality",
+                "Ethiopian",
+                "American",
+                "British",
+                "Other",
+              ]
+                  .map((c) => DropdownMenuItem(
+                        value: c,
+                        child: Text(c,
+                            style:
+                                const TextStyle(fontSize: 13, color: _sectionLabel)),
+                      ))
+                  .toList(),
+              onChanged: (v) => setState(() => nationality = v),
+              decoration: _decor(
+                hint: "Select Nationality",
+                suffixIcon: const Padding(
+                  padding: EdgeInsets.only(right: 6),
+                  child: Icon(Icons.keyboard_arrow_down_rounded,
+                      color: _iconMuted, size: 22),
+                ),
+              ),
+              icon: const SizedBox.shrink(),
+              borderRadius: BorderRadius.circular(10),
+              validator: (value) =>
+                  (value == null || value == "Select Nationality")
+                      ? "Please select nationality"
+                      : null,
+              style: const TextStyle(fontSize: 13, color: _sectionLabel),
+            ),
+            const SizedBox(height: 20),
+
+            // Submit button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _submitTeal,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                )
-                .toList(),
-            onChanged: (v) => setState(() => nationality = v),
-            decoration: _decor(
-              hint: "Select Nationality",
-              suffixIcon: const Padding(
-                padding: EdgeInsets.only(right: 6),
-                child: Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  color: _iconMuted,
-                  size: 22,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                onPressed: _submitForm,
+                child: const Text(
+                  "Submit",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),
-            icon: const SizedBox.shrink(),
-            borderRadius: BorderRadius.circular(10),
-            style: const TextStyle(fontSize: 13, color: _sectionLabel),
-          ),
-          const SizedBox(height: 20),
-
-          // Submit button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _submitTeal,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Form submitted!")),
-                  );
-                }
-              },
-              child: const Text(
-                "Submit",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

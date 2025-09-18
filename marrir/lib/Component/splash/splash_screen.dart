@@ -40,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // Token exists → navigate immediately based on role
       switch (role.toLowerCase()) {
         case "employee":
-          nextPage = const EmployeePage();
+              nextPage = EmployeePage(token: token!); // ✅ pass token
           break;
         case "agent":
           nextPage = const AgentPage();

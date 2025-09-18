@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
 import 'package:country_picker/country_picker.dart';
-import '../../services/api_service.dart'; // <-- make sure you created this file
+import '../../services/user.dart'; // <-- make sure you created this file
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -26,6 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       TextEditingController();
 
   final Map<String, String> accountTypeLabels = {
+
   "agent": "Foreign Employment Agent",
   "recruitment": "Recruitment Firm",
   "sponsor": "Employer",
@@ -38,6 +39,7 @@ List<String> get accountTypeOptions {
       ? ["agent", "recruitment", "sponsor"]
       : ["employee", "sponsor"];
 }
+
 
 
   @override
@@ -214,8 +216,8 @@ List<String> get accountTypeOptions {
                               },
                               activeColor: const Color(0xFF7B4BBA),
                             ),
-                            Text(accountTypeLabels[type] ?? type, style: const TextStyle(fontSize: 16))
-,
+                            Text(accountTypeLabels[type] ?? type,
+                                style: const TextStyle(fontSize: 16)),
                           ],
                         );
                       }).toList(),
@@ -318,8 +320,7 @@ List<String> get accountTypeOptions {
           decoration: InputDecoration(
             hintText: label,
             prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
-            border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           ),
         ),
       ],

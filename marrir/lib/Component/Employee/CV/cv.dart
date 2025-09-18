@@ -9,7 +9,6 @@ import 'package:marrir/Component/Employee/CV/Steps/personal_info.dart';
 import 'package:marrir/Component/Employee/CV/Steps/photo.dart';
 import 'package:marrir/Component/Employee/CV/Steps/references.dart';
 import 'package:marrir/Component/Employee/CV/Steps/summary.dart';
-// Import dashboard-like pages
 import 'package:marrir/Component/Employee/EmployeeDashboard/dashboard.dart';
 import 'package:marrir/Component/Employee/EmployeeDashboard/help.dart';
 import 'package:marrir/Component/Employee/EmployeeDashboard/payment.dart';
@@ -23,7 +22,9 @@ import 'cv_header.dart';
 import 'cv_footer.dart';
 
 class CVMain extends StatefulWidget {
-  const CVMain({super.key});
+  final String token; // 👈 Add token
+
+  const CVMain({super.key, required this.token}); // 👈 require token
 
   @override
   State<CVMain> createState() => _CVMainState();
@@ -34,18 +35,85 @@ class _CVMainState extends State<CVMain> {
   final int totalSteps = 10;
   int _selectedMenuIndex = -1; // -1 = CV steps, >=0 = menu page
 
-  final List<Widget> steps = [
-    const StepPassport(),
-    const StepID(),
-    const PersonalInformationStep(),
-    const AddressInformationStep(),
-    const SummaryStep(),
-    const EducationalDataForm(),
-    const PhotoAndLanguageForm(),
-    const PreviousExperienceForm(),
-    const ReferencesForm(),
-    const AdditionalContactForm(),
-  ];
+  late List<Widget> steps;
+
+  @override
+  void initState() {
+    super.initState();
+    steps = [
+      StepPassport(
+        onSuccess: () {
+          // Handle successful upload
+          print("Passport uploaded successfully!");
+        },
+        onNextStep: () {
+          // Navigate to next step
+          setState(() {
+            currentStep += 1;
+          });
+        },
+      ),
+      StepID(
+        onSuccess: () {
+          print("Infromation Added successfully!");
+        },
+        onNextStep: () {
+          // Navigate to next step
+          setState(() {
+            currentStep += 1;
+          });
+        },
+      ),
+      PersonalInformationStep(
+        onSuccess: () {
+          print("Infromation Added successfully!");
+        },
+        onNextStep: () {
+          // Navigate to next step
+          setState(() {
+            currentStep += 1;
+          });
+        },
+      ),
+      AddressInformationStep(
+        onSuccess: () {
+          print("Infromation Added successfully!");
+        },
+        onNextStep: () {
+          // Navigate to next step
+          setState(() {
+            currentStep += 1;
+          });
+        },
+      ),
+      SummaryStep(
+        onSuccess: () {
+          print("Infromation Added successfully!");
+        },
+        onNextStep: () {
+          // Navigate to next step
+          setState(() {
+            currentStep += 1;
+          });
+        },
+      ),
+      EducationalDataForm(
+        onSuccess: () {
+          print("Infromation Added successfully!");
+        },
+        onNextStep: () {
+          // Navigate to next step
+          setState(() {
+            currentStep += 1;
+          });
+        },
+      ),
+      const PhotoAndLanguageForm(),
+      const PreviousExperienceForm(),
+      const ReferencesForm(),
+      const AdditionalContactForm(),
+    ];
+  }
 
   void nextStep() {
     if (currentStep < totalSteps) setState(() => currentStep++);
@@ -97,6 +165,7 @@ class _CVMainState extends State<CVMain> {
     return Scaffold(
       backgroundColor: Colors.white,
       drawer: EmployeeHeaderDrawer(
+        token: widget.token, // 👈 Pass token here
         selectedIndex: _selectedMenuIndex,
         closeDrawer: () => Navigator.of(context).pop(),
         onMenuSelected: (index) {
@@ -110,7 +179,6 @@ class _CVMainState extends State<CVMain> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Use Builder to provide correct context for openDrawer()
                     Builder(
                       builder: (context) => CvHeader(
                         currentStep: currentStep,

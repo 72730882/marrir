@@ -129,3 +129,4 @@ zope.interface==6.1
 zopfli==0.2.3
 apscheduler
 openpyxl
+stripe

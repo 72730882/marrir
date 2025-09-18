@@ -1,3 +1,7 @@
+from fastapi.security import HTTPBearer
+from sqlalchemy.orm import Session
+from typing import List, Any
+from fastapi import UploadFile, Request, Response, Depends
 from datetime import datetime
 from http.client import HTTPException
 import json
@@ -14,7 +18,7 @@ from models.additionallanguagemodel import AdditionalLanguageModel
 from models.db import authentication_context, build_request_context, get_db_session
 from models.cvmodel import CVModel
 from models.referencemodel import ReferenceModel
-from models.usermodel import UserModel 
+from models.usermodel import UserModel
 from models.workexperiencemodel import WorkExperienceModel
 from repositories.cv import CVRepository
 from routers import version_prefix
@@ -46,7 +50,7 @@ async def create_update_cv(
     cv_data_json: str = Form(...),
     head_photo: Optional[UploadFile] = None,
     full_body_photo: Optional[UploadFile] = None,
-    intro_video: Optional[UploadFile] = None,    
+    intro_video: Optional[UploadFile] = None,
     _=Depends(authentication_context),
     __=Depends(build_request_context),
     request: Request,
@@ -73,13 +77,6 @@ async def create_update_cv(
         "data": new_cv,
     }
 
-
-
-
-from fastapi import UploadFile, Request, Response, Depends
-from io import BytesIO
-from typing import List, Any
-from sqlalchemy.orm import Session
 
 @cv_router.post(
     "/bulk", response_model=GenericSingleResponse[List[CVReadSchema]], status_code=201
@@ -287,11 +284,6 @@ async def upload_passport(
     }
 
 
-from fastapi.security import HTTPBearer
-
-
-
-
 '''
 @cv_router.post(
     "/generate-report",
@@ -326,7 +318,6 @@ async def generate_cv_report(
 '''
 
 
-
 @cv_router.post(
     "/generate-report",
     response_model=None,
@@ -350,7 +341,7 @@ async def generate_cv_report(
     try:
         db = get_db_session()
         cv_repo = CVRepository(entity=CVModel)
-        
+
         logger.info("Starting PDF generation process")
         cv_created = cv_repo.export_to_pdf(
             db, request=request, title="Curriculum Vitae", filters=filters
@@ -358,12 +349,14 @@ async def generate_cv_report(
 
         res_data = context_set_response_code_message.get()
         response.status_code = res_data.status_code
-        
-        logger.info(f"PDF generation completed with status code: {res_data.status_code}")
+
+        logger.info(
+            f"PDF generation completed with status code: {res_data.status_code}")
         logger.debug(f"Response message: {res_data.message}")
-        
+
         if res_data.error:
-            logger.warning(f"PDF generation completed with error: {res_data.message}")
+            logger.warning(
+                f"PDF generation completed with error: {res_data.message}")
         else:
             logger.info("PDF generated successfully")
 
@@ -373,11 +366,11 @@ async def generate_cv_report(
             "error": res_data.error,
             "data": cv_created,
         }
-        
+
     except Exception as e:
         logger.error(f"Error generating CV report: {str(e)}", exc_info=True)
         raise HTTPException(
-           
+
             detail="An error occurred while generating the CV report"
         )
 
@@ -405,7 +398,7 @@ async def generate_cv_report(
     try:
         db = get_db_session()
         cv_repo = CVRepository(entity=CVModel)
-        
+
         logger.info("Starting PDF generation process")
         cv_created = cv_repo.export_to_pdf(
             db, request=request, title="Curriculum Vitae", filters=filters
@@ -413,12 +406,14 @@ async def generate_cv_report(
 
         res_data = context_set_response_code_message.get()
         response.status_code = res_data.status_code
-        
-        logger.info(f"PDF generation completed with status code: {res_data.status_code}")
+
+        logger.info(
+            f"PDF generation completed with status code: {res_data.status_code}")
         logger.debug(f"Response message: {res_data.message}")
-        
+
         if res_data.error:
-            logger.warning(f"PDF generation completed with error: {res_data.message}")
+            logger.warning(
+                f"PDF generation completed with error: {res_data.message}")
         else:
             logger.info("PDF generated successfully")
 
@@ -428,14 +423,15 @@ async def generate_cv_report(
             "error": res_data.error,
             "data": cv_created,
         }
-        
+
     except Exception as e:
         logger.error(f"Error generating CV report: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while generating the CV report"
         )
-        
+
+
 @cv_router.post(
     "/generate-saudi",
     response_model=None,
@@ -511,15 +507,17 @@ async def get_cv_rating(
 
     if not cv:
         return Response(status_code=404, content="CV not found")
-    
-    references = db.query(ReferenceModel).filter(ReferenceModel.cv_id == cv.id).all()
+
+    references = db.query(ReferenceModel).filter(
+        ReferenceModel.cv_id == cv.id).all()
 
     rating = 0
 
     if references:
         rating += 1
 
-    work_experiences = db.query(WorkExperienceModel).filter(WorkExperienceModel.cv_id == cv.id).all()
+    work_experiences = db.query(WorkExperienceModel).filter(
+        WorkExperienceModel.cv_id == cv.id).all()
 
     if work_experiences:
         if len(work_experiences) >= 2:
@@ -527,8 +525,8 @@ async def get_cv_rating(
         elif len(work_experiences) == 1:
             rating += 1
 
-
-    additional_languages = db.query(AdditionalLanguageModel).filter(AdditionalLanguageModel.cv_id == cv.id).all()
+    additional_languages = db.query(AdditionalLanguageModel).filter(
+        AdditionalLanguageModel.cv_id == cv.id).all()
 
     if additional_languages:
         if len(additional_languages) > 2:
@@ -548,7 +546,7 @@ async def get_cv_public(cv_id: int, __=Depends(build_request_context)):
         cv = db.query(CVModel).filter(CVModel.id == cv_id).first()
         if not cv:
             return Response(status_code=404, content="CV not found")
-    
+
         return cv
     except Exception as e:
         print(e)
@@ -563,7 +561,7 @@ async def download_cv(request: Request, user_id: uuid.UUID, __=Depends(build_req
         user = db.query(UserModel).filter(UserModel.id == user_id).first()
         if not user:
             return Response(status_code=404, content=json.dumps({"error": "User not found"}), media_type="application/json")
-        
+
         if user.role != "employee":
             return Response(status_code=400, content=json.dumps({"error": "The user you are trying to download the CV for is not an employee"}), media_type="application/json")
 
@@ -574,7 +572,8 @@ async def download_cv(request: Request, user_id: uuid.UUID, __=Depends(build_req
 
         if user.employees:
             manager_id = user.employees[0].manager_id
-            manager = db.query(UserModel).filter(UserModel.id == manager_id).first()
+            manager = db.query(UserModel).filter(
+                UserModel.id == manager_id).first()
             if manager.role == "agent" or manager.role == "recruitment" or manager.role == "sponsor":
                 owner_data = {
                     "company_name": manager.company.company_name,
@@ -642,18 +641,18 @@ async def download_cv(request: Request, user_id: uuid.UUID, __=Depends(build_req
         except Exception as e:
             print(e)
         content = template.render(
-                request=request,
-                user=user.cv,
-                img_base64=qr_code,
-                passport_url=user.cv.passport_url,
-                base_url=f"{settings.BASE_URL}/static",
-                rate=rate,
-                additional_languages=additional_languages,
-                owner=owner_data,
-                description=user.cv.summary,
-                age=age
-            )
-        
+            request=request,
+            user=user.cv,
+            img_base64=qr_code,
+            passport_url=user.cv.passport_url,
+            base_url=f"{settings.BASE_URL}/static",
+            rate=rate,
+            additional_languages=additional_languages,
+            owner=owner_data,
+            description=user.cv.summary,
+            age=age
+        )
+
         # return StreamingResponse(content=content, media_type="text/html")
         return {"data": content}
     except Exception as e:

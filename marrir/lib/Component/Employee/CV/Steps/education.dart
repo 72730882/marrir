@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:marrir/services/Employee/cv_service.dart';
 
 class EducationalDataForm extends StatefulWidget {
-  const EducationalDataForm({super.key});
+  final VoidCallback onSuccess;
+  final VoidCallback onNextStep;
+  const EducationalDataForm(
+      {super.key, required this.onSuccess, required this.onNextStep});
 
   @override
+  // ignore: library_private_types_in_public_api
   _EducationalDataFormState createState() => _EducationalDataFormState();
 }
 
@@ -35,11 +41,65 @@ class _EducationalDataFormState extends State<EducationalDataForm> {
     });
   }
 
+  Future<void> _submitForm() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? userId = prefs.getString('user_id');
+    final String? token = prefs.getString('access_token');
+
+    if (userId == null || token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("User not logged in!")),
+      );
+      return;
+    }
+
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final res = await CVService.submitEducationInfo(
+        userId: userId,
+        token: token,
+        highestLevel: selectedEducation,
+        institutionName: selectedInstitution,
+        country: selectedCountry,
+        city: cityController.text.trim(),
+        grade: gradeController.text.trim(),
+        occupationCategory: selectedOccupationField,
+        occupation: selectedOccupation,
+      );
+
+      Navigator.pop(context); // close loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text(res['message'] ?? "Education info submitted successfully!"),
+        ),
+      );
+    } catch (e) {
+      Navigator.pop(context); // close loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Submission failed: ${e.toString()}")),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    cityController.dispose();
+    gradeController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     const Color textColor = Color(0xFF111111);
 
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,10 +108,7 @@ class _EducationalDataFormState extends State<EducationalDataForm> {
           const Text(
             'Step 6: Educational Data',
             style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: textColor,
-            ),
+                fontSize: 22, fontWeight: FontWeight.bold, color: textColor),
           ),
           const SizedBox(height: 30),
 
@@ -72,29 +129,23 @@ class _EducationalDataFormState extends State<EducationalDataForm> {
           _buildSectionLabel('Highest Level of Education Received'),
           const SizedBox(height: 8),
           _buildDropdownField(
-            'Select Education',
-            educationOptions,
-            selectedEducation,
-            (value) => setState(() => selectedEducation = value),
-          ),
+              'Select Education',
+              educationOptions,
+              selectedEducation,
+              (val) => setState(() => selectedEducation = val)),
 
           _buildSectionLabel('Institution Name'),
           const SizedBox(height: 8),
           _buildDropdownField(
-            'Select Institution Name',
-            institutionOptions,
-            selectedInstitution,
-            (value) => setState(() => selectedInstitution = value),
-          ),
+              'Select Institution',
+              institutionOptions,
+              selectedInstitution,
+              (val) => setState(() => selectedInstitution = val)),
 
           _buildSectionLabel('Country'),
           const SizedBox(height: 8),
-          _buildDropdownField(
-            'Select Country',
-            countryOptions,
-            selectedCountry,
-            (value) => setState(() => selectedCountry = value),
-          ),
+          _buildDropdownField('Select Country', countryOptions, selectedCountry,
+              (val) => setState(() => selectedCountry = val)),
 
           _buildSectionLabel('City'),
           const SizedBox(height: 8),
@@ -107,46 +158,37 @@ class _EducationalDataFormState extends State<EducationalDataForm> {
           _buildSectionLabel('Occupation Field'),
           const SizedBox(height: 8),
           _buildDropdownField(
-            'Select Occupation Field',
-            occupationFieldOptions,
-            selectedOccupationField,
-            (value) => setState(() => selectedOccupationField = value),
-          ),
+              'Select Occupation Field',
+              occupationFieldOptions,
+              selectedOccupationField,
+              (val) => setState(() => selectedOccupationField = val)),
 
           _buildSectionLabel('Occupation'),
           const SizedBox(height: 8),
           _buildDropdownField(
-            'Select Occupation',
-            occupationOptions,
-            selectedOccupation,
-            (value) => setState(() => selectedOccupation = value),
-          ),
+              'Select Occupation',
+              occupationOptions,
+              selectedOccupation,
+              (val) => setState(() => selectedOccupation = val)),
 
           const SizedBox(height: 30),
 
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                // Handle submit
-                print('City: ${cityController.text}');
-                print('Grade: ${gradeController.text}');
-                print('Education: $selectedEducation');
-              },
+              onPressed: _submitForm,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromRGBO(142, 198, 214, 1),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                    borderRadius: BorderRadius.circular(8)),
               ),
               child: const Text(
                 'Submit',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -168,26 +210,18 @@ class _EducationalDataFormState extends State<EducationalDataForm> {
           color: isSelected ? selectedColor : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : textColor,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        child: Text(label,
+            style: TextStyle(
+                color: isSelected ? Colors.white : textColor,
+                fontWeight: FontWeight.w600)),
       ),
     );
   }
 
   Widget _buildSectionLabel(String label) {
-    return Text(
-      label,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: Colors.black,
-      ),
-    );
+    return Text(label,
+        style: const TextStyle(
+            fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black));
   }
 
   Widget _buildTextField(String placeholder, TextEditingController controller) {
@@ -199,30 +233,20 @@ class _EducationalDataFormState extends State<EducationalDataForm> {
       decoration: InputDecoration(
         hintText: placeholder,
         hintStyle: const TextStyle(color: mutedText),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 14,
-        ),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: borderColor),
-        ),
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: borderColor)),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(
-            color: borderColor,
-          ), // Keep border same on focus
-        ),
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: borderColor)),
       ),
     );
   }
 
-  Widget _buildDropdownField(
-    String hint,
-    List<String> options,
-    String? selectedValue,
-    ValueChanged<String?> onChanged,
-  ) {
+  Widget _buildDropdownField(String hint, List<String> options,
+      String? selectedValue, ValueChanged<String?> onChanged) {
     const Color borderColor = Color(0xFFD1D1D6);
     const Color mutedText = Color(0xFF8E8E93);
 
@@ -231,18 +255,14 @@ class _EducationalDataFormState extends State<EducationalDataForm> {
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: mutedText),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 14,
-        ),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: borderColor),
-        ),
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: borderColor)),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: borderColor),
-        ),
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: borderColor)),
       ),
       items: options
           .map((e) => DropdownMenuItem(value: e, child: Text(e)))

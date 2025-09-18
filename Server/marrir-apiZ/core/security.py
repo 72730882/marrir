@@ -119,7 +119,8 @@ def decode_user_access_token(token: str) -> Optional[UserTokenSchema]:
             raise jwt.JWTError("token is invalid")
 
         access_token = UserTokenSchema(
-            id=id, email=email, phone_number=phone_number, role=UserRoleSchema(role)
+            id=id, email=email, phone_number=phone_number, role=UserRoleSchema(
+                role)
         )
         return access_token
     except Exception as e:

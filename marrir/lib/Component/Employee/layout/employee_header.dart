@@ -1,9 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:marrir/services/user.dart';
 
-class EmployeeHeader extends StatelessWidget {
+class EmployeeHeader extends StatefulWidget {
   final VoidCallback onMenuTap;
 
   const EmployeeHeader({super.key, required this.onMenuTap});
+
+  @override
+  State<EmployeeHeader> createState() => _EmployeeHeaderState();
+}
+
+class _EmployeeHeaderState extends State<EmployeeHeader> {
+  String? userName;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("access_token");
+    final email = prefs.getString("user_email");
+
+    if (token != null && email != null) {
+      try {
+        final Map<String, dynamic> user =
+            await ApiService.getUserInfo(email: email, Token: token);
+
+        setState(() {
+          final fullName =
+              "${user["first_name"] ?? ""} ${user["last_name"] ?? ""}".trim();
+          userName = fullName.isNotEmpty ? fullName : "Unknown";
+        });
+      } catch (e) {
+        debugPrint("Failed to load user: $e");
+        setState(() {
+          userName = "Unknown";
+        });
+      }
+    } else {
+      setState(() {
+        userName = "Unknown";
+      });
+    }
+  }
 
   static const _bgWhite = Color(0xFFFFFFFF);
   static const _ink = Color(0xFF111111);
@@ -25,14 +68,14 @@ class EmployeeHeader extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Reliable tappable menu icon
+                  // Menu icon
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: onMenuTap,
+                      onTap: widget.onMenuTap,
                       borderRadius: BorderRadius.circular(25),
                       child: const Padding(
-                        padding: EdgeInsets.all(8.0), // extra tappable area
+                        padding: EdgeInsets.all(8.0),
                         child: UnevenHamburgerIcon(
                           color: _ink,
                           lineThickness: 2,
@@ -45,10 +88,10 @@ class EmployeeHeader extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Welcome,',
                         style: TextStyle(
                           fontSize: 12.5,
@@ -57,10 +100,10 @@ class EmployeeHeader extends StatelessWidget {
                           height: 1.15,
                         ),
                       ),
-                      SizedBox(height: 2),
+                      const SizedBox(height: 2),
                       Text(
-                        'Hanan',
-                        style: TextStyle(
+                        userName ?? "Loading...",
+                        style: const TextStyle(
                           fontSize: 17.5,
                           fontWeight: FontWeight.w700,
                           color: _ink,
@@ -81,6 +124,7 @@ class EmployeeHeader extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
+          // Search bar
           Row(
             children: [
               Expanded(

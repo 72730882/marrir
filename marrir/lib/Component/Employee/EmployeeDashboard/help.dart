@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/Page/Employee/employee_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:marrir/services/user.dart';
 
 class HelpCenterScreen extends StatefulWidget {
   const HelpCenterScreen({super.key});
@@ -41,11 +43,23 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const EmployeePage()),
-            );
+          onPressed: () async {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            String? token = prefs.getString("access_token");
+
+            if (token != null) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EmployeePage(token: token),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text("Token not found, please login again.")),
+              );
+            }
           },
         ),
         centerTitle: true,

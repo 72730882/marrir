@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:marrir/services/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EmployeeHeaderDrawer extends StatefulWidget {
   final VoidCallback closeDrawer;
   final Function(int) onMenuSelected;
   final int selectedIndex;
+  final String token; // 👈 pass token from login
 
   const EmployeeHeaderDrawer({
     super.key,
     required this.closeDrawer,
     required this.onMenuSelected,
     required this.selectedIndex,
+    required this.token,
   });
 
   @override
@@ -20,6 +24,9 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late List<Animation<Offset>> _animations;
+
+  Map<String, dynamic>? userData;
+  bool isLoading = true;
 
   final List<Map<String, dynamic>> menuItems = [
     {"icon": Icons.home_outlined, "title": "Dashboard"},
@@ -59,6 +66,32 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
     });
 
     _controller.forward();
+
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      final email = prefs.getString("user_email");
+
+      if (email == null) {
+        throw Exception("No stored email found");
+      }
+
+      final data = await ApiService.getUserInfo(
+        email: email,
+        Token: widget.token, // ✅ Changed to accessToken
+      );
+
+      setState(() {
+        userData = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+      debugPrint("Failed to load user info: $e");
+    }
   }
 
   @override
@@ -69,6 +102,12 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
 
   @override
   Widget build(BuildContext context) {
+    final fullName = userData != null
+        ? "${userData!['first_name']} ${userData!['last_name']}"
+        : "Loading...";
+
+    final role = userData?['role'] ?? "";
+
     return Material(
       color: _bgWhite,
       child: SafeArea(
@@ -81,23 +120,23 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.person_outline, size: 28, color: _ink),
-                      SizedBox(height: 8),
+                      const Icon(Icons.person_outline, size: 28, color: _ink),
+                      const SizedBox(height: 8),
                       Text(
-                        'Hanan N',
-                        style: TextStyle(
+                        fullName,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: _ink,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        'UX/UI Designer',
-                        style: TextStyle(fontSize: 14, color: _muted),
+                        role,
+                        style: const TextStyle(fontSize: 14, color: _muted),
                       ),
                     ],
                   ),
@@ -138,7 +177,6 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
 
   Widget _buildMenuItem(IconData icon, String title, int index) {
     final isSelected = widget.selectedIndex == index;
-    // Track hover state
     bool isHovered = false;
 
     return StatefulBuilder(

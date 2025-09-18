@@ -1,7 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:marrir/providers/user_provider.dart';
+import 'package:marrir/Component/auth/login_screen.dart';
 import 'package:marrir/Component/onboarding/SplashScreen/splash_screen.dart';
+import '../../services/api_service.dart';
 
-// Import your components from Component/Employer
+// Import Employer components
 import '../../Component/Employer/dashboard.dart';
 import '../../Component/Employer/company_info.dart';
 import '../../Component/Employer/employee.dart';
@@ -24,6 +31,8 @@ class EmployerPage extends StatefulWidget {
 
 class _EmployerPageState extends State<EmployerPage> {
   int _selectedIndex = 0;
+  String? employerName;
+  bool isLoading = true;
 
   final List<Widget> _pages = const [
     DashboardPage(),
@@ -70,201 +79,212 @@ class _EmployerPageState extends State<EmployerPage> {
     Icons.help_outline,
   ];
 
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            "End Session",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          content: const Text(
-            "Are you sure you want to log out?",
-            style: TextStyle(fontSize: 15, color: Colors.black54),
-            textAlign: TextAlign.center,
-          ),
-          actionsPadding: const EdgeInsets.only(bottom: 8, right: 8, left: 8),
-          actions: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    // Navigate back to login screen
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SplashScreen(),
+  @override
+  void initState() {
+    super.initState();
+    _fetchEmployerProfile();
+  }
+
+  Future<void> _fetchEmployerProfile() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString("access_token") ?? "";
+      final userId = prefs.getString("user_id") ?? "";
+
+      final data = await ApiService.getUserInfo(token: token, userId: userId);
+
+      setState(() {
+        employerName =
+            "${data['first_name'] ?? ''} ${data['last_name'] ?? ''}".trim();
+        if (employerName!.isEmpty) employerName = "Employer";
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        employerName = "Employer";
+        isLoading = false;
+      });
+      print("Error fetching employer profile: $e");
+    }
+  }
+
+  Widget _buildDrawerHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.person_outline, size: 40, color: Colors.black87),
+              const SizedBox(height: 8),
+              isLoading
+                  ? const CircularProgressIndicator(strokeWidth: 2)
+                  : Text(
+                      employerName ?? "Employer",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
                       ),
-                    );
-                  },
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF65B2C9),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
                     ),
-                  ),
-                  child: const Text(
-                    "Yes, End Session",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 248, 248, 248),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    "Cancel",
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
+            ],
+          ),
+          const Spacer(),
+          IconButton(
+            icon: const Icon(Icons.close, color: Colors.black87),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return WillPopScope(
+      onWillPop: () async {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString("access_token");
+
+        if (token != null && token.isNotEmpty) {
+          // Logged-in -> close app
+          if (Platform.isAndroid) {
+            SystemNavigator.pop();
+          } else if (Platform.isIOS) {
+            exit(0);
+          }
+        } else {
+          // Logged-out -> go to SplashScreen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const SplashScreen()),
+          );
+        }
+        return false;
+      },
+      child: Scaffold(
         backgroundColor: Colors.white,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
           ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.notifications_none),
+              onPressed: () {},
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      drawer: Drawer(
-        backgroundColor: Colors.white,
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(Icons.person_outline,
-                            size: 40, color: Colors.black87),
-                        SizedBox(height: 8),
-                        Text(
-                          'Employer',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.black87),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Divider(color: Color(0xFFE5E5E5), thickness: 1),
-              const SizedBox(height: 20),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _menuTitles.length + 1, // +1 for Logout
-                  itemBuilder: (context, index) {
-                    if (index < _menuTitles.length) {
-                      return ListTile(
-                        leading: Icon(
-                          _menuIcons[index],
-                          color: _selectedIndex == index
-                              ? const Color(0xFF65b2c9)
-                              : Colors.black54,
-                        ),
-                        title: Text(
-                          _menuTitles[index],
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: _selectedIndex == index
-                                ? FontWeight.bold
-                                : FontWeight.normal,
+        drawer: Drawer(
+          backgroundColor: Colors.white,
+          child: SafeArea(
+            child: Column(
+              children: [
+                _buildDrawerHeader(),
+                const SizedBox(height: 20),
+                const Divider(color: Color(0xFFE5E5E5), thickness: 1),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _menuTitles.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index < _menuTitles.length) {
+                        return ListTile(
+                          leading: Icon(
+                            _menuIcons[index],
                             color: _selectedIndex == index
                                 ? const Color(0xFF65b2c9)
-                                : Colors.black87,
+                                : Colors.black54,
                           ),
-                        ),
-                        selected: _selectedIndex == index,
-                        onTap: () {
-                          setState(() {
-                            _selectedIndex = index;
-                          });
-                          Navigator.pop(context);
-                        },
-                      );
-                    } else {
-                      // Logout menu item like AgentPage
-                      return ListTile(
-                        leading: const Icon(
-                          Icons.logout,
-                          color: Colors.black54,
-                        ),
-                        title: const Text(
-                          "Logout",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.normal,
-                            color: Colors.black87,
+                          title: Text(
+                            _menuTitles[index],
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: _selectedIndex == index
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: _selectedIndex == index
+                                  ? const Color(0xFF65b2c9)
+                                  : Colors.black87,
+                            ),
                           ),
-                        ),
-                        onTap: () => _showLogoutDialog(context),
-                      );
-                    }
-                  },
+                          selected: _selectedIndex == index,
+                          onTap: () {
+                            setState(() {
+                              _selectedIndex = index;
+                            });
+                            Navigator.pop(context);
+                          },
+                        );
+                      } else {
+                        return ListTile(
+                          leading: const Icon(Icons.logout, color: Colors.black54),
+                          title: const Text(
+                            "Logout",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                    "End Session",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  content: const Text(
+                                    "Are you sure you want to log out?",
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () async {
+                                        final userProvider = Provider.of<UserProvider>(context, listen: false);
+                                        await userProvider.logout();
+
+                                        Navigator.of(context).pop();
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => const LoginScreen(),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text("Yes"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(),
+                                      child: const Text("Cancel"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        );
+                      }
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: _pages,
+        ),
       ),
     );
   }

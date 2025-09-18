@@ -26,18 +26,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
       TextEditingController();
 
   final Map<String, String> accountTypeLabels = {
-    "agent": "Foreign Employment Agent",
-    "recruitment": "Recruitment Firm",
-    "sponsor": "Employer",
-    "employee": "Employee",
-    "selfsponsor": "Self Sponsor",
-  };
 
-  List<String> get accountTypeOptions {
-    return isCompany
-        ? ["agent", "recruitment", "sponsor"]
-        : ["employee", "selfsponsor"];
-  }
+  "agent": "Foreign Employment Agent",
+  "recruitment": "Recruitment Firm",
+  "sponsor": "Employer",
+  "employee": "Employee",
+  
+};
+
+List<String> get accountTypeOptions {
+  return isCompany
+      ? ["agent", "recruitment", "sponsor"]
+      : ["employee", "sponsor"];
+}
+
+
 
   @override
   Widget build(BuildContext context) {

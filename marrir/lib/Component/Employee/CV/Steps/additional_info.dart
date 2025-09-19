@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:marrir/services/Employee/cv_service.dart'; // import your CVService
+import 'package:marrir/services/Employee/cv_service.dart'; // Make sure your CVService has userId & token
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AdditionalContactForm extends StatefulWidget {
@@ -26,6 +26,16 @@ class _AdditionalContactFormState extends State<AdditionalContactForm> {
     _loadSavedContacts();
   }
 
+  @override
+  void dispose() {
+    facebookController.dispose();
+    xController.dispose();
+    telegramController.dispose();
+    tiktokController.dispose();
+    instagramController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadSavedContacts() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -46,13 +56,29 @@ class _AdditionalContactFormState extends State<AdditionalContactForm> {
     await prefs.setString('instagram', instagramController.text);
   }
 
-  void _submitContacts() async {
+  Future<void> _submitContacts() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => isLoading = true);
 
     try {
+      // 🔹 Get userId and token
+      final prefs = await SharedPreferences.getInstance();
+      final String? userId = prefs.getString('user_id');
+      final String? token = prefs.getString('access_token');
+
+      if (userId == null || token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("User not logged in!")),
+        );
+        setState(() => isLoading = false);
+        return;
+      }
+
+      // 🔹 Call CVService
       final result = await CVService.submitAdditionalContacts(
+        userId: userId,
+        token: token,
         facebook: facebookController.text,
         x: xController.text,
         telegram: telegramController.text,
@@ -60,17 +86,15 @@ class _AdditionalContactFormState extends State<AdditionalContactForm> {
         instagram: instagramController.text,
       );
 
-      // Save locally
+      // 🔹 Save locally
       await _saveContactsLocally();
 
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Contacts submitted successfully!")),
       );
     } catch (e) {
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
+        SnackBar(content: Text("Submission failed: $e")),
       );
     } finally {
       setState(() => isLoading = false);
@@ -124,51 +148,56 @@ class _AdditionalContactFormState extends State<AdditionalContactForm> {
     const Color textColor = Color(0xFF111111);
     const Color buttonColor = Color.fromRGBO(142, 198, 214, 1);
 
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          const Text(
-            'Step 10: Additional Contact Information',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: textColor,
-            ),
-          ),
-          const SizedBox(height: 30),
-          _buildSocialInput("Facebook", Icons.facebook, facebookController),
-          _buildSocialInput("X / Twitter", Icons.alternate_email, xController),
-          _buildSocialInput("Telegram", Icons.send, telegramController),
-          _buildSocialInput("TikTok", Icons.music_note, tiktokController),
-          _buildSocialInput("Instagram", Icons.camera_alt, instagramController),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: isLoading ? null : _submitContacts,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: buttonColor,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+    return SingleChildScrollView(
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            const Text(
+              'Step 10: Additional Contact Information',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: textColor,
               ),
-              child: isLoading
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text(
-                      'Submit',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
+            const SizedBox(height: 30),
+            _buildSocialInput("Facebook", Icons.facebook, facebookController),
+            _buildSocialInput(
+                "X / Twitter", Icons.alternate_email, xController),
+            _buildSocialInput("Telegram", Icons.send, telegramController),
+            _buildSocialInput("TikTok", Icons.music_note, tiktokController),
+            _buildSocialInput(
+                "Instagram", Icons.camera_alt, instagramController),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: isLoading ? null : _submitContacts,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: buttonColor,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        'Submit',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }

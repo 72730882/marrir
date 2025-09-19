@@ -45,7 +45,9 @@ class SecurityPage extends StatelessWidget {
                 "Change Pin",
                 onTap: () {
                   onChildSelected(
-                    ChangePinPage(onChildSelected: onChildSelected),
+                    ChangePinPage(
+                      onChildSelected: onChildSelected,
+                    ),
                   );
                 },
               ),

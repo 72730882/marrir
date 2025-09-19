@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSecurity/security.dart';
 import 'package:marrir/Component/Employee/wave_background.dart';
+import 'package:marrir/services/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+// StatefulWidget wrapper
 class ChangePinPage extends StatefulWidget {
   final Function(Widget)? onChildSelected;
 
   const ChangePinPage({super.key, this.onChildSelected});
 
   @override
-  State<ChangePinPage> createState() => _ChangePinPageState();
+  State<ChangePinPage> createState() => ChangePinPageState();
 }
 
-class _ChangePinPageState extends State<ChangePinPage> {
+class ChangePinPageState extends State<ChangePinPage> {
   bool _obscureCurrent = true;
   bool _obscureNew = true;
   bool _obscureConfirm = true;
 
+  final TextEditingController _currentPinController = TextEditingController();
+  final TextEditingController _newPinController = TextEditingController();
+  final TextEditingController _confirmPinController = TextEditingController();
+
+  // Show success dialog
   void _showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -33,7 +41,7 @@ class _ChangePinPageState extends State<ChangePinPage> {
                 const Icon(Icons.check_circle, color: Colors.green, size: 60),
                 const SizedBox(height: 20),
                 const Text(
-                  'Pin Has Been\nChanged Successfully',
+                  'Pin Has Been Changed Successfully',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -46,8 +54,7 @@ class _ChangePinPageState extends State<ChangePinPage> {
                       if (widget.onChildSelected != null) {
                         widget.onChildSelected!(
                           SecurityPage(
-                            onChildSelected: widget.onChildSelected!,
-                          ),
+                              onChildSelected: widget.onChildSelected!),
                         );
                       } else {
                         Navigator.of(context).pop();
@@ -63,10 +70,9 @@ class _ChangePinPageState extends State<ChangePinPage> {
                     child: const Text(
                       'OK',
                       style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                     ),
                   ),
                 ),
@@ -78,15 +84,57 @@ class _ChangePinPageState extends State<ChangePinPage> {
     );
   }
 
+  // Handle Change Pin button pressed
+  Future<void> _handleChangePin() async {
+    final newPin = _newPinController.text.trim();
+    final confirmPin = _confirmPinController.text.trim();
+
+    if (newPin.isEmpty || confirmPin.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    if (newPin != confirmPin) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('New Pin and Confirm Pin do not match')),
+      );
+      return;
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString("user_id");
+      final token = prefs.getString("token");
+
+      if (userId == null || token == null) {
+        throw Exception("User not logged in or token missing.");
+      }
+
+      await ApiService.updateUserProfile(
+        userId: userId,
+        token: token,
+        firstName: "", // no change
+        lastName: "", // no change
+        password: newPin, // send new pin as password
+      );
+
+      _showSuccessDialog(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
   InputDecoration _pinInputDecoration(bool obscure, VoidCallback toggle) {
     return InputDecoration(
       filled: true,
       fillColor: const Color.fromRGBO(142, 198, 214, 0.3),
       suffixIcon: IconButton(
-        icon: Icon(
-          obscure ? Icons.visibility_off : Icons.visibility,
-          color: Colors.black54,
-        ),
+        icon: Icon(obscure ? Icons.visibility_off : Icons.visibility,
+            color: Colors.black54),
         onPressed: toggle,
       ),
       border: OutlineInputBorder(
@@ -103,37 +151,30 @@ class _ChangePinPageState extends State<ChangePinPage> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Wave Header
           WaveBackground(
             title: "Change Pin",
             onBack: () {
               if (widget.onChildSelected != null) {
                 widget.onChildSelected!(
-                  SecurityPage(onChildSelected: widget.onChildSelected!),
-                );
+                    SecurityPage(onChildSelected: widget.onChildSelected!));
               } else {
                 Navigator.pop(context);
               }
             },
             onNotification: () {},
           ),
-
-          // Body Content
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
-                vertical: 20,
-              ),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Current Pin',
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
-                  ),
+                  const Text('Current Pin',
+                      style: TextStyle(fontSize: 16, color: Colors.black54)),
                   const SizedBox(height: 8),
                   TextFormField(
+                    controller: _currentPinController,
                     obscureText: _obscureCurrent,
                     keyboardType: TextInputType.number,
                     decoration: _pinInputDecoration(_obscureCurrent, () {
@@ -141,13 +182,11 @@ class _ChangePinPageState extends State<ChangePinPage> {
                     }),
                   ),
                   const SizedBox(height: 20),
-
-                  const Text(
-                    'New Pin',
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
-                  ),
+                  const Text('New Pin',
+                      style: TextStyle(fontSize: 16, color: Colors.black54)),
                   const SizedBox(height: 8),
                   TextFormField(
+                    controller: _newPinController,
                     obscureText: _obscureNew,
                     keyboardType: TextInputType.number,
                     decoration: _pinInputDecoration(_obscureNew, () {
@@ -155,13 +194,11 @@ class _ChangePinPageState extends State<ChangePinPage> {
                     }),
                   ),
                   const SizedBox(height: 20),
-
-                  const Text(
-                    'Confirm Pin',
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
-                  ),
+                  const Text('Confirm Pin',
+                      style: TextStyle(fontSize: 16, color: Colors.black54)),
                   const SizedBox(height: 8),
                   TextFormField(
+                    controller: _confirmPinController,
                     obscureText: _obscureConfirm,
                     keyboardType: TextInputType.number,
                     decoration: _pinInputDecoration(_obscureConfirm, () {
@@ -169,27 +206,21 @@ class _ChangePinPageState extends State<ChangePinPage> {
                     }),
                   ),
                   const SizedBox(height: 25),
-
-                  // Change Pin Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => _showSuccessDialog(context),
+                      onPressed: _handleChangePin,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromRGBO(142, 198, 214, 1),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
+                            borderRadius: BorderRadius.circular(30)),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: const Text(
-                        'Change Pin',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: const Text('Change Pin',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
                     ),
                   ),
                 ],
@@ -201,5 +232,3 @@ class _ChangePinPageState extends State<ChangePinPage> {
     );
   }
 }
-
-// Wave clippers (reuse same as SecurityPage)

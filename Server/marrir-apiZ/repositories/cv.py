@@ -89,7 +89,7 @@ class CVRepository(BaseRepository[CVModel, CVUpsertSchema, CVUpsertSchema]):
             "region",
             "street3",
             "street2",
-            "street1",
+            "street",
             "street",
             "zip_code",
             "house_no",

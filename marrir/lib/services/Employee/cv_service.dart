@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:marrir/Dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class CVService {
   static final Dio _dio = DioClient().dio;
@@ -496,6 +495,8 @@ class CVService {
 
   /// Submit or update additional contact/social links
   static Future<Map<String, dynamic>> submitAdditionalContacts({
+    required String userId, // ✅ pass userId explicitly
+    required String token, // ✅ pass token explicitly
     String? facebook,
     String? x,
     String? instagram,
@@ -503,14 +504,6 @@ class CVService {
     String? tiktok,
   }) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString("user_id");
-      final token = prefs.getString("token");
-
-      if (userId == null || token == null) {
-        throw Exception("User ID or token not found in SharedPreferences");
-      }
-
       final cvData = {
         "user_id": userId,
         "facebook": facebook,

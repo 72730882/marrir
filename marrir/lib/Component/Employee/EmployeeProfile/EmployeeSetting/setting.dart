@@ -53,7 +53,11 @@ class SettingPage extends StatelessWidget {
                 onTap: () {
                   // Replace with your TermsAndConditionsPage widget
                   onChildSelected(
-                    DeleteAccountPage(onChildSelected: onChildSelected),
+                    DeleteAccountPage(
+                      onChildSelected: onChildSelected,
+                      userId: '',
+                      accessToken: '',
+                    ),
                   );
                 },
               ),

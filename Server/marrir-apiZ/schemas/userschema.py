@@ -102,6 +102,7 @@ class EmployeeReadSchema(BaseProps):
     work_experiences: List[WorkExperienceCreateSchema] = []
     cv_completed: Optional[bool]
 
+
 class RedactedEmployeeReadSchema(BaseProps):
     id: Optional[uuid.UUID]
     first_name: Optional[str]
@@ -112,6 +113,7 @@ class RedactedEmployeeReadSchema(BaseProps):
     education: Optional[EducationData] = None
     work_experiences: List[WorkExperienceCreateSchema] = []
 
+
 class UsersFilterSchema(BaseProps):
     id: Optional[uuid.UUID] = Field(None)
     first_name: Optional[str] = Field(None)
@@ -121,6 +123,7 @@ class UsersFilterSchema(BaseProps):
     country: Optional[str] = Field(None)
     role: Optional[UserRoleSchema] = Field(None)
     disabled: Optional[bool] = Field(None)
+
 
 class UsersSearchSchema(BaseProps):
     first_name: Optional[str] = Field(None)
@@ -133,7 +136,8 @@ class UsersSearchSchema(BaseProps):
 class AdminUsersSearchSchema(UsersSearchSchema):
     company_name: Optional[str] = Field(None)
     location: Optional[str] = Field(None)
-    
+
+
 class UserFilterSchema(BaseProps):
     id: Optional[uuid.UUID] = Field(None)
     email: Optional[EmailStr] = Field(None)
@@ -245,4 +249,3 @@ class PasswordResetRequest(BaseProps):
 class UploadTermsRequest(BaseProps):
     email: EmailStr
     terms_file_path: str
-   

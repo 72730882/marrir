@@ -210,7 +210,7 @@ class UserRoleSchema(str, Enum):
     AGENT = "agent"
     EMPLOYEE = "employee"
     SPONSOR = "sponsor"
-    SELFSPONSOR = 'selfsponsor',
+    SELFSPONSOR = "selfsponsor"
     RECRUITMENT = "recruitment"
 
     def __str__(self):

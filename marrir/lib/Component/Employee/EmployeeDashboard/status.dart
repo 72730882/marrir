@@ -142,7 +142,6 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: _addStatus,
-                            child: const Text("Add Update"),
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
                                   const Color.fromRGBO(142, 198, 214, 1),
@@ -150,19 +149,20 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8)),
                             ),
+                            child: const Text("Add Update"),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: OutlinedButton(
                             onPressed: _fetchResults,
-                            child: const Text("Results"),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               side: BorderSide(color: Colors.grey.shade400),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8)),
                             ),
+                            child: const Text("Results"),
                           ),
                         ),
                       ],

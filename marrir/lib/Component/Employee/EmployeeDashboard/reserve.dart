@@ -15,7 +15,7 @@ class _ReservesScreenState extends State<ReservesScreen> {
   bool _loading = true;
   String? _error;
   List<ReserveBatchItem> _items = [];
-  int _skip = 0;
+  final int _skip = 0;
   int _limit = 10;
 
   @override

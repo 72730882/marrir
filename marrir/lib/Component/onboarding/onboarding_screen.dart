@@ -31,7 +31,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       'button': 'Enter',
     },
     {
-      'image': 'assets/images/onboarding_images/onb3.png',
+      'image': 'assets/images/onboarding_images/CLEANER.jpg',
       'title': 'Profile Reservation',
       'desc':
           'Securing candidate profiles for personal interviews and future considerations.',
@@ -52,7 +52,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         MaterialPageRoute(builder: (context) => const MyApp()),
       );
     }
-  }
+}
 
   @override
   Widget build(BuildContext context) {

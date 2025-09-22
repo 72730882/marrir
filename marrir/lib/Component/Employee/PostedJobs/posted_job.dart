@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:marrir/services/Employer/job_service.dart';
+import 'package:dio/dio.dart';
+// import 'package:intl/intl.dart';
 
 class RecentlyPostedJobs extends StatefulWidget {
   const RecentlyPostedJobs({super.key});
@@ -10,39 +13,12 @@ class RecentlyPostedJobs extends StatefulWidget {
 
 class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
   final ScrollController _scrollController = ScrollController();
+  final JobService _jobService = JobService();
   int _currentIndex = 0;
   Timer? _timer;
-
-  // Temporary dummy job list (replace with backend later)
-  final List<Map<String, dynamic>> jobs = const [
-    {
-      'title': 'Senior Driver',
-      'company': 'Marrir',
-      'location': 'Addis Ababa, Eth',
-      'type': 'Full-time',
-      'workplace': 'On-Site',
-      'salary': '\$120k - \$180k',
-      'postedTime': '2h ago',
-    },
-    {
-      'title': 'Senior Driver',
-      'company': 'Marrir',
-      'location': 'Addis Ababa, Eth',
-      'type': 'Full-time',
-      'workplace': 'On-Site',
-      'salary': '\$120k - \$180k',
-      'postedTime': '4h ago',
-    },
-    {
-      'title': 'Senior Driver',
-      'company': 'Marrir',
-      'location': 'Addis Ababa, Eth',
-      'type': 'Full-time',
-      'workplace': 'On-Site',
-      'salary': '\$120k - \$180k',
-      'postedTime': '6h ago',
-    },
-  ];
+  bool isLoading = true;
+  String? errorMessage;
+  List<dynamic> recentJobs = [];
 
   // Top horizontal slider data
   final List<Map<String, dynamic>> topCards = const [
@@ -64,22 +40,96 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
   void initState() {
     super.initState();
     _startAutoSlide();
+    fetchRecentJobs();
+  }
+
+  Future<void> fetchRecentJobs() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    try {
+      final allJobs = await _jobService.getJobs(
+        skip: 0,
+        limit: 50, // Get more jobs to filter recent ones
+      );
+
+      // Filter jobs from last 24 hours
+      final now = DateTime.now();
+      final twentyFourHoursAgo = now.subtract(const Duration(hours: 24));
+
+      setState(() {
+        recentJobs = allJobs.where((job) {
+          final createdAt = _parseJobDate(job);
+          return createdAt != null && createdAt.isAfter(twentyFourHoursAgo);
+        }).toList();
+
+        isLoading = false;
+      });
+    } on DioException catch (e) {
+      final errorMsg = ApiErrorHandler.handleDioError(e);
+      setState(() {
+        isLoading = false;
+        errorMessage = errorMsg;
+        recentJobs = [];
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        errorMessage = 'Unexpected error: $e';
+        recentJobs = [];
+      });
+    }
+  }
+
+  DateTime? _parseJobDate(dynamic job) {
+    try {
+      final createdAt = job['created_at'];
+      if (createdAt is String) {
+        return DateTime.parse(createdAt);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String _getJobField(dynamic job, String fieldName) {
+    try {
+      final value = job[fieldName];
+      return value?.toString() ?? 'N/A';
+    } catch (e) {
+      return 'N/A';
+    }
+  }
+
+  String _getTimeAgo(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inMinutes < 60) {
+      return '${difference.inMinutes}m ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours}h ago';
+    } else {
+      return '${difference.inDays}d ago';
+    }
   }
 
   void _startAutoSlide() {
-    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (_currentIndex < topCards.length - 1) {
         _currentIndex++;
-
-        _scrollController.animateTo(
-          _currentIndex * 360, // 👈 keep same as card width
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
       } else {
-        // stop sliding when last slide is reached
-        _timer?.cancel();
+        _currentIndex = 0;
       }
+
+      _scrollController.animateTo(
+        _currentIndex * 360,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
     });
   }
 
@@ -107,7 +157,7 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
               itemBuilder: (context, index) {
                 final card = topCards[index];
                 return SizedBox(
-                  width: 360, // 👈 kept same as your code
+                  width: 360,
                   child: buildTopCard(
                     card['title'] as String,
                     card['description'] as String,
@@ -122,23 +172,45 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
 
           // Section title
           const Text(
-            "Recently Posted Jobs",
+            "Recently Posted Jobs (Last 24h)",
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
 
-          // Job cards
-          ...jobs.map(
-            (job) => jobCard(
-              job['title'] as String,
-              job['company'] as String,
-              job['location'] as String,
-              job['type'] as String,
-              job['workplace'] as String,
-              job['salary'] as String,
-              job['postedTime'] as String,
+          // Loading/Error States
+          if (isLoading)
+            const Center(child: CircularProgressIndicator())
+          else if (errorMessage != null)
+            Center(
+              child: Text(
+                errorMessage!,
+                style: const TextStyle(color: Colors.red),
+                textAlign: TextAlign.center,
+              ),
+            )
+          else if (recentJobs.isEmpty)
+            const Center(
+              child: Column(
+                children: [
+                  Icon(Icons.work_outline, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text(
+                    "No recent jobs found",
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  Text(
+                    "Jobs posted in the last 24 hours will appear here",
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            )
+          else
+            // Job cards
+            ...recentJobs.map(
+              (job) => jobCard(job: job),
             ),
-          ),
         ],
       ),
     );
@@ -180,15 +252,24 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
   }
 
   // Reusable job card widget
-  Widget jobCard(
-    String title,
-    String company,
-    String location,
-    String type,
-    String workplace,
-    String salary,
-    String postedTime,
-  ) {
+  Widget jobCard({required dynamic job}) {
+    final title = _getJobField(job, 'name');
+    final company = _getJobField(job, 'company') != 'N/A'
+        ? _getJobField(job, 'company')
+        : 'Unknown Company';
+    final location = _getJobField(job, 'location');
+    final jobType = _getJobField(job, 'type');
+    final salary = _getJobField(job, 'amount') != 'N/A'
+        ? '\$${_getJobField(job, 'amount')}'
+        : 'Salary not specified';
+
+    final createdAt = _parseJobDate(job);
+    final postedTime = createdAt != null ? _getTimeAgo(createdAt) : 'Recently';
+
+    // Determine workplace type based on location or other criteria
+    final workplace =
+        location.toLowerCase().contains('remote') ? 'Remote' : 'On-Site';
+
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -223,7 +304,9 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
             Row(
               children: [
                 tag(
-                  type,
+                  jobType != 'N/A'
+                      ? JobService.getOccupationDisplayName(jobType)
+                      : 'General',
                   const Color.fromARGB(255, 151, 196, 210),
                   const Color.fromARGB(255, 251, 252, 252),
                 ),
@@ -254,7 +337,44 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
         color: bgColor,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(text, style: TextStyle(color: textColor, fontSize: 12)),
+      child: Text(
+        text,
+        style: TextStyle(color: textColor, fontSize: 12),
+        overflow: TextOverflow.ellipsis,
+      ),
     );
+  }
+}
+
+// Error Handler Helper
+class ApiErrorHandler {
+  static String handleDioError(DioException e) {
+    if (e.response != null) {
+      final responseData = e.response?.data;
+      String? serverMessage;
+      if (responseData is Map<String, dynamic>) {
+        serverMessage = responseData['message'] ??
+            responseData['detail'] ??
+            responseData['error'];
+      }
+      switch (e.response?.statusCode) {
+        case 400:
+          return serverMessage ?? 'Bad request. Please check your input.';
+        case 401:
+          return serverMessage ?? 'Unauthorized. Please login again.';
+        case 403:
+          return serverMessage ?? 'Forbidden.';
+        case 404:
+          return serverMessage ?? 'Not found.';
+        case 422:
+          return serverMessage ?? 'Validation error.';
+        case 500:
+          return serverMessage ?? 'Server error.';
+        default:
+          return serverMessage ?? 'Unexpected error: ${e.response?.statusCode}';
+      }
+    } else {
+      return 'Network error: ${e.message}';
+    }
   }
 }

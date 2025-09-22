@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSecurity/change_pin.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSecurity/term_condition.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/employee_profile.dart';
 import 'package:marrir/Component/Employee/wave_background.dart';
@@ -41,16 +40,16 @@ class SecurityPage extends StatelessWidget {
         Expanded(
           child: ListView(
             children: [
-              _buildSecurityOption(
-                "Change Pin",
-                onTap: () {
-                  onChildSelected(
-                    ChangePinPage(
-                      onChildSelected: onChildSelected,
-                    ),
-                  );
-                },
-              ),
+              // _buildSecurityOption(
+              //   "Change Pin",
+              //   onTap: () {
+              //     onChildSelected(
+              //       ChangePinPage(
+              //         onChildSelected: onChildSelected,
+              //       ),
+              //     );
+              //   },
+              // ),
               _buildSecurityOption(
                 "Terms And Conditions",
                 onTap: () {

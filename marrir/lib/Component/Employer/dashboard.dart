@@ -1,7 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:marrir/services/user.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  Map<String, dynamic>? userInfo;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserInfo();
+  }
+
+  Future<void> _fetchUserInfo() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString("access_token");
+      final userId = prefs.getString("user_id");
+
+      if (token != null && userId != null) {
+        final info = await ApiService.getUserInfo(
+          id: userId,
+          Token: token,
+        );
+        setState(() {
+          userInfo = info;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to load user info: $e")),
+      );
+    }
+  }
+
+  String _formatDate(String dateString) {
+    try {
+      final dateTime = DateTime.parse(dateString);
+      return DateFormat('MMMM dd, yyyy').format(dateTime);
+    } catch (e) {
+      return dateString;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,44 +78,82 @@ class DashboardPage extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Row(
-              children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: Color(0xFFDDDDDD),
-                  child: Text(
-                    "M",
-                    style: TextStyle(
-                      fontSize: 22,
-                      color: Colors.black87,
-                      fontWeight: FontWeight.bold,
-                    ),
+            child: isLoading
+                ? const Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: Color(0xFFDDDDDD),
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Loading...",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            "Please wait",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: const Color(0xFFDDDDDD),
+                        child: Text(
+                          userInfo?['first_name'] != null &&
+                                  userInfo!['first_name'].isNotEmpty
+                              ? userInfo!['first_name'][0].toUpperCase()
+                              : "E",
+                          style: const TextStyle(
+                            fontSize: 22,
+                            color: Colors.black87,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Hi, ${userInfo?['first_name'] ?? ''} ${userInfo?['last_name'] ?? 'Employer'}",
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Date Created: ${userInfo?['created_at'] != null ? _formatDate(userInfo!['created_at']) : 'Not available'}",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Hi, Employer Name",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "Date Created: January 15, 2024",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
           ),
           const SizedBox(height: 20),
 
@@ -152,20 +242,20 @@ class DashboardPage extends StatelessWidget {
   }
 
   // ==== Helper Widget for Overview Cards ====
-  static Widget _buildStatCard(String title, String value, String subtitle) {
+  Widget _buildStatCard(String title, String value, String subtitle) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey.withOpacity(0.5), // border color
-          width: 1.1, // border thickness
+          color: Colors.grey.withOpacity(0.5),
+          width: 1.1,
         ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.10),
-            spreadRadius: 8, // how wide the shadow spreads
+            spreadRadius: 8,
             blurRadius: 15,
             offset: const Offset(0, 10),
           ),
@@ -201,16 +291,15 @@ class DashboardPage extends StatelessWidget {
   }
 
   // ==== Helper Widget for Progress Cards ====
-  static Widget _buildProgressCard(
-      String section, String title, double progress) {
+  Widget _buildProgressCard(String section, String title, double progress) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey.withOpacity(0.3), // border color
-          width: 1.1, // border thickness
+          color: Colors.grey.withOpacity(0.3),
+          width: 1.1,
         ),
         boxShadow: [
           BoxShadow(
@@ -237,15 +326,15 @@ class DashboardPage extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           SizedBox(
-            height: 9, // 👈 thickness of the line
-            width: 150, // 👈 total width of the progress bar
+            height: 9,
+            width: 150,
             child: LinearProgressIndicator(
               value: progress,
               backgroundColor: const Color(0xFFE5E5E5),
               valueColor: const AlwaysStoppedAnimation<Color>(
                 Color(0xFF65b2c9),
               ),
-              borderRadius: BorderRadius.circular(5), // Flutter 3.7+ only
+              borderRadius: BorderRadius.circular(5),
             ),
           ),
           const SizedBox(height: 15),
@@ -267,7 +356,7 @@ class DashboardPage extends StatelessWidget {
               child: const Text(
                 "Continue",
                 style: TextStyle(
-                  color: Colors.white, // 👈 makes text white
+                  color: Colors.white,
                   fontSize: 15,
                 ),
               ),

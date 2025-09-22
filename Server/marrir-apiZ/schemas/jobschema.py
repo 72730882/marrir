@@ -109,5 +109,4 @@ class ApplicationStatusUpdateSchema(BaseModel):
 
 class JobApplicationPaymentInfoSchema(BaseModel):
     job_application_ids: list[int]
-
     job_id: int

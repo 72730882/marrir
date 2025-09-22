@@ -161,12 +161,14 @@ class ContactScreen extends StatelessWidget {
 
               // Email
               const Text(
-                "info@marrrir.com",
-                style: TextStyle(
-                  fontSize: 13,
-                ),
-                textAlign: TextAlign.center,
-              ),
+  "EJITIAZ PORTAL LLC",
+  textAlign: TextAlign.center,
+  style: TextStyle(
+    fontSize: 13,
+    color: Color(0xFF65b2c9),
+  ),
+),
+
               const SizedBox(height: 15),
 
               // Address

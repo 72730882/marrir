@@ -71,7 +71,7 @@ class JobRepository(BaseRepository[JobModel, JobCreateSchema, JobUpdateSchema]):
                 )
             )
             return None
-        
+
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
@@ -117,7 +117,6 @@ class JobRepository(BaseRepository[JobModel, JobCreateSchema, JobUpdateSchema]):
                 )
                 return
 
-    
         context_set_response_code_message.set(
             BaseGenericResponse(
                 error=False,

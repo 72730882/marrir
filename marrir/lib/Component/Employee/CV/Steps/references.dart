@@ -34,8 +34,10 @@ class _ReferencesFormState extends State<ReferencesForm> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final String? token = prefs.getString("token");
-      final String? userId = prefs.getString("userId");
+      final String? userId =
+          prefs.getString('user_id'); // same as work experience
+      final String? token =
+          prefs.getString('access_token'); // same as work experience
 
       if (token == null || userId == null) {
         ScaffoldMessenger.of(context).showSnackBar(

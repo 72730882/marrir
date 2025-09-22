@@ -6,7 +6,7 @@ class EmployeeHeaderDrawer extends StatefulWidget {
   final VoidCallback closeDrawer;
   final Function(int) onMenuSelected;
   final int selectedIndex;
-  final String token; // 👈 pass token from login
+  final String token;
 
   const EmployeeHeaderDrawer({
     super.key,
@@ -23,7 +23,10 @@ class EmployeeHeaderDrawer extends StatefulWidget {
 class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late List<Animation<Offset>> _animations;
+
+  // ✅ Initialize empty lists to prevent LateInitializationError
+  List<Animation<Offset>> _slideAnimations = [];
+  List<Animation<double>> _fadeAnimations = [];
 
   Map<String, dynamic>? userData;
   bool isLoading = true;
@@ -51,18 +54,24 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
       duration: const Duration(milliseconds: 600),
     );
 
-    _animations = List.generate(menuItems.length, (index) {
+    // ✅ Populate animation lists
+    _slideAnimations = List.generate(menuItems.length, (index) {
       final start = index * 0.1;
-      final end = start + 0.5;
-      return Tween<Offset>(
-        begin: const Offset(-1, 0),
-        end: Offset.zero,
-      ).animate(
-        CurvedAnimation(
-          parent: _controller,
-          curve: Interval(start, end, curve: Curves.easeOut),
-        ),
-      );
+      final end = (start + 0.5).clamp(0.0, 1.0);
+      return Tween<Offset>(begin: const Offset(-1, 0), end: Offset.zero)
+          .animate(CurvedAnimation(
+        parent: _controller,
+        curve: Interval(start, end, curve: Curves.easeOut),
+      ));
+    });
+
+    _fadeAnimations = List.generate(menuItems.length, (index) {
+      final start = index * 0.1;
+      final end = (start + 0.5).clamp(0.0, 1.0);
+      return Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(
+        parent: _controller,
+        curve: Interval(start, end, curve: Curves.easeOut),
+      ));
     });
 
     _controller.forward();
@@ -75,14 +84,10 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final email = prefs.getString("user_email");
 
-      if (email == null) {
-        throw Exception("No stored email found");
-      }
+      if (email == null) throw Exception("No stored email found");
 
-      final data = await ApiService.getUserInfo(
-        email: email,
-        Token: widget.token, // ✅ Changed to accessToken
-      );
+      final data =
+          await ApiService.getUserInfo(email: email, Token: widget.token);
 
       setState(() {
         userData = data;
@@ -105,7 +110,6 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
     final fullName = userData != null
         ? "${userData!['first_name']} ${userData!['last_name']}"
         : "Loading...";
-
     final role = userData?['role'] ?? "";
 
     return Material(
@@ -154,14 +158,16 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: List.generate(menuItems.length, (index) {
                       return SlideTransition(
-                        position: _animations[index],
-                        child: _buildMenuItem(
-                          menuItems[index]["icon"],
-                          menuItems[index]["title"],
-                          index,
+                        position: _slideAnimations[index],
+                        child: FadeTransition(
+                          opacity: _fadeAnimations[index],
+                          child: _buildMenuItem(
+                            menuItems[index]["icon"],
+                            menuItems[index]["title"],
+                            index,
+                          ),
                         ),
                       );
                     }),

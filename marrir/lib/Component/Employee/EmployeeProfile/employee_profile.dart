@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:marrir/services/user.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/EditProfile/edit_profile.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeHelp/help.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSecurity/security.dart';
@@ -6,49 +8,122 @@ import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSetting/settin
 import 'package:marrir/Component/Employee/wave_background.dart';
 import 'package:marrir/Component/onboarding/SplashScreen/splash_screen.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   final Function(Widget) onChildSelected;
 
   const ProfilePage({super.key, required this.onChildSelected});
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String userName = "Loading...";
+  String userId = "";
+  String userImage = "";
+  bool isLoading = true;
+  String token = ""; // Store token locally
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    token = prefs.getString("access_token") ?? "";
+    final email = prefs.getString("user_email") ?? "";
+
+    if (token.isNotEmpty && email.isNotEmpty) {
+      try {
+        final user = await ApiService.getUserInfo(email: email, Token: token);
+
+        // Decide which image to use
+        String imageUrl = "";
+        if (user["cv"] != null && user["cv"]["head_photo"] != null) {
+          imageUrl = user["cv"]["head_photo"];
+        } else if (user["profile"] != null &&
+            user["profile"]["image"] != null) {
+          imageUrl = user["profile"]["image"];
+        }
+
+        setState(() {
+          userName =
+              "${user["first_name"] ?? ""} ${user["last_name"] ?? ""}".trim();
+          userId = user["id"]?.toString() ?? "";
+          userImage = imageUrl;
+          isLoading = false;
+        });
+      } catch (e) {
+        debugPrint("Failed to load user info: $e");
+        setState(() {
+          userName = "Unknown";
+          userId = "";
+          userImage = "";
+          isLoading = false;
+        });
+      }
+    } else {
+      setState(() {
+        userName = "Unknown";
+        userId = "";
+        userImage = "";
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _navigateToEditProfile() async {
+    widget.onChildSelected(
+      EditProfilePage(
+        onChildSelected: widget.onChildSelected,
+        userName: userName,
+        userId: userId,
+        userImage: userImage,
+        token: token, // ✅ Pass the real token here
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Header with 3 layered waves
         WaveBackground(
           title: "Profile",
-          onBack: () {}, // you can add logic if needed
+          onBack: () {},
           onNotification: () {},
-          bottomContent: const Column(
+          bottomContent: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               CircleAvatar(
                 radius: 50,
                 backgroundColor: Colors.white,
-                child: Icon(Icons.person, size: 50, color: Colors.blue),
+                backgroundImage:
+                    userImage.isNotEmpty ? NetworkImage(userImage) : null,
+                child: userImage.isEmpty
+                    ? const Icon(Icons.person, size: 50, color: Colors.blue)
+                    : null,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
-                "John Smith",
-                style: TextStyle(
+                isLoading ? "Loading..." : userName,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
               ),
               Text(
-                "ID: 25030024",
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+                isLoading ? "" : "ID: $userId",
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
         ),
-
         const SizedBox(height: 20),
-
-        // Profile options
         Expanded(
           child: ListView(
             children: [
@@ -56,31 +131,33 @@ class ProfilePage extends StatelessWidget {
                 context,
                 "Edit Profile",
                 Icons.person_2,
-                EditProfilePage(onChildSelected: onChildSelected),
+                null, // We handle navigation separately
+                onTap: _navigateToEditProfile,
               ),
               _buildProfileOption(
                 context,
                 "Security",
                 Icons.security_sharp,
-                SecurityPage(onChildSelected: onChildSelected),
+                SecurityPage(onChildSelected: widget.onChildSelected),
               ),
               _buildProfileOption(
                 context,
                 "Setting",
                 Icons.settings,
-                SettingPage(onChildSelected: onChildSelected),
+                SettingPage(onChildSelected: widget.onChildSelected),
               ),
               _buildProfileOption(
                 context,
                 "Help",
                 Icons.help,
-                HelpFAQPage(onChildSelected: onChildSelected),
+                HelpFAQPage(onChildSelected: widget.onChildSelected),
               ),
               _buildProfileOption(
                 context,
                 "Logout",
                 Icons.logout,
                 const SizedBox(),
+                onTap: () => _showLogoutDialog(context),
               ),
             ],
           ),
@@ -90,17 +167,12 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildProfileOption(
-    BuildContext context,
-    String title,
-    IconData icon,
-    Widget page,
-  ) {
+      BuildContext context, String title, IconData icon, Widget? page,
+      {VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: InkWell(
-        onTap: title == "Logout"
-            ? () => _showLogoutDialog(context)
-            : () => onChildSelected(page),
+        onTap: onTap ?? () => widget.onChildSelected(page!),
         child: Row(
           children: [
             Container(
@@ -144,7 +216,6 @@ class ProfilePage extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
-            // Align the title to the center
             textAlign: TextAlign.center,
           ),
           content: const Text(
@@ -160,7 +231,6 @@ class ProfilePage extends StatelessWidget {
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    // Navigate back to login screen
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -178,7 +248,7 @@ class ProfilePage extends StatelessWidget {
                   child: const Text(
                     "Yes, End Session",
                     style: TextStyle(
-                      color: Colors.white, // white text
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -198,7 +268,7 @@ class ProfilePage extends StatelessWidget {
                   child: const Text(
                     "Cancel",
                     style: TextStyle(
-                      color: Color(0xFF333333), // dark gray text
+                      color: Color(0xFF333333),
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
                     ),

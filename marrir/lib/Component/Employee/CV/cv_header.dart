@@ -241,9 +241,10 @@ class CvHeader extends StatelessWidget {
                         ),
                       ),
                       // Foreground line (completed + active)
+                      // Foreground line (completed + active)
                       FractionallySizedBox(
                         alignment: Alignment.centerLeft,
-                        widthFactor: clampedCurrent / clampedTotal,
+                        widthFactor: percent, // ✅ use clamped percent
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           height: 4,

@@ -361,21 +361,4 @@ class _DashboardPageState extends State<DashboardPage> {
 
 
 
-  
-  
-// Widget _photoLanguageTab() {
-//     return const Center(child: Text("Photo and Language Form"));
-//     // 
-//   }
-
-//   Widget _experienceTab() {
-//     return const Center(child: Text("Experience & Documents Form"));
-//   }
-
-//   Widget _referencesTab() {
-//     return const Center(child: Text("Experience & Documents Form"));
-//   }
-
-//   Widget _additionalContactInformationTab() {
-//     return const Center(child: Text("Experience & Documents Form"));
-//   }
+ 

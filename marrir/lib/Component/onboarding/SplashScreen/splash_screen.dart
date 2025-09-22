@@ -36,8 +36,7 @@ class SplashScreen extends StatelessWidget {
                 width: double.infinity,
                 child: OutlinedButton(
                   onPressed: () {
-                    Navigator.pop(context);
-                    // Navigate back to login screen
+                    // Navigate to login screen - use pushReplacement to replace splash screen
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -69,8 +68,7 @@ class SplashScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context);
-                    // Navigate back to login screen
+                    // Navigate to register screen - use pushReplacement to replace splash screen
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(

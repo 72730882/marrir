@@ -72,8 +72,8 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString("token");
-      final userId = prefs.getString("userId");
+      final String? userId = prefs.getString('user_id');
+      final String? token = prefs.getString('access_token');
 
       if (token == null || userId == null) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:marrir/Dio/dio.dart';
+import 'package:uuid/uuid.dart';
 
 class ApiService {
   static final Dio _dio = DioClient().dio;
@@ -194,6 +195,109 @@ class ApiService {
       }
     } on DioException catch (e) {
       throw Exception("Get users failed: ${e.response?.data ?? e.message}");
+    }
+  }
+
+  static Future<Map<String, dynamic>> updateUserProfile({
+    required String userId,
+    required String token,
+    required String firstName,
+    required String lastName,
+    String? phoneNumber,
+    String? email,
+    String? password, // <-- new optional password field
+  }) async {
+    // Validate UUID
+    try {
+      Uuid.parse(userId);
+    } catch (e) {
+      throw Exception("Invalid user ID format. Must be a UUID.");
+    }
+
+    // Build update payload according to UserUpdateSchema
+    final Map<String, dynamic> requestData = {
+      "filter": {
+        "id": userId,
+      },
+      "update": {
+        if (firstName.isNotEmpty) "first_name": firstName,
+        if (lastName.isNotEmpty) "last_name": lastName,
+        if (phoneNumber != null && phoneNumber.isNotEmpty)
+          "phone_number": phoneNumber,
+        if (email != null && email.isNotEmpty) "email": email,
+        if (password != null && password.isNotEmpty)
+          "password": password, // include password if provided
+      },
+    };
+
+    if (requestData["update"].isEmpty) {
+      throw Exception("No fields provided to update.");
+    }
+
+    try {
+      final response = await _dio.put(
+        "/user/",
+        data: requestData,
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            "Content-Type": "application/json",
+          },
+        ),
+      );
+
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(
+            "API error: ${e.response?.data?['message'] ?? e.message}");
+      } else {
+        throw Exception("Network error: ${e.message}");
+      }
+    }
+  }
+
+//
+  // ===== Delete Account =====
+  static Future<Map<String, dynamic>> deleteAccount({
+    required String accessToken,
+    required String password,
+    required String userId,
+  }) async {
+    try {
+      final response = await _dio.delete(
+        "/user/",
+        data: jsonEncode({
+          "filter": {"id": userId},
+          "password": password, // adjust if backend expects differently
+        }),
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $accessToken",
+            "Content-Type": "application/json",
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return {
+          "success": true,
+          "message": "Account deleted successfully",
+          "data": response.data,
+        };
+      } else {
+        return {
+          "success": false,
+          "message": response.data?["message"] ?? "Failed to delete account",
+          "error": true,
+        };
+      }
+    } on DioException catch (e) {
+      return {
+        "success": false,
+        "message": e.response?.data?["message"] ?? e.message,
+        "error": true,
+      };
     }
   }
 }

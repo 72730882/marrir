@@ -1,11 +1,18 @@
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 
 
+import 'package:dio/dio.dart';
+import 'package:marrir/Dio/dio.dart';
+
+
 class ApiService {
-  static const String baseUrl = "http://10.0.2.2:8000";
-  
+  static final DioClient _client = DioClient();
+  static Dio get _dio => _client.dio;
+   static const String baseUrl = "http://10.0.2.2:8000";
+
 
   // ===== Register User =====
   static Future<dynamic> registerUser(Map<String, dynamic> data) async {
@@ -24,7 +31,7 @@ class ApiService {
     }
   }
 
-  // ===== Login User with Role =====
+ // ===== Login User with Role =====
   static Future<Map<String, dynamic>> loginUser({
     required String email,
     required String password,
@@ -95,7 +102,7 @@ static Future<Map<String, dynamic>> loginWithFacebook(String accessToken) async 
   }
 }
 
-// ===== Get Agent / User Information =====
+  // ===== Get Agent / User Information =====
 static Future<Map<String, dynamic>> getUserInfo({
   required String token,
   required String userId,
@@ -127,6 +134,7 @@ static Future<Map<String, dynamic>> getUserInfo({
         "Failed to fetch user info: ${response.statusCode} ${response.body}");
   }
 }
+
 
 // ===== Request Password Reset (send OTP to email) =====
 static Future<Map<String, dynamic>> requestPasswordReset(String email) async {
@@ -458,3 +466,4 @@ static Future<Map<String, dynamic>> getEmployee({
 
   
 }
+

@@ -40,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // Token exists → navigate immediately based on role
       switch (role.toLowerCase()) {
         case "employee":
-              nextPage = EmployeePage(token: token!); // ✅ pass token
+          nextPage = EmployeePage(token: token); // ✅ pass token
           break;
         case "agent":
           nextPage = const AgentPage();
@@ -99,8 +99,7 @@ class _SplashScreenState extends State<SplashScreen> {
         // Token expired or invalid → logout user
         await prefs.clear();
 
-        final userProvider =
-            Provider.of<UserProvider>(context, listen: false);
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
         userProvider.logout();
 
         if (mounted) {

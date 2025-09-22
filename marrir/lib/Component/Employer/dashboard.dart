@@ -1,9 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/user_info_provider.dart';
 import '../../services/api_service.dart';
-import 'dart:convert';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -31,17 +31,16 @@ class _DashboardPageState extends State<DashboardPage> {
       final token = prefs.getString("access_token") ?? "";
       final userId = prefs.getString("user_id") ?? "";
       final email = prefs.getString("email") ?? "";
-
       if (token.isEmpty || userId.isEmpty) return;
 
-      // Get user info
+      // 1️⃣ Get user info
       final userInfo =
           await ApiService.getUserInfo(token: token, userId: userId);
       final firstName = userInfo["first_name"] ?? "";
       final lastName = userInfo["last_name"] ?? "";
-      final createdAtDate = userInfo["createdAt"] ?? "";
+      final createdAtDate = userInfo["created_at"] ?? "";
 
-      // Update provider
+      // Update provider and state
       if (!mounted) return;
       setState(() => createdAt = createdAtDate);
       Provider.of<UserInfoProvider>(context, listen: false)
@@ -75,8 +74,8 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     final userInfoProvider = Provider.of<UserInfoProvider>(context);
-    final userName = userInfoProvider.fullName ?? "Employer Name";
-    final initials = (userInfoProvider.fullName ?? "EN")
+    final userName = userInfoProvider.fullName ?? "Agency Firm Name";
+    final initials = (userInfoProvider.fullName ?? "AF")
         .split(' ')
         .map((e) => e.isNotEmpty ? e[0] : "")
         .join();
@@ -130,7 +129,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "Date Created: ${createdAt.isNotEmpty ? createdAt : 'January 15, 2024'}",
+                      " ${createdAt.isNotEmpty ? createdAt : 'January 15, 2024'}",
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.black54,
@@ -178,29 +177,29 @@ class _DashboardPageState extends State<DashboardPage> {
                 "Change: ${dashboardStats?['profile_view']?['change'] ?? 0}%",
               ),
               _buildStatCard(
-                "Jobs Posted",
+                "Jobs Count",
                 "${dashboardStats?['jobs_posted_count']?['value'] ?? 0}",
                 "Change: ${dashboardStats?['jobs_posted_count']?['change'] ?? 0}%",
               ),
               _buildStatCard(
-                "Male Employees",
+                "Completed profiles male",
                 "${dashboardStats?['male_employees_count']?['value'] ?? 0}",
                 "Change: ${dashboardStats?['male_employees_count']?['change'] ?? 0}%",
               ),
               _buildStatCard(
-                "Female Employees",
+                "Completed profiles female",
                 "${dashboardStats?['female_employees_count']?['value'] ?? 0}",
                 "Change: ${dashboardStats?['female_employees_count']?['change'] ?? 0}%",
               ),
               _buildStatCard(
-                "Total Employees",
+                "Booked Profiles",
                 "${dashboardStats?['employees_count']?['value'] ?? 0}",
                 "Change: ${dashboardStats?['employees_count']?['change'] ?? 0}%",
               ),
               _buildStatCard("Profile transfers", "0", "Count - 0%"),
               _buildStatCard("Job count", "0", "Count - 0%"),
               _buildStatCard(
-                "Transfers",
+                "Transfer count",
                 "${dashboardStats?['transfers_count']?['value'] ?? 0}",
                 "Change: ${dashboardStats?['transfers_count']?['change'] ?? 0}%",
               ),
@@ -262,7 +261,10 @@ class _DashboardPageState extends State<DashboardPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.withOpacity(0.5), width: 1.1),
+        border: Border.all(
+          color: Colors.grey.withOpacity(0.5),
+          width: 1.1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.10),
@@ -281,9 +283,10 @@ class _DashboardPageState extends State<DashboardPage> {
           Text(
             value,
             style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87),
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
           ),
           const SizedBox(height: 2),
           Text(subtitle,
@@ -354,3 +357,8 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 }
+
+
+
+
+ 

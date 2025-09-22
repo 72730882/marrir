@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:marrir/providers/user_provider.dart';
 import '../../services/api_service.dart';
 import '../../Component/auth/login_screen.dart';
-import '../../Component/onboarding/SplashScreen/splash_screen.dart';
 
 // Import your Agent components
 import '../../Component/Agent/dashboard.dart';
@@ -236,7 +235,8 @@ class _AgentPageState extends State<AgentPage> {
                         );
                       } else {
                         return ListTile(
-                          leading: const Icon(Icons.logout, color: Colors.black54),
+                          leading:
+                              const Icon(Icons.logout, color: Colors.black54),
                           title: const Text(
                             "Logout",
                             style: TextStyle(
@@ -264,21 +264,25 @@ class _AgentPageState extends State<AgentPage> {
                                   actions: [
                                     TextButton(
                                       onPressed: () async {
-                                        final userProvider = Provider.of<UserProvider>(context, listen: false);
+                                        final userProvider =
+                                            Provider.of<UserProvider>(context,
+                                                listen: false);
                                         await userProvider.logout();
 
                                         Navigator.of(context).pop();
                                         Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => const LoginScreen(),
+                                            builder: (context) =>
+                                                const LoginScreen(),
                                           ),
                                         );
                                       },
                                       child: const Text("Yes"),
                                     ),
                                     TextButton(
-                                      onPressed: () => Navigator.of(context).pop(),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
                                       child: const Text("Cancel"),
                                     ),
                                   ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:marrir/Page/Employee/employee_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:marrir/services/user.dart';
+import 'package:marrir/services/Employee/dashboard_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -11,19 +12,61 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  String employeeName = "Loading..."; // placeholder
-  String employeeInitials = "JD"; // fallback initials
+  String employeeName = "Loading...";
+  String employeeInitials = "JD";
+  Map<String, dynamic> cvProgress = {};
+  Map<String, dynamic> processProgress = {};
+  Map<String, dynamic> errors = {};
+  bool isLoading = true;
+  bool hasPartialData = false;
+  String errorMessage = '';
 
   @override
   void initState() {
     super.initState();
+    _loadDashboardData();
     _loadEmployeeName();
+  }
+
+  Future<void> _loadDashboardData() async {
+    try {
+      final data = await EmployeeDashboardService.getDashboardData();
+
+      setState(() {
+        cvProgress = data['cv_progress'] ?? {};
+        processProgress = data['process_progress'] ?? {};
+        errors = data['errors'] ?? {};
+
+        // Check if we have at least some data
+        hasPartialData = cvProgress.isNotEmpty || processProgress.isNotEmpty;
+        isLoading = false;
+      });
+
+      // Show error messages if any
+      if (errors.isNotEmpty) {
+        errors.forEach((key, error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error.toString())),
+          );
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = e.toString();
+        isLoading = false;
+        hasPartialData = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load dashboard: $e')),
+      );
+    }
   }
 
   Future<void> _loadEmployeeName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString("access_token");
-    String? email = prefs.getString("user_email"); // ✅ store this during login
+    String? email = prefs.getString("user_email");
 
     if (token != null && email != null) {
       try {
@@ -61,8 +104,128 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return name.isNotEmpty ? name[0].toUpperCase() : "?";
   }
 
+  // Helper methods to extract progress data
+  int _getCVCompletedSections() {
+    if (cvProgress.isEmpty) return 0;
+
+    final completed = [
+      cvProgress['id_progress'] ?? 0,
+      cvProgress['personal_info_progress'] ?? 0,
+      cvProgress['address_progress'] ?? 0,
+      cvProgress['education_progress'] ?? 0,
+      cvProgress['photo_and_language_progress'] ?? 0,
+      cvProgress['experience_progress'] ?? 0,
+      cvProgress['reference_progress'] ?? 0,
+      cvProgress['contact_progress'] ?? 0,
+    ].where((progress) => progress >= 100).length;
+
+    return completed;
+  }
+
+  int _getProcessCompletedSections() {
+    if (processProgress.isEmpty) return 0;
+
+    final completed = [
+      processProgress['acceptance_of_application_progress'] ?? 0,
+      processProgress['signing_of_contract_progress'] ?? 0,
+      processProgress['passport_progress'] ?? 0,
+      processProgress['insurance_progress'] ?? 0,
+      processProgress['medical_report_progress'] ?? 0,
+      processProgress['certificate_of_freedom_progress'] ?? 0,
+      processProgress['coc_progress'] ?? 0,
+      processProgress['enjaz_slip_to_agents_progress'] ?? 0,
+      processProgress['enjaz_slip_for_recruitment_progress'] ?? 0,
+      processProgress['worker_file_to_embassy_progress'] ?? 0,
+      processProgress['visa_progress'] ?? 0,
+      processProgress['worker_file_in_labor_office_progress'] ?? 0,
+      processProgress['receive_travel_authorization_code_progress'] ?? 0,
+      processProgress['molsa_letter_progress'] ?? 0,
+      processProgress['ticket_progress'] ?? 0,
+      processProgress['arrive_progress'] ?? 0,
+    ].where((progress) => progress >= 100).length;
+
+    return completed;
+  }
+
+  double _getCVOverallProgress() {
+    if (cvProgress.isEmpty) return 0.0;
+
+    final progressValues = [
+      cvProgress['id_progress'],
+      cvProgress['personal_info_progress'],
+      cvProgress['address_progress'],
+      cvProgress['education_progress'],
+      cvProgress['photo_and_language_progress'],
+      cvProgress['experience_progress'],
+      cvProgress['reference_progress'],
+      cvProgress['contact_progress'],
+    ].map((e) => (e != null ? e.toDouble() : 0.0)).toList();
+
+    final total = progressValues.fold(0.0, (sum, value) => sum + value);
+    return progressValues.isNotEmpty
+        ? total / progressValues.length / 100
+        : 0.0;
+  }
+
+  double _getProcessOverallProgress() {
+    if (processProgress.isEmpty) return 0.0;
+
+    final progressValues = [
+      processProgress['acceptance_of_application_progress'],
+      processProgress['signing_of_contract_progress'],
+      processProgress['passport_progress'],
+      processProgress['insurance_progress'],
+      processProgress['medical_report_progress'],
+      processProgress['certificate_of_freedom_progress'],
+      processProgress['coc_progress'],
+      processProgress['enjaz_slip_to_agents_progress'],
+      processProgress['enjaz_slip_for_recruitment_progress'],
+      processProgress['worker_file_to_embassy_progress'],
+      processProgress['visa_progress'],
+      processProgress['worker_file_in_labor_office_progress'],
+      processProgress['receive_travel_authorization_code_progress'],
+      processProgress['molsa_letter_progress'],
+      processProgress['ticket_progress'],
+      processProgress['arrive_progress'],
+    ].map((e) => (e != null ? e.toDouble() : 0.0)).toList();
+
+    final total = progressValues.fold(0.0, (sum, value) => sum + value);
+    return progressValues.isNotEmpty
+        ? total / progressValues.length / 100
+        : 0.0;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (!hasPartialData && errorMessage.isNotEmpty) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Error: $errorMessage'),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _loadDashboardData,
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final cvCompleted = _getCVCompletedSections();
+    final processCompleted = _getProcessCompletedSections();
+    final cvOverallProgress = _getCVOverallProgress();
+    final processOverallProgress = _getProcessOverallProgress();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -150,6 +313,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
             const SizedBox(height: 20),
 
+            // Show error messages if any
+            if (errors.isNotEmpty) ...[
+              ...errors.entries.map((error) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      error.value.toString(),
+                      style: TextStyle(color: Colors.red[700]),
+                    ),
+                  )),
+              const SizedBox(height: 10),
+            ],
+
             // CV & Process Cards
             Row(
               children: [
@@ -157,7 +332,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: _buildProgressCard(
                     icon: Icons.description_outlined,
                     title: "CV",
-                    subtitle: "0/8 sections completed",
+                    subtitle: cvProgress.isNotEmpty
+                        ? "$cvCompleted/8 sections completed"
+                        : "Data not available",
+                    progress: cvOverallProgress,
+                    enabled: cvProgress.isNotEmpty,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -165,7 +344,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: _buildProgressCard(
                     icon: Icons.settings_outlined,
                     title: "Process",
-                    subtitle: "0/5 sections completed",
+                    subtitle: processProgress.isNotEmpty
+                        ? "$processCompleted/16 sections completed"
+                        : "Data not available",
+                    progress: processOverallProgress,
+                    enabled: processProgress.isNotEmpty,
                   ),
                 ),
               ],
@@ -205,38 +388,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
-
-      // Bottom Navigation
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 3, // Profile tab active (matches screenshot)
-        selectedItemColor: const Color.fromRGBO(142, 198, 214, 1),
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.work_outline), label: "Job"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark_border),
-            label: "Saved",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: "Profile",
-          ),
-        ],
-      ),
     );
   }
 
-  // Progress Card
+  // Progress Card with enabled state
   Widget _buildProgressCard({
     required IconData icon,
     required String title,
     required String subtitle,
+    required double progress,
+    required bool enabled,
   }) {
     return Container(
       padding: const EdgeInsets.all(14),
@@ -255,33 +416,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 26, color: Colors.grey.shade700),
+          Icon(icon,
+              size: 26,
+              color: enabled ? Colors.grey.shade700 : Colors.grey.shade400),
           const SizedBox(height: 8),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: Colors.black,
+              color: enabled ? Colors.black : Colors.grey,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            style: TextStyle(
+                fontSize: 12,
+                color: enabled ? Colors.grey.shade600 : Colors.grey.shade400),
           ),
           const SizedBox(height: 10),
           LinearProgressIndicator(
-            value: 0.0,
+            value: progress.isNaN ? 0.0 : progress,
             minHeight: 6,
-            color: const Color.fromRGBO(142, 198, 214, 1),
+            color:
+                enabled ? const Color.fromRGBO(142, 198, 214, 1) : Colors.grey,
             backgroundColor: Colors.grey.shade200,
             borderRadius: BorderRadius.circular(6),
           ),
           const SizedBox(height: 4),
-          const Text(
-            "0% Complete",
-            style: TextStyle(fontSize: 12, color: Colors.grey),
+          Text(
+            enabled
+                ? "${(progress * 100).toStringAsFixed(0)}% Complete"
+                : "N/A",
+            style: TextStyle(
+                fontSize: 12,
+                color: enabled ? Colors.grey : Colors.grey.shade400),
           ),
         ],
       ),

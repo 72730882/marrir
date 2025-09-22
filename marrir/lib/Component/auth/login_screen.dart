@@ -5,19 +5,18 @@ import 'package:marrir/Page/Employer/employer_page.dart';
 import 'package:marrir/Page/Recruitment/recruitment_page.dart';
 import 'register_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../../services/api_service.dart';
 
 // import '../../services/user.dart'; // make sure this file exists
 
 import 'package:shared_preferences/shared_preferences.dart';
-
 // Social login packages
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:marrir/Component/auth/ForgotPassword/forgot_password_screen.dart';
 import 'package:marrir/providers/user_provider.dart';
 import 'package:provider/provider.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -334,15 +333,37 @@ class _LoginScreenState extends State<LoginScreen> {
       final apiEmail = (userData['email'] ?? '').toString().toLowerCase();
       final selectedRole = _selectedAccountType!.toLowerCase();
 
+
       if (apiRole.isEmpty || apiEmail.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text("Invalid user data returned from server")),
         );
         return;
+
+      // Navigate to dashboard based on role, passing token
+      Widget page;
+      switch (userData["role"].toLowerCase()) {
+        case "employee":
+          page = EmployeePage(token: userData["access_token"]); // ✅ pass token
+          break;
+        case "agent":
+          page = const AgentPage(); // If needed
+          break;
+        case "employer":
+          page = const EmployerPage(); // If needed
+          break;
+        case "recruitment":
+          page = const RecruitmentPage(); // If needed
+          break;
+        default:
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Unknown role: ${userData["role"]}")),
+          );
+          return;
+
       }
 
-      // Check if the role and email match
       if (apiRole != selectedRole || apiEmail != email.toLowerCase()) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -353,8 +374,8 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         return;
       }
+      }
 
-      // If everything is valid, save and redirect
       await _saveAndRedirect(userData);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -382,9 +403,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Get the authorization code (backend expects this)
       final String? authCode = googleAuth.serverAuthCode;
-      if (authCode == null) {
+      if (authCode == null)
         throw Exception("No authorization code returned by Google");
-      }
 
       // Call your backend API with the authCode
       final userData = await ApiService.loginWithGoogle(authCode);
@@ -438,8 +458,10 @@ class _LoginScreenState extends State<LoginScreen> {
     await prefs.setString("user_id", userData["user_id"]);
 
     // ✅ Update the provider so app knows user is logged in
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
+  final userProvider = Provider.of<UserProvider>(context, listen: false);
     await userProvider.login(userData['role']);
+
+
 
     Widget page;
     switch (userData["role"].toLowerCase()) {

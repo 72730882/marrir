@@ -29,20 +29,20 @@ company_info_router_prefix = version_prefix + "company_info"
 company_info_router = APIRouter(prefix=company_info_router_prefix)
 
 
-def send_notification(db, user_id, title, description, type):
-    notification = Notifications(
-        title=title,
-        description=description,
-        type=type,
-        user_id=user_id,
-    )
-    db.add(notification)
+# def send_notification(db, user_id, title, description, type):
+#     notification = Notifications(
+#         title=title,
+#         description=description,
+#         type=type,
+#         user_id=user_id,
+#     )
+#     db.add(notification)
 
-    try:
-        db.commit()
-    except Exception as e:
-        logger.error(f"Failed to send notification: {e}")
-        db.rollback()
+#     try:
+#         db.commit()
+#     except Exception as e:
+#         logger.error(f"Failed to send notification: {e}")
+#         db.rollback()
 
 import logging
 # Setup logger (ideally do this at the top of your main application file)
@@ -258,14 +258,14 @@ async def assign_agent_recruitment(
         title = "New Agent Recruitment Request"
         description = "A new agent recruitment request has been made."
 
-        for admin in admins:
-            background_tasks.add_task(
-                send_notification, db, admin.id, title, description, "agent_recruitment"
-            )
+        # for admin in admins:
+        #     background_tasks.add_task(
+        #         send_notification, db, admin.id, title, description, "agent_recruitment"
+        #     )
 
-            background_tasks.add_task(
-                send_email, admin.email, title, description
-            )
+        #     background_tasks.add_task(
+        #         send_email, admin.email, title, description
+        #     )
 
         if role == "agent":
             dealer.update({"user_id": agent_recruitment.recruitment_id, "name": agent_recruitment.recruitment.company.company_name or agent_recruitment.recruitment.first_name, "status": agent_recruitment.status})

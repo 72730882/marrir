@@ -1,11 +1,12 @@
+import 'dart:io';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:marrir/services/Employer/companyInfo_service.dart';
-import 'package:marrir/services/Employee/reserves_service.dart'; // Import your reserve service
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../services/api_service.dart';
 
 class CompanyInfoPage extends StatefulWidget {
   const CompanyInfoPage({super.key});
@@ -15,464 +16,315 @@ class CompanyInfoPage extends StatefulWidget {
 }
 
 class _CompanyInfoPageState extends State<CompanyInfoPage> {
-  String? selectedYear;
-  File? companyLicenseFile;
-  File? companyLogoFile;
-  bool isLoading = false;
-  bool isSubmitting = false;
-  bool isLoadingAgreements = false;
-  Map<String, dynamic>? companyData;
-  List<ReserveBatchItem> agreements = [];
-  int currentPage = 0;
-  int limit = 10;
-  bool hasMoreAgreements = true;
-
+  String? year;
   final TextEditingController companyNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController tinController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
-  final ReserveService _reserveService = ReserveService();
-  final ImagePicker _imagePicker = ImagePicker();
 
-  @override
-  void initState() {
-    super.initState();
-    _loadCompanyData();
-    _loadAgreements();
-  }
+  File? licenseFile;
+  File? logoFile;
 
-  Future<void> _loadCompanyData() async {
-    try {
-      setState(() => isLoading = true);
-      final data = await CompanyInfoService.getSingleCompanyInfo();
-      setState(() => companyData = data);
-      _populateFormFields(data);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading data: $e')),
-      );
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
+  final picker = ImagePicker();
 
-  Future<void> _loadAgreements() async {
-    if (isLoadingAgreements || !hasMoreAgreements) return;
+  File? agreementFile;
 
-    try {
-      setState(() => isLoadingAgreements = true);
-      final reserves = await _reserveService.getMyIncomingReserves(
-        skip: currentPage * limit,
-        limit: limit,
-      );
-
+  Future<void> pickAgreementFile() async {
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
       setState(() {
-        agreements.addAll(reserves);
-        if (reserves.length < limit) {
-          hasMoreAgreements = false;
-        }
-        currentPage++;
+        agreementFile = File(picked.path);
       });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading agreements: $e')),
-      );
-    } finally {
-      setState(() => isLoadingAgreements = false);
+      await uploadAgreement();
     }
   }
 
-  Future<void> _handleReserveAction(int reserveId, String action) async {
+  Future<void> uploadAgreement() async {
     try {
-      // You'll need to implement this method in your ReserveService
-      // For now, let's just show a message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                'Reserve $action functionality would be implemented here')),
-      );
-
-      // Refresh agreements
-      setState(() {
-        agreements = [];
-        currentPage = 0;
-        hasMoreAgreements = true;
-      });
-      await _loadAgreements();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error updating reserve: $e')),
-      );
-    }
-  }
-
-  void _populateFormFields(Map<String, dynamic> data) {
-    if (data['data'] != null) {
-      final companyInfo = data['data'];
-      companyNameController.text = companyInfo['company_name'] ?? '';
-      emailController.text = companyInfo['alternative_email'] ?? '';
-      phoneController.text = companyInfo['alternative_phone'] ?? '';
-      tinController.text = companyInfo['ein_tin'] ?? '';
-      locationController.text = companyInfo['location'] ?? '';
-      selectedYear = companyInfo['year_established']?.toString();
-    }
-  }
-
-  Future<void> _pickFile(bool isLicense) async {
-    try {
-      FilePickerResult? result;
-
-      if (isLicense) {
-        // For license files (documents)
-        result = await FilePicker.platform.pickFiles(
-          type: FileType.custom,
-          allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
+      if (agreementFile == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select a file first.")),
         );
-      } else {
-        // For logo files (images) - use image_picker for better reliability
-        final XFile? image = await _imagePicker.pickImage(
-          source: ImageSource.gallery,
-          imageQuality: 85,
-        );
-
-        if (image != null) {
-          setState(() {
-            companyLogoFile = File(image.path);
-          });
-          return;
-        }
         return;
       }
 
-      if (result?.files.isNotEmpty ?? false) {
-        final filePath = result!.files.first.path;
-        if (filePath != null) {
-          setState(() {
-            if (isLicense) {
-              companyLicenseFile = File(filePath);
-            } else {
-              companyLogoFile = File(filePath);
-            }
-          });
-        }
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString("access_token") ?? "";
+      final dealerId =
+          prefs.getString("user_id") ?? ""; // using logged-in user's id
+
+      if (token.isEmpty || dealerId.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Login required before uploading.")),
+        );
+        return;
+      }
+
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+            '${ApiService.baseUrl}/api/v1/company_info/assign-agent-recruitment'),
+      );
+
+      request.headers['Authorization'] = 'Bearer $token';
+      request.fields['dealer_id'] = dealerId;
+      request.files.add(await http.MultipartFile.fromPath(
+        'document',
+        agreementFile!.path,
+      ));
+
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Agreement uploaded successfully.")),
+        );
+        setState(() {
+          agreementFile = null;
+        });
+      } else {
+        final resBody = await response.stream.bytesToString();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Upload failed: $resBody")),
+        );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error picking file: $e')),
+        SnackBar(content: Text("Error uploading: $e")),
       );
     }
   }
 
-  Future<void> _submitCompanyInfo() async {
-    if (!_validateForm()) return;
+  Future<void> pickFile(bool isLicense) async {
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() {
+        if (isLicense) {
+          licenseFile = File(picked.path);
+        } else {
+          logoFile = File(picked.path);
+        }
+      });
+    }
+  }
 
-    setState(() => isSubmitting = true);
-
+  Future<void> submitForm() async {
     try {
-      // Get user_id from shared preferences
       final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('user_id');
-      if (userId == null) {
-        throw Exception('User not logged in.');
+      final token = prefs.getString("access_token") ?? "";
+      final userId = prefs.getString("user_id") ?? "";
+      final email = prefs.getString("email") ?? "";
+
+      if (token.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("No token found, please login again.")),
+        );
+        return;
       }
 
+      // Make sure year is int
+      final intYear = int.tryParse(year ?? '') ?? 2023;
+
+      // Correct JSON structure
       final companyData = {
+        "user_id": prefs.getString("user_id") ?? "", // <--- add this
         "company_name": companyNameController.text,
         "alternative_email": emailController.text,
         "alternative_phone": phoneController.text,
-        "ein_tin": tinController.text,
         "location": locationController.text,
-        "year_established":
-            selectedYear != null ? int.parse(selectedYear!) : null,
-        "agent_ids": [],
-        "recruitment_ids": [],
-        "user_id": userId, // <-- add this
+        "year_established": intYear,
+        "ein_tin": tinController.text,
       };
 
-      final response = await CompanyInfoService.createUpdateCompanyInfo(
-        companyData: companyData,
-        companyLicense: companyLicenseFile,
-        companyLogo: companyLogoFile,
+      final result = await ApiService.createOrUpdateCompanyInfo(
+        token: token,
+        fields: companyData,
+        licenseFile: licenseFile,
+        logoFile: logoFile,
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Company information saved successfully!')),
+        const SnackBar(content: Text("Company info updated")),
       );
 
-      await _loadCompanyData();
+      print("Response: $result");
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text("Failed to update: $e")),
       );
-    } finally {
-      setState(() => isSubmitting = false);
     }
-  }
-
-  bool _validateForm() {
-    if (companyNameController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Company name is required')),
-      );
-      return false;
-    }
-
-    if (emailController.text.isNotEmpty &&
-        !_isValidEmail(emailController.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid email address')),
-      );
-      return false;
-    }
-
-    return true;
-  }
-
-  bool _isValidEmail(String email) {
-    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    return emailRegex.hasMatch(email);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: isLoading && companyData == null
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(25.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(25.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ==== HEADER ====
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border:
+                    Border.all(color: const Color.fromARGB(255, 220, 220, 220)),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Row(
                 children: [
-                  // ==== DASHBOARD STYLE HEADER ====
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(
-                          color: const Color.fromARGB(255, 220, 220, 220)),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Row(
-                      children: [
-                        SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Company Information',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'You can add company information below',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.black54,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-
-                  // ==== FORM FIELDS ====
-                  _buildTextField('Company Name', companyNameController,
-                      'Enter company name'),
-                  const SizedBox(height: 12),
-                  _buildTextField('Alternative Email', emailController,
-                      'Enter Alternative Email'),
-                  const SizedBox(height: 12),
-                  _buildTextField('Alternative Phone Number', phoneController,
-                      'Enter Alternative Phone number'),
-                  const SizedBox(height: 12),
-
-                  // Year and TIN Row
-                  Row(
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Year of Establishment',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 8),
-                            DropdownButtonFormField<String>(
-                              value: selectedYear,
-                              items: List.generate(30, (index) {
-                                String year =
-                                    (DateTime.now().year - index).toString();
-                                return DropdownMenuItem(
-                                    value: year, child: Text(year));
-                              }),
-                              onChanged: (value) =>
-                                  setState(() => selectedYear = value),
-                              decoration: _inputDecoration('Select year'),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('EIN or TIN Number',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 8),
-                            TextField(
-                              controller: tinController,
-                              decoration: _inputDecoration('123456789'),
-                              keyboardType: TextInputType.number,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                      'Location', locationController, 'Enter location'),
-
-                  const SizedBox(height: 18),
-                  // ==== UPLOAD LICENSE ====
-                  _buildUploadContainer(
-                    'Upload Company License',
-                    'PDF, DOC, JPG, PNG (Max 5MB)',
-                    companyLicenseFile,
-                    () => _pickFile(true),
-                  ),
-
-                  const SizedBox(height: 16),
-                  // ==== UPLOAD LOGO ====
-                  _buildUploadContainer(
-                    'Upload Company Logo',
-                    'JPG, PNG (Max 2MB)',
-                    companyLogoFile,
-                    () => _pickFile(false),
-                  ),
-
-                  const SizedBox(height: 20),
-                  // ==== SUBMIT BUTTON ====
-                  Center(
-                    child: SizedBox(
-                      width: 300,
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed: isSubmitting ? null : _submitCompanyInfo,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF65b2c9),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 12),
-                        ),
-                        child: isSubmitting
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text(
-                                'Submit',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-
-                  // ==== GRAY LINE DIVIDER ====
-                  const Divider(
-                    color: Colors.grey,
-                    thickness: 0.1,
-                    height: 0.8,
-                  ),
-                  const SizedBox(height: 30),
-
-                  // ==== AGREEMENT TABLE ====
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Agreement Table',
+                      Text(
+                        'Company Information',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.black,
-                        ),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87),
                       ),
-                      ElevatedButton(
-                        onPressed: () {
-                          // Refresh agreements
-                          setState(() {
-                            agreements = [];
-                            currentPage = 0;
-                            hasMoreAgreements = true;
-                          });
-                          _loadAgreements();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF65b2c9),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'Refresh',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                      SizedBox(height: 4),
+                      Text(
+                        'You can add company information below',
+                        style: TextStyle(fontSize: 15, color: Colors.black54),
                       ),
                     ],
                   ),
-
-                  const SizedBox(height: 14),
-                  _buildAgreementTable(),
-
-                  if (isLoadingAgreements)
-                    const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-
-                  if (hasMoreAgreements && !isLoadingAgreements)
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Center(
-                        child: ElevatedButton(
-                          onPressed: _loadAgreements,
-                          child: const Text('Load More'),
-                        ),
-                      ),
-                    ),
                 ],
               ),
             ),
+            const SizedBox(height: 60),
+
+            // ==== FORM FIELDS ====
+            _buildTextField(
+                'Company Name', companyNameController, 'Enter company name'),
+            const SizedBox(height: 12),
+            _buildTextField('Alternative Email', emailController,
+                'Enter Alternative Email'),
+            const SizedBox(height: 12),
+            _buildTextField('Alternative Phone Number', phoneController,
+                'Enter Alternative Phone number'),
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Year of Establishment',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 25),
+                      DropdownButtonFormField<String>(
+                        value: year,
+                        items: List.generate(10, (index) {
+                          String yr = (2023 - index).toString();
+                          return DropdownMenuItem(value: yr, child: Text(yr));
+                        }),
+                        onChanged: (value) => setState(() => year = value),
+                        decoration: _dropdownDecoration(),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildTextField('EIN or TIN Number of company',
+                      tinController, '123456789'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _buildTextField('Location', locationController, 'A.A'),
+
+            const SizedBox(height: 18),
+            // ==== UPLOAD LICENSE ====
+            _buildUploadContainer('Upload Company License',
+                'Tap to upload license', true, licenseFile),
+
+            const SizedBox(height: 16),
+            // ==== UPLOAD LOGO ====
+            _buildUploadContainer(
+                'Upload Company Logo', 'Tap to upload logo', false, logoFile),
+
+            const SizedBox(height: 20),
+            Center(
+              child: SizedBox(
+                width: 300,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: submitForm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF65b2c9),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                  ),
+                  child: const Text('Submit',
+                      style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+            // ==== GRAY LINE DIVIDER ====
+            const Divider(
+              color: Colors.grey,
+              thickness: 0.1, // you can adjust thickness
+              height: 0.8, // height of the divider widget
+            ),
+            const SizedBox(height: 30),
+            // ==== AGREEMENT TABLE ====
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Agreement Table',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: pickAgreementFile,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF65b2c9),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Add Agreement',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 14),
+            _buildAgreementTable(),
+          ],
+        ),
+      ),
     );
   }
 
-  InputDecoration _inputDecoration(String hintText) {
+  InputDecoration _dropdownDecoration() {
     return InputDecoration(
-      hintText: hintText,
+      hintText: '2025',
       hintStyle: TextStyle(color: Colors.grey.shade500),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -519,20 +371,17 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           ),
-        ),
+        )
       ],
     );
   }
 
   Widget _buildUploadContainer(
-      String title, String description, File? file, VoidCallback onTap) {
+      String title, String hint, bool isLicense, File? file) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        Text(description,
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
         const SizedBox(height: 10),
         DottedBorder(
           color: Colors.grey,
@@ -540,41 +389,31 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
           borderType: BorderType.RRect,
           radius: const Radius.circular(8),
           dashPattern: const [2, 1],
-          child: InkWell(
-            onTap: onTap,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (file != null)
+                  Image.file(file, height: 60)
+                else
                   const Icon(Icons.cloud_upload_outlined, color: Colors.grey),
-                  const SizedBox(height: 10),
-                  Text(
-                    file != null
-                        ? 'File selected: ${file.path.split('/').last}'
-                        : 'Tap to select file',
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: onTap,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF65b2c9),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                const SizedBox(height: 10),
+                Text(hint),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () => pickFile(isLicense),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 238, 233, 233),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Text('Choose File',
-                        style: TextStyle(color: Colors.white)),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    file != null ? 'Ready to upload' : 'No file chosen',
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                ],
-              ),
+                  child: const Text('Upload',
+                      style: TextStyle(color: Colors.black)),
+                ),
+              ],
             ),
           ),
         ),
@@ -583,15 +422,6 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
   }
 
   Widget _buildAgreementTable() {
-    if (agreements.isEmpty && !isLoadingAgreements) {
-      return const Center(
-        child: Text(
-          'No agreements found',
-          style: TextStyle(color: Colors.grey),
-        ),
-      );
-    }
-
     return Container(
       margin: const EdgeInsets.only(top: 12),
       decoration: BoxDecoration(
@@ -617,10 +447,9 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
             child: const Row(
               children: [
                 Expanded(
-                  flex: 2,
                   child: Center(
                     child: Text(
-                      'Reserver Name',
+                      'Reserve Name',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -641,101 +470,54 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                     ),
                   ),
                 ),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      'Actions',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
-
           // ==== TABLE ROWS ====
-          ...agreements.map((agreement) {
-            return Container(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Colors.grey.shade200, width: 1),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      agreement.reserverFullName,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
-                        fontWeight: FontWeight.bold,
+          Column(
+            children: List.generate(5, (index) {
+              bool isActive = index % 2 == 0;
+              return Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Hanan N',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Container(
+                    Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.orange
-                            .withOpacity(0.2), // Default color for pending
+                        color: isActive
+                            ? Colors.green.withOpacity(0.2)
+                            : const Color.fromARGB(255, 245, 221, 12)
+                                .withOpacity(0.2),
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: const Text(
-                        'PENDING',
+                      child: Text(
+                        isActive ? 'Active' : 'Pending',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.orange,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                          color:
+                              isActive ? Colors.green[800] : Colors.orange[800],
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.check,
-                              color: Colors.green, size: 20),
-                          onPressed: () =>
-                              _handleReserveAction(agreement.id, 'accepted'),
-                          tooltip: 'Accept',
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close,
-                              color: Colors.red, size: 20),
-                          onPressed: () =>
-                              _handleReserveAction(agreement.id, 'declined'),
-                          tooltip: 'Decline',
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
+                  ],
+                ),
+              );
+            }),
+          ),
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    companyNameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    tinController.dispose();
-    locationController.dispose();
-    super.dispose();
   }
 }

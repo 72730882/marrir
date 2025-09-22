@@ -49,6 +49,8 @@ dependencies:
   google_sign_in: ^6.2.1
   flutter_facebook_auth: ^6.2.0
   provider: ^6.0.5
+  file_picker: ^8.0.3
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

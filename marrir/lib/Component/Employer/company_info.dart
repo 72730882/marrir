@@ -1,5 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:dotted_border/dotted_border.dart'; // Add this package
+import 'package:dotted_border/dotted_border.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import '../../services/api_service.dart';
 
 class CompanyInfoPage extends StatefulWidget {
   const CompanyInfoPage({super.key});
@@ -16,23 +21,141 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
   final TextEditingController tinController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
 
+  File? licenseFile;
+  File? logoFile;
+  File? agreementFile;
+  final picker = ImagePicker();
+
+  Future<void> pickFile(bool isLicense) async {
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() {
+        if (isLicense) {
+          licenseFile = File(picked.path);
+        } else {
+          logoFile = File(picked.path);
+        }
+      });
+    }
+  }
+
+  Future<void> pickAgreementFile() async {
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() => agreementFile = File(picked.path));
+      await uploadAgreement();
+    }
+  }
+
+  Future<void> uploadAgreement() async {
+    try {
+      if (agreementFile == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select a file first.")),
+        );
+        return;
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString("access_token") ?? "";
+      final dealerId = prefs.getString("user_id") ?? "";
+
+      if (token.isEmpty || dealerId.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Login required before uploading.")),
+        );
+        return;
+      }
+
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse("${ApiService.baseUrl}/api/v1/company_info/assign-agent-recruitment"),
+      );
+
+      request.headers['Authorization'] = 'Bearer $token';
+      request.fields['dealer_id'] = dealerId;
+      request.files.add(await http.MultipartFile.fromPath(
+        'document',
+        agreementFile!.path,
+      ));
+
+      final response = await request.send();
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Agreement uploaded successfully.")),
+        );
+        setState(() => agreementFile = null);
+      } else {
+        final resBody = await response.stream.bytesToString();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Upload failed: $resBody")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error uploading: $e")),
+      );
+    }
+  }
+
+  Future<void> submitForm() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString("access_token") ?? "";
+
+      if (token.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please login first.")),
+        );
+        return;
+      }
+
+      final intYear = int.tryParse(year ?? '') ?? 2023;
+
+      final companyData = {
+        "user_id": prefs.getString("user_id") ?? "",
+        "company_name": companyNameController.text,
+        "alternative_email": emailController.text,
+        "alternative_phone": phoneController.text,
+        "location": locationController.text,
+        "year_established": intYear,
+        "ein_tin": tinController.text,
+      };
+
+      final result = await ApiService.createOrUpdateCompanyInfo(
+        token: token,
+        fields: companyData,
+        licenseFile: licenseFile,
+        logoFile: logoFile,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Company info updated")),
+      );
+
+      print("Response: $result");
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to update: $e")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Optional: match your Layout’s background
-
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(25.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ==== DASHBOARD STYLE HEADER ====
+            // ==== HEADER ====
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
-                border:
-                    Border.all(color: const Color.fromARGB(255, 220, 220, 220)),
+                border: Border.all(color: Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
@@ -42,210 +165,95 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                   ),
                 ],
               ),
-              child: const Row(
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Company Information',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'You can add company information below',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.black54,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'Company Information',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
+                  SizedBox(height: 4),
+                  Text('You can add company information below',
+                      style: TextStyle(fontSize: 15, color: Colors.black54)),
                 ],
               ),
             ),
             const SizedBox(height: 60),
 
-            // ==== FORM FIELDS ====
-            _buildTextField(
-                'Company Name', companyNameController, 'Enter company name'),
+            _buildTextField("Company Name", companyNameController, "Enter company name"),
             const SizedBox(height: 12),
-            _buildTextField('Alternative Email', emailController,
-                'Enter Alternative Email'),
+            _buildTextField("Alternative Email", emailController, "Enter alternative email"),
             const SizedBox(height: 12),
-            _buildTextField('Alternative Phone Number', phoneController,
-                'Enter Alternative Phone number'),
+            _buildTextField("Alternative Phone Number", phoneController, "Enter phone number"),
             const SizedBox(height: 12),
 
-            // Year and TIN Row
             Row(
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Year of Establishment',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 25),
-                      DropdownButtonFormField<String>(
-                        value: year,
-                        items: List.generate(10, (index) {
-                          String yr = (2023 - index).toString();
-                          return DropdownMenuItem(value: yr, child: Text(yr));
-                        }),
-                        onChanged: (value) => setState(() => year = value),
-                        decoration: InputDecoration(
-                          hintText: '2023',
-                          hintStyle: TextStyle(color: Colors.grey.shade500),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(
-                              color: Colors.grey, // border color
-                              width: 0.6, // 👈 thinner border line
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(
-                              color: Colors.grey,
-                              width: 0.6, // thinner line when not focused
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(
-                              color: Colors.blue,
-                              width: 0.8, // slightly thicker when focused
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 12),
-                        ),
-                      ),
-                    ],
+                  child: DropdownButtonFormField<String>(
+                    value: year,
+                    items: List.generate(10, (index) {
+                      String yr = (2023 - index).toString();
+                      return DropdownMenuItem(value: yr, child: Text(yr));
+                    }),
+                    onChanged: (value) => setState(() => year = value),
+                    decoration: _dropdownDecoration(),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('EIN or TIN Number of company',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 4),
-                      TextField(
-                        controller: tinController,
-                        decoration: InputDecoration(
-                          hintText: '123456789',
-                          hintStyle: TextStyle(color: Colors.grey.shade500),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(
-                              color: Colors.grey, // border color
-                              width: 0.6, // 👈 thinner border line
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(
-                              color: Colors.grey,
-                              width: 0.6, // thinner line when not focused
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(
-                              color: Colors.blue,
-                              width: 0.8, // slightly thicker when focused
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 12),
-                        ),
-                      )
-                    ],
-                  ),
+                  child: _buildTextField("EIN or TIN", tinController, "123456789"),
                 ),
               ],
             ),
+
             const SizedBox(height: 12),
-            _buildTextField('Location', locationController, 'A.A'),
+            _buildTextField("Location", locationController, "A.A"),
 
             const SizedBox(height: 18),
-            // ==== UPLOAD LICENSE ====
-            _buildUploadContainer(
-                'Upload Company License', 'Tap to upload license'),
-
+            _buildUploadContainer("Upload Company License", "Tap to upload license", true, licenseFile),
             const SizedBox(height: 16),
-            // ==== UPLOAD LOGO ====
-            _buildUploadContainer('Upload Company Logo', 'Tap to upload logo'),
+            _buildUploadContainer("Upload Company Logo", "Tap to upload logo", false, logoFile),
 
             const SizedBox(height: 20),
-            // ==== SUBMIT BUTTON ====
             Center(
               child: SizedBox(
                 width: 300,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: submitForm,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF65b2c9),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
                   ),
-                  child: const Text(
-                    'Submit',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: const Text("Submit", style: TextStyle(color: Colors.white)),
                 ),
               ),
             ),
+
+            const SizedBox(height: 30),
+            const Divider(color: Colors.grey, thickness: 0.1, height: 0.8),
             const SizedBox(height: 30),
 
-            // ==== GRAY LINE DIVIDER ====
-            const Divider(
-              color: Colors.grey,
-              thickness: 0.1, // you can adjust thickness
-              height: 0.8, // height of the divider widget
-            ),
-            const SizedBox(height: 30),
-
-            // ==== AGREEMENT TABLE ====
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Agreement Table',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.black,
-                  ),
-                ),
+                const Text("Agreement Table",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: pickAgreementFile,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF65b2c9),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Add Agreement',
-                    style: TextStyle(color: Colors.white), // ← text color white
-                  ),
+                  child: const Text("Add Agreement", style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
-
             const SizedBox(height: 14),
             _buildAgreementTable(),
           ],
@@ -254,50 +262,33 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
     );
   }
 
-  // ==== Helper Widgets ====
-  Widget _buildTextField(
-      String label, TextEditingController controller, String hint) {
+  InputDecoration _dropdownDecoration() {
+    return InputDecoration(
+      hintText: "2025",
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller, String hint) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
         const SizedBox(height: 7),
         TextField(
           controller: controller,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey.shade500), // <-- light gray
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(
-                color: Colors.grey, // border color
-                width: 0.6, // 👈 thinner border line
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(
-                color: Color.fromARGB(255, 155, 154, 154),
-                width: 0.5, // 👈 when not focused
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(
-                color: Colors.blue,
-                width: 0.8, // 👈 when focused
-              ),
-            ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           ),
-        )
+        ),
       ],
     );
   }
 
-  Widget _buildUploadContainer(String title, String hint) {
+  Widget _buildUploadContainer(String title, String hint, bool isLicense, File? file) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -305,34 +296,26 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
         const SizedBox(height: 10),
         DottedBorder(
           color: Colors.grey,
-          strokeWidth: 1.5,
           borderType: BorderType.RRect,
           radius: const Radius.circular(8),
-          dashPattern: const [2, 1],
           child: Container(
-            width: double.infinity, // make width same as input fields
-            padding: const EdgeInsets.symmetric(
-                vertical: 24, horizontal: 16), // top & bottom padding
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.cloud_upload_outlined, color: Colors.grey),
+                if (file != null)
+                  Image.file(file, height: 60)
+                else
+                  const Icon(Icons.cloud_upload_outlined, color: Colors.grey),
                 const SizedBox(height: 10),
                 Text(hint),
-                const SizedBox(height: 10),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () => pickFile(isLicense),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF65b2c9),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    backgroundColor: Colors.grey.shade200,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: const Text('Choose File',
-                      style: TextStyle(color: Colors.white)),
+                  child: const Text("Upload", style: TextStyle(color: Colors.black)),
                 ),
-                const SizedBox(height: 4),
-                const Text('No file chosen', style: TextStyle(fontSize: 12)),
               ],
             ),
           ),
@@ -348,16 +331,11 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
+          BoxShadow(color: Colors.grey.withOpacity(0.15), blurRadius: 8, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
         children: [
-          // ==== TABLE HEADER ====
           Container(
             padding: const EdgeInsets.symmetric(vertical: 12),
             decoration: const BoxDecoration(
@@ -366,70 +344,26 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
             ),
             child: const Row(
               children: [
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      'Reserve Name',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      'Status',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ),
+                Expanded(child: Center(child: Text("Reserve Name", style: TextStyle(color: Colors.white)))),
+                Expanded(child: Center(child: Text("Status", style: TextStyle(color: Colors.white)))),
               ],
             ),
           ),
-          // ==== TABLE ROWS ====
           Column(
             children: List.generate(5, (index) {
               bool isActive = index % 2 == 0;
               return Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
                 child: Row(
                   children: [
-                    const Expanded(
-                      child: Text(
-                        'Hanan N',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black87,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                    const Expanded(child: Text("Hanan N", style: TextStyle(fontWeight: FontWeight.bold))),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: isActive
-                            ? Colors.green.withOpacity(0.2)
-                            : const Color.fromARGB(255, 245, 221, 12)
-                                .withOpacity(0.2),
+                        color: isActive ? Colors.green.withOpacity(0.2) : Colors.orange.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Text(
-                        isActive ? 'Active' : 'Pending',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color:
-                              isActive ? Colors.green[800] : Colors.orange[800],
-                        ),
-                      ),
+                      child: Text(isActive ? "Active" : "Pending"),
                     ),
                   ],
                 ),

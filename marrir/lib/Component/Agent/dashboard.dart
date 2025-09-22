@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../providers/user_info_provider.dart';
+import '../../services/api_service.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -11,57 +13,73 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  String firstName = "";
-  String lastName = "";
   String createdAt = "";
+  Map<String, dynamic>? dashboardStats;
 
   @override
   void initState() {
     super.initState();
-    _loadUserInfo();
+    _loadDashboard();
   }
 
-  Future<void> _loadUserInfo() async {
+  double section1Progress = 0.0; // 0 to 1
+  double section2Progress = 0.0; // 0 to 1 (if needed)
+
+  Future<void> _loadDashboard() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString("access_token") ?? "";
       final userId = prefs.getString("user_id") ?? "";
-
+      final email = prefs.getString("email") ?? "";
       if (token.isEmpty || userId.isEmpty) return;
 
-      final response = await http.post(
-        Uri.parse("http://10.0.2.2:8000/api/v1/dashboard/"),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
-       body: jsonEncode({
-    "id": userId,   
-  }),
+      // 1️⃣ Get user info
+      final userInfo =
+          await ApiService.getUserInfo(token: token, userId: userId);
+      final firstName = userInfo["first_name"] ?? "";
+      final lastName = userInfo["last_name"] ?? "";
+      final createdAtDate = userInfo["created_at"] ?? "";
+
+      // Update provider and state
+      if (!mounted) return;
+      setState(() => createdAt = createdAtDate);
+      Provider.of<UserInfoProvider>(context, listen: false)
+          .setUserName(firstName: firstName, lastName: lastName);
+
+      // Get dashboard stats
+      final stats =
+          await ApiService.getDashboardInfo(token: token, userId: userId);
+      if (!mounted) return;
+      setState(() => dashboardStats = stats["data"] ?? {});
+
+      // ✅ Get company info progress from endpoint
+      final progressData = await ApiService.getCompanyInfoProgress(
+        token: token,
+        userId: userId,
+        email: email,
       );
 
-      if (response.statusCode == 200) {
-        final res = jsonDecode(response.body);
-
-        if (res["error"] == false && res["data"] != null) {
-          setState(() {
-            firstName = res["data"]["firstName"] ?? "";
-            lastName = res["data"]["lastName"] ?? "";
-            createdAt = res["data"]["createdAt"] ?? "";
-          });
-        } else {
-          debugPrint("Error fetching user info: ${res['message'] ?? 'Unknown error'}");
-        }
-      } else {
-        debugPrint("Server error: ${response.statusCode} - ${response.body}");
-      }
+      if (!mounted) return;
+      setState(() {
+        section1Progress =
+            (progressData["data"]?["company_info_progress"] ?? 0) / 100;
+        section2Progress =
+            (progressData["data"]?["company_document_progress"] ?? 0) / 100;
+      });
     } catch (e) {
-      debugPrint("Failed to fetch user info: $e");
+      debugPrint("Failed to load dashboard: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final userInfoProvider = Provider.of<UserInfoProvider>(context);
+    final userName = userInfoProvider.fullName ?? "Agency Firm Name";
+    final initials = (userInfoProvider.fullName ?? "AF")
+        .split(' ')
+        .map((e) => e.isNotEmpty ? e[0] : "")
+        .join();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -72,7 +90,8 @@ class _DashboardPageState extends State<DashboardPage> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border.all(color: const Color.fromARGB(255, 220, 220, 220)),
+              border:
+                  Border.all(color: const Color.fromARGB(255, 220, 220, 220)),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
@@ -88,7 +107,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   radius: 24,
                   backgroundColor: const Color(0xFFDDDDDD),
                   child: Text(
-                    firstName.isNotEmpty ? firstName[0] : "M",
+                    initials,
                     style: const TextStyle(
                       fontSize: 22,
                       color: Colors.black87,
@@ -101,7 +120,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Hi, ${firstName.isNotEmpty ? '$firstName $lastName' : 'Agency Firm Name'}",
+                      "Hi, $userName",
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -110,7 +129,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "Date Created: ${createdAt.isNotEmpty ? createdAt : 'January 15, 2024'}",
+                      " ${createdAt.isNotEmpty ? createdAt : 'January 15, 2024'}",
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.black54,
@@ -152,14 +171,38 @@ class _DashboardPageState extends State<DashboardPage> {
             crossAxisSpacing: 12,
             childAspectRatio: 1.5,
             children: [
-              _buildStatCard("Profile views", "0", "Count - 0%"),
-              _buildStatCard("Job count", "0", "Count - 0%"),
-              _buildStatCard("Completed profiles male", "0", "Count - 0%"),
-              _buildStatCard("Completed profiles female", "0", "Count - 0%"),
-              _buildStatCard("Booked Profiles", "0", "Count - 0%"),
+              _buildStatCard(
+                "Profile Views",
+                "${dashboardStats?['profile_view']?['value'] ?? 0}",
+                "Change: ${dashboardStats?['profile_view']?['change'] ?? 0}%",
+              ),
+              _buildStatCard(
+                "Jobs Count",
+                "${dashboardStats?['jobs_posted_count']?['value'] ?? 0}",
+                "Change: ${dashboardStats?['jobs_posted_count']?['change'] ?? 0}%",
+              ),
+              _buildStatCard(
+                "Completed profiles male",
+                "${dashboardStats?['male_employees_count']?['value'] ?? 0}",
+                "Change: ${dashboardStats?['male_employees_count']?['change'] ?? 0}%",
+              ),
+              _buildStatCard(
+                "Completed profiles female",
+                "${dashboardStats?['female_employees_count']?['value'] ?? 0}",
+                "Change: ${dashboardStats?['female_employees_count']?['change'] ?? 0}%",
+              ),
+              _buildStatCard(
+                "Booked Profiles",
+                "${dashboardStats?['employees_count']?['value'] ?? 0}",
+                "Change: ${dashboardStats?['employees_count']?['change'] ?? 0}%",
+              ),
               _buildStatCard("Profile transfers", "0", "Count - 0%"),
               _buildStatCard("Job count", "0", "Count - 0%"),
-              _buildStatCard("Transfer count", "0", "Count - 0%"),
+              _buildStatCard(
+                "Transfer count",
+                "${dashboardStats?['transfers_count']?['value'] ?? 0}",
+                "Change: ${dashboardStats?['transfers_count']?['change'] ?? 0}%",
+              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -182,32 +225,36 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
           const SizedBox(height: 12),
-
           Row(
             children: [
               Expanded(
                 child: _buildProgressCard(
                   "Section 1",
                   "Company Information Progress",
-                  0.45,
+                  section1Progress, // <- from API
                 ),
               ),
-              const SizedBox(width: 12),
               Expanded(
                 child: _buildProgressCard(
                   "Section 2",
                   "Company License Progress",
-                  0.30,
+                  section2Progress, // <- from API
                 ),
               ),
             ],
           ),
+          // ==== GRAY LINE DIVIDER ====
+          const Divider(
+            color: Colors.grey,
+            thickness: 0.1,
+            height: 0.8,
+          ),
+          const SizedBox(height: 30),
         ],
       ),
     );
   }
 
-  // ==== Helper Widget for Overview Cards ====
   static Widget _buildStatCard(String title, String value, String subtitle) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -230,11 +277,9 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 13, color: Colors.black87),
-          ),
-          const SizedBox(width: 12),
+          Text(title,
+              style: const TextStyle(fontSize: 13, color: Colors.black87)),
+          const SizedBox(height: 4),
           Text(
             value,
             style: const TextStyle(
@@ -244,20 +289,15 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
           const SizedBox(height: 2),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.black54,
-            ),
-          ),
+          Text(subtitle,
+              style: const TextStyle(fontSize: 12, color: Colors.black54)),
         ],
       ),
     );
   }
 
-  // ==== Helper Widget for Progress Cards ====
-  static Widget _buildProgressCard(String section, String title, double progress) {
+  static Widget _buildProgressCard(
+      String section, String title, double progress) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -278,36 +318,26 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            section,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black87,
-            ),
-          ),
+          Text(section,
+              style: const TextStyle(fontSize: 16, color: Colors.black87)),
           const SizedBox(height: 6),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 13, color: Colors.black87),
-          ),
+          Text(title,
+              style: const TextStyle(fontSize: 13, color: Colors.black87)),
           const SizedBox(height: 12),
           SizedBox(
             height: 9,
-            width: 150,
+            width: double.infinity,
             child: LinearProgressIndicator(
               value: progress,
               backgroundColor: const Color(0xFFE5E5E5),
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                Color(0xFF65b2c9),
-              ),
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(Color(0xFF65b2c9)),
               borderRadius: BorderRadius.circular(5),
             ),
           ),
           const SizedBox(height: 15),
-          Text(
-            "${(progress * 100).toInt()}% Complete",
-            style: const TextStyle(fontSize: 14, color: Colors.black87),
-          ),
+          Text("${(progress * 100).toInt()}% Complete",
+              style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 4),
           SizedBox(
             width: double.infinity,
@@ -316,16 +346,10 @@ class _DashboardPageState extends State<DashboardPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF65b2c9),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
+                    borderRadius: BorderRadius.circular(6)),
               ),
-              child: const Text(
-                "Continue",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                ),
-              ),
+              child: const Text("Continue",
+                  style: TextStyle(color: Colors.white, fontSize: 15)),
             ),
           ),
         ],
@@ -333,3 +357,25 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 }
+
+
+
+
+  
+  
+// Widget _photoLanguageTab() {
+//     return const Center(child: Text("Photo and Language Form"));
+//     // 
+//   }
+
+//   Widget _experienceTab() {
+//     return const Center(child: Text("Experience & Documents Form"));
+//   }
+
+//   Widget _referencesTab() {
+//     return const Center(child: Text("Experience & Documents Form"));
+//   }
+
+//   Widget _additionalContactInformationTab() {
+//     return const Center(child: Text("Experience & Documents Form"));
+//   }

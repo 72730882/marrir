@@ -1,10 +1,86 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../providers/user_info_provider.dart';
+import '../../services/api_service.dart';
+import 'dart:convert';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
 
   @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  String createdAt = "";
+  Map<String, dynamic>? dashboardStats;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDashboard();
+  }
+
+  double section1Progress = 0.0; // 0 to 1
+  double section2Progress = 0.0; // 0 to 1 (if needed)
+
+  Future<void> _loadDashboard() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString("access_token") ?? "";
+      final userId = prefs.getString("user_id") ?? "";
+      final email = prefs.getString("email") ?? "";
+
+      if (token.isEmpty || userId.isEmpty) return;
+
+      // Get user info
+      final userInfo =
+          await ApiService.getUserInfo(token: token, userId: userId);
+      final firstName = userInfo["first_name"] ?? "";
+      final lastName = userInfo["last_name"] ?? "";
+      final createdAtDate = userInfo["createdAt"] ?? "";
+
+      // Update provider
+      if (!mounted) return;
+      setState(() => createdAt = createdAtDate);
+      Provider.of<UserInfoProvider>(context, listen: false)
+          .setUserName(firstName: firstName, lastName: lastName);
+
+      // Get dashboard stats
+      final stats =
+          await ApiService.getDashboardInfo(token: token, userId: userId);
+      if (!mounted) return;
+      setState(() => dashboardStats = stats["data"] ?? {});
+
+      // ✅ Get company info progress from endpoint
+      final progressData = await ApiService.getCompanyInfoProgress(
+        token: token,
+        userId: userId,
+        email: email,
+      );
+
+      if (!mounted) return;
+      setState(() {
+        section1Progress =
+            (progressData["data"]?["company_info_progress"] ?? 0) / 100;
+        section2Progress =
+            (progressData["data"]?["company_document_progress"] ?? 0) / 100;
+      });
+    } catch (e) {
+      debugPrint("Failed to load dashboard: $e");
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final userInfoProvider = Provider.of<UserInfoProvider>(context);
+    final userName = userInfoProvider.fullName ?? "Employer Name";
+    final initials = (userInfoProvider.fullName ?? "EN")
+        .split(' ')
+        .map((e) => e.isNotEmpty ? e[0] : "")
+        .join();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -26,36 +102,36 @@ class DashboardPage extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Row(
+            child: Row(
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: Color(0xFFDDDDDD),
+                  backgroundColor: const Color(0xFFDDDDDD),
                   child: Text(
-                    "M",
-                    style: TextStyle(
+                    initials,
+                    style: const TextStyle(
                       fontSize: 22,
                       color: Colors.black87,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Hi, Employer Name",
-                      style: TextStyle(
+                      "Hi, $userName",
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      "Date Created: January 15, 2024",
-                      style: TextStyle(
+                      "Date Created: ${createdAt.isNotEmpty ? createdAt : 'January 15, 2024'}",
+                      style: const TextStyle(
                         fontSize: 14,
                         color: Colors.black54,
                       ),
@@ -96,14 +172,38 @@ class DashboardPage extends StatelessWidget {
             crossAxisSpacing: 12,
             childAspectRatio: 1.5,
             children: [
-              _buildStatCard("Profile views", "0", "Count - 0%"),
-              _buildStatCard("Job count", "0", "Count - 0%"),
-              _buildStatCard("Completed profiles male", "0", "Count - 0%"),
-              _buildStatCard("Completed profiles female", "0", "Count - 0%"),
-              _buildStatCard("Booked Profiles", "0", "Count - 0%"),
+              _buildStatCard(
+                "Profile Views",
+                "${dashboardStats?['profile_view']?['value'] ?? 0}",
+                "Change: ${dashboardStats?['profile_view']?['change'] ?? 0}%",
+              ),
+              _buildStatCard(
+                "Jobs Posted",
+                "${dashboardStats?['jobs_posted_count']?['value'] ?? 0}",
+                "Change: ${dashboardStats?['jobs_posted_count']?['change'] ?? 0}%",
+              ),
+              _buildStatCard(
+                "Male Employees",
+                "${dashboardStats?['male_employees_count']?['value'] ?? 0}",
+                "Change: ${dashboardStats?['male_employees_count']?['change'] ?? 0}%",
+              ),
+              _buildStatCard(
+                "Female Employees",
+                "${dashboardStats?['female_employees_count']?['value'] ?? 0}",
+                "Change: ${dashboardStats?['female_employees_count']?['change'] ?? 0}%",
+              ),
+              _buildStatCard(
+                "Total Employees",
+                "${dashboardStats?['employees_count']?['value'] ?? 0}",
+                "Change: ${dashboardStats?['employees_count']?['change'] ?? 0}%",
+              ),
               _buildStatCard("Profile transfers", "0", "Count - 0%"),
               _buildStatCard("Job count", "0", "Count - 0%"),
-              _buildStatCard("Transfer count", "0", "Count - 0%"),
+              _buildStatCard(
+                "Transfers",
+                "${dashboardStats?['transfers_count']?['value'] ?? 0}",
+                "Change: ${dashboardStats?['transfers_count']?['change'] ?? 0}%",
+              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -126,46 +226,47 @@ class DashboardPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-
           Row(
             children: [
               Expanded(
                 child: _buildProgressCard(
                   "Section 1",
                   "Company Information Progress",
-                  0.45,
+                  section1Progress, // <- from API
                 ),
               ),
-              const SizedBox(width: 12),
               Expanded(
                 child: _buildProgressCard(
                   "Section 2",
                   "Company License Progress",
-                  0.30,
+                  section2Progress, // <- from API
                 ),
               ),
             ],
           ),
+          // ==== GRAY LINE DIVIDER ====
+          const Divider(
+            color: Colors.grey,
+            thickness: 0.1,
+            height: 0.8,
+          ),
+          const SizedBox(height: 30),
         ],
       ),
     );
   }
 
-  // ==== Helper Widget for Overview Cards ====
   static Widget _buildStatCard(String title, String value, String subtitle) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.grey.withOpacity(0.5), // border color
-          width: 1.1, // border thickness
-        ),
+        border: Border.all(color: Colors.grey.withOpacity(0.5), width: 1.1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.10),
-            spreadRadius: 8, // how wide the shadow spreads
+            spreadRadius: 8,
             blurRadius: 15,
             offset: const Offset(0, 10),
           ),
@@ -174,33 +275,24 @@ class DashboardPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 13, color: Colors.black87),
-          ),
-          const SizedBox(width: 12),
+          Text(title,
+              style: const TextStyle(fontSize: 13, color: Colors.black87)),
+          const SizedBox(height: 4),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87),
           ),
           const SizedBox(height: 2),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.black54,
-            ),
-          ),
+          Text(subtitle,
+              style: const TextStyle(fontSize: 12, color: Colors.black54)),
         ],
       ),
     );
   }
 
-  // ==== Helper Widget for Progress Cards ====
   static Widget _buildProgressCard(
       String section, String title, double progress) {
     return Container(
@@ -209,8 +301,8 @@ class DashboardPage extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey.withOpacity(0.3), // border color
-          width: 1.1, // border thickness
+          color: Colors.grey.withOpacity(0.3),
+          width: 1.1,
         ),
         boxShadow: [
           BoxShadow(
@@ -223,36 +315,26 @@ class DashboardPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            section,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black87,
-            ),
-          ),
+          Text(section,
+              style: const TextStyle(fontSize: 16, color: Colors.black87)),
           const SizedBox(height: 6),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 13, color: Colors.black87),
-          ),
+          Text(title,
+              style: const TextStyle(fontSize: 13, color: Colors.black87)),
           const SizedBox(height: 12),
           SizedBox(
-            height: 9, // 👈 thickness of the line
-            width: 150, // 👈 total width of the progress bar
+            height: 9,
+            width: double.infinity,
             child: LinearProgressIndicator(
               value: progress,
               backgroundColor: const Color(0xFFE5E5E5),
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                Color(0xFF65b2c9),
-              ),
-              borderRadius: BorderRadius.circular(5), // Flutter 3.7+ only
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(Color(0xFF65b2c9)),
+              borderRadius: BorderRadius.circular(5),
             ),
           ),
           const SizedBox(height: 15),
-          Text(
-            "${(progress * 100).toInt()}% Complete",
-            style: const TextStyle(fontSize: 14, color: Colors.black87),
-          ),
+          Text("${(progress * 100).toInt()}% Complete",
+              style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 4),
           SizedBox(
             width: double.infinity,
@@ -261,16 +343,10 @@ class DashboardPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF65b2c9),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
+                    borderRadius: BorderRadius.circular(6)),
               ),
-              child: const Text(
-                "Continue",
-                style: TextStyle(
-                  color: Colors.white, // 👈 makes text white
-                  fontSize: 15,
-                ),
-              ),
+              child: const Text("Continue",
+                  style: TextStyle(color: Colors.white, fontSize: 15)),
             ),
           ),
         ],

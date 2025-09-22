@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'dart:io';
+
 
 class ApiService {
   static const String baseUrl = "http://10.0.2.2:8000";
@@ -205,5 +207,254 @@ static Future<void> resetPassword({
 }
 
 
+static Future<Map<String, dynamic>> getDashboardInfo({
+  required String token,
+  required String userId,
+  String period = "monthly",
+}) async {
+  final url = Uri.parse("$baseUrl/api/v1/dashboard/");
 
+  final response = await http.post(
+    url,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    },
+    body: jsonEncode({"id": userId}),
+  );
+
+  if (response.statusCode == 200) {
+    final res = jsonDecode(response.body);
+    if (res["error"] == false && res["data"] != null) {
+      return Map<String, dynamic>.from(res);
+    } else {
+      throw Exception(res["message"] ?? "Failed to get dashboard info");
+    }
+  } else {
+    throw Exception(
+        "Failed to fetch dashboard info: ${response.statusCode} ${response.body}");
+  }
+}
+
+
+// ===== COMPANY INFO APIS =====
+
+  /// ✅ Create or Update company info with file upload
+ static Future<Map<String, dynamic>> createOrUpdateCompanyInfo({
+  required String token,
+  required Map<String, dynamic> fields, // pass all fields like company_name, location, etc
+  File? licenseFile,
+  File? logoFile,
+}) async {
+  final uri = Uri.parse("$baseUrl/api/v1/company_info/");
+  var request = http.MultipartRequest('POST', uri);
+
+  request.headers['Authorization'] = 'Bearer $token';
+  // send all fields as a JSON string
+  request.fields['company_info_data_json'] = jsonEncode(fields);
+
+  if (licenseFile != null) {
+    request.files.add(
+      await http.MultipartFile.fromPath('company_license', licenseFile.path),
+    );
+  }
+
+  if (logoFile != null) {
+    request.files.add(
+      await http.MultipartFile.fromPath('company_logo', logoFile.path),
+    );
+  }
+
+  final streamedResponse = await request.send();
+  final response = await http.Response.fromStream(streamedResponse);
+
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    return jsonDecode(response.body);
+  } else {
+    throw Exception("Failed to save company info: ${response.statusCode} ${response.body}");
+  }
+}
+
+static Future<Map<String, dynamic>> getCompanyInfoProgress({
+  required String token,
+  required String userId,
+  required String email,
+}) async {
+  final url = Uri.parse("$baseUrl/api/v1/company_info/progress");
+  final body = jsonEncode({
+    "user_id": userId,
+    "email": email,
+  });
+
+  final response = await http.post(
+    url,
+    headers: {"Authorization": "Bearer $token", "Content-Type": "application/json"},
+    body: body,
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  } else {
+    throw Exception("Failed to get company progress: ${response.statusCode} ${response.body}");
+  }
+}
+
+
+  static Future<Map<String, dynamic>> getCompanyInfo({
+    required String token,
+    required String companyId,
+  }) async {
+    final url = Uri.parse("$baseUrl/api/v1/company_info/single");
+    final response = await http.post(
+      url,
+      headers: {"Authorization": "Bearer $token", "Content-Type": "application/json"},
+      body: jsonEncode({"filters": {"id": companyId}}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to get company info: ${response.statusCode} ${response.body}");
+    }
+  }
+
+  static Future<Map<String, dynamic>> assignAgentRecruitment({
+    required String token,
+    required String companyId,
+    required String agentId,
+  }) async {
+    final url = Uri.parse("$baseUrl/api/v1/company_info/assign-agent-recruitment");
+    final response = await http.post(
+      url,
+      headers: {"Authorization": "Bearer $token", "Content-Type": "application/json"},
+      body: jsonEncode({"company_id": companyId, "agent_id": agentId}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to assign agent: ${response.statusCode} ${response.body}");
+    }
+  }
+
+// Create employee
+static Future<Map<String, dynamic>> createEmployee({
+  required String token,
+  required Map<String, dynamic> data, // only the employee fields
+}) async {
+  final url = Uri.parse("$baseUrl/api/v1/user/employee/create");
+
+  final response = await http.post(
+    url,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    },
+    body: jsonEncode(data), // send only backend-expected fields
+  );
+
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    return jsonDecode(response.body);
+  } else {
+    throw Exception(
+        "Failed to create employee: ${response.statusCode} ${response.body}");
+  }
+}
+
+// Submit CV / Create or Update Employee
+static Future<Map<String, dynamic>> submitCv({
+  required String token,
+  required Map<String, dynamic> data,
+}) async {
+  final url = Uri.parse("$baseUrl/api/v1/user/employee/create");
+
+  final response = await http.post(
+    url,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    },
+    body: jsonEncode(data),
+  );
+
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    return jsonDecode(response.body);
+  } else {
+    throw Exception(
+        "Failed to submit CV: ${response.statusCode} ${response.body}");
+  }
+}
+
+// List employees under user
+static Future<List<Map<String, dynamic>>> getEmployees({
+  required String token,
+  required String managerId,
+  int skip = 0,
+  int limit = 1000,
+  String? search,
+}) async {
+  final queryParameters = {
+    "manager_id": managerId,
+    "skip": skip.toString(),
+    "limit": limit.toString(),
+  };
+  if (search != null) queryParameters["search"] = search;
+
+  final url = Uri.parse("$baseUrl/api/v1/user/employees")
+      .replace(queryParameters: queryParameters);
+
+  final response = await http.post(
+    url,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final res = jsonDecode(response.body);
+    if (res["error"] == false && res["data"] != null) {
+      // Ensure it's a list of maps
+      return List<Map<String, dynamic>>.from(res["data"]);
+    } else {
+      return [];
+    }
+  } else {
+    throw Exception(
+        "Failed to get employees: ${response.statusCode} ${response.body}");
+  }
+}
+
+
+// Get single employee
+static Future<Map<String, dynamic>> getEmployee({
+  required String token,
+  required String userId,
+}) async {
+  final url = Uri.parse("$baseUrl/api/v1/user/employee");
+  final response = await http.post(
+    url,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    },
+    body: jsonEncode({"user_id": userId}),
+  );
+
+  if (response.statusCode == 200) {
+    final res = jsonDecode(response.body);
+    if (res["error"] == false && res["data"] != null) {
+      return Map<String, dynamic>.from(res["data"]);
+    } else {
+      throw Exception("Employee not found");
+    }
+  } else {
+    throw Exception(
+        "Failed to get employee: ${response.statusCode} ${response.body}");
+  }
+}
+
+
+
+  
 }

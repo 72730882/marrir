@@ -405,10 +405,7 @@ class _EmployeePageState extends State<EmployeePage> {
   }
 
   String _getStatusText(dynamic employee) {
-    final status = _getEmployeeField(employee, 'status') ??
-        _getEmployeeField(employee, 'employee_status') ??
-        _getEmployeeField(employee, 'user_status') ??
-        'Unknown';
+    final status = _getEmployeeField(employee, 'status');
 
     if (status == 'N/A' || status.isEmpty) {
       return 'Active';

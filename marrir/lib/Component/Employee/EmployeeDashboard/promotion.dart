@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:marrir/Page/Employee/employee_page.dart';
 import 'package:marrir/services/Employee/dashboard_service.dart';
+import 'package:marrir/services/Employer/payment_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart'; // For web URL launching
 
 class PromotionScreen extends StatefulWidget {
   const PromotionScreen({super.key});
@@ -12,10 +15,12 @@ class PromotionScreen extends StatefulWidget {
 
 class _PromotionScreenState extends State<PromotionScreen> {
   final EmployeeDashboardService _promotionService = EmployeeDashboardService();
+  final PaymentService _paymentService = PaymentService();
   List<Map<String, dynamic>> _packages = [];
   bool _isLoading = true;
   String? _error;
   bool _hasActiveSubscription = false;
+  final Map<int, bool> _packageLoadingStates = {};
 
   @override
   void initState() {
@@ -30,6 +35,10 @@ class _PromotionScreenState extends State<PromotionScreen> {
       setState(() {
         _packages = packages;
         _isLoading = false;
+        // Initialize loading states
+        for (var package in packages) {
+          _packageLoadingStates[package['id']] = false;
+        }
       });
     } catch (e) {
       setState(() {
@@ -46,48 +55,214 @@ class _PromotionScreenState extends State<PromotionScreen> {
         _hasActiveSubscription = subscription != null;
       });
     } catch (e) {
-      // Silently handle subscription check error
       print('Subscription check error: $e');
     }
   }
 
   Future<void> _buyPackage(int packageId) async {
     try {
-      final paymentData =
-          await _promotionService.buyPromotionPackage(packageId);
+      setState(() {
+        _packageLoadingStates[packageId] = true;
+        _error = null;
+      });
 
-      // Handle payment redirect - you might want to open a WebView here
-      if (paymentData.containsKey('order') &&
-          paymentData['order'].containsKey('url')) {
-        final paymentUrl = paymentData['order']['url'];
-        // Navigate to payment screen or open WebView
-        _showPaymentDialog(paymentUrl);
+      // Get package details
+      final package = _packages.firstWhere((p) => p['id'] == packageId);
+
+      // Convert price to double
+      final price = package['price'] is num
+          ? package['price'].toDouble()
+          : double.tryParse(package['price'].toString()) ?? 0.0;
+
+      // Get user ID
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('user_id');
+
+      if (userId == null) {
+        throw Exception('User ID not found. Please login again.');
+      }
+
+      // Show payment confirmation dialog
+      final proceed = await _showPaymentConfirmation(
+        packageName: '${package['duration']} Promotion',
+        amount: price,
+      );
+
+      if (!proceed) {
+        setState(() {
+          _packageLoadingStates[packageId] = false;
+        });
+        return;
+      }
+
+      // Initiate Telr payment
+      final paymentResult = await _paymentService.createTelrPayment(
+        amount: price,
+        package: '${package['duration']} Promotion',
+        userId: userId,
+      );
+
+      // Handle payment result
+      if (paymentResult['order'] != null &&
+          paymentResult['order']['url'] != null) {
+        final paymentUrl = paymentResult['order']['url'];
+
+        // Launch the payment URL
+        await _launchPaymentUrl(paymentUrl);
+
+        // Show success message - payment is being processed
+        setState(() {
+          _packageLoadingStates[packageId] = false;
+          _hasActiveSubscription =
+              true; // Assume subscription is active after payment
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Redirected to payment gateway. Complete the payment and return to the app.'),
+            backgroundColor: Colors.blue,
+            duration: Duration(seconds: 5),
+          ),
+        );
+      } else {
+        throw Exception('Failed to get payment URL from Telr');
       }
     } catch (e) {
+      setState(() {
+        _packageLoadingStates[packageId] = false;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to buy package: ${e.toString()}')),
+        SnackBar(
+          content: Text('Payment failed: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
 
-  void _showPaymentDialog(String paymentUrl) {
+  Future<void> _completePurchase(int packageId) async {
+    try {
+      // Mark package as purchased after payment
+      final result = await _promotionService.buyPromotionPackage(packageId);
+
+      setState(() {
+        _hasActiveSubscription = true;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Package purchased successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to complete purchase: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<bool> _showPaymentConfirmation(
+      {required String packageName, required double amount}) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Confirm Payment'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Package: $packageName'),
+                Text('Amount: \$${amount.toStringAsFixed(2)}'),
+                const SizedBox(height: 16),
+                const Text(
+                  'You will be redirected to Telr payment gateway to complete the payment securely.',
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'After payment, return to this app to see your updated status.',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(142, 198, 214, 1),
+                ),
+                child: const Text('Proceed to Payment'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
+  Future<void> _launchPaymentUrl(String url) async {
+    try {
+      if (kIsWeb) {
+        // For web: open new browser tab
+        // html.window.open(url, '_blank');
+      } else {
+        // For mobile/desktop: use url_launcher
+        final uri = Uri.parse(url);
+        if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+          throw Exception('Could not launch $url');
+        }
+      }
+    } catch (e) {
+      print('Error launching URL: $e');
+      _showUrlFallback(url);
+    }
+  }
+
+  void _showUrlFallback(String url) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Payment Required'),
-        content: const Text('You will be redirected to complete your payment.'),
+        title: const Text('Payment URL'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Please copy this URL and open it in your browser:'),
+            const SizedBox(height: 16),
+            SelectableText(
+              url,
+              style: const TextStyle(
+                color: Colors.blue,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'After completing payment, return to this app.',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text('OK'),
           ),
           TextButton(
             onPressed: () {
+              // Copy to clipboard functionality would go here
               Navigator.pop(context);
-              // Implement payment navigation here
-              // For example: Navigator.push(context, MaterialPageRoute(builder: (_) => WebViewScreen(url: paymentUrl)));
             },
-            child: const Text('Continue'),
+            child: const Text('Copy URL'),
           ),
         ],
       ),
@@ -220,13 +395,18 @@ class _PromotionScreenState extends State<PromotionScreen> {
                               itemCount: _packages.length,
                               itemBuilder: (context, index) {
                                 final package = _packages[index];
+                                final packageId = package['id'];
+                                final isLoading =
+                                    _packageLoadingStates[packageId] ?? false;
+
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 16),
                                   child: _planCard(
                                     "\$${package['price']}",
                                     "Duration: ${package['duration']}",
                                     "${package['profile_count']} Profile Count",
-                                    onTap: () => _buyPackage(package['id']),
+                                    isLoading: isLoading,
+                                    onTap: () => _buyPackage(packageId),
                                   ),
                                 );
                               },
@@ -255,10 +435,15 @@ class _PromotionScreenState extends State<PromotionScreen> {
     );
   }
 
-  Widget _planCard(String price, String duration, String profileCount,
-      {VoidCallback? onTap}) {
+  Widget _planCard(
+    String price,
+    String duration,
+    String profileCount, {
+    bool isLoading = false,
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: isLoading ? null : onTap,
       child: Container(
         height: 240,
         padding: const EdgeInsets.all(50),
@@ -301,21 +486,31 @@ class _PromotionScreenState extends State<PromotionScreen> {
                 color: const Color.fromRGBO(142, 198, 214, 1),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Text(
-                profileCount,
-                style: const TextStyle(color: Colors.white, fontSize: 13),
-              ),
+              child: isLoading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Text(
+                      profileCount,
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                    ),
             ),
             const SizedBox(height: 16),
-            // if (onTap != null)
-            //   ElevatedButton(
-            //     onPressed: onTap,
-            //     style: ElevatedButton.styleFrom(
-            //       backgroundColor: Colors.blue,
-            //       foregroundColor: Colors.white,
-            //     ),
-            //     child: const Text('Buy Now'),
-            //   ),
+            if (onTap != null && !isLoading)
+              ElevatedButton(
+                onPressed: onTap,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(142, 198, 214, 1),
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Buy Now'),
+              ),
+            if (isLoading) const CircularProgressIndicator(),
           ],
         ),
       ),
@@ -323,7 +518,7 @@ class _PromotionScreenState extends State<PromotionScreen> {
   }
 }
 
-// Placeholder for EmployeeSelectionScreen - you'll need to implement this
+// Placeholder for EmployeeSelectionScreen
 class EmployeeSelectionScreen extends StatelessWidget {
   const EmployeeSelectionScreen({super.key});
 

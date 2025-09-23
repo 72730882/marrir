@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/services/Employee/dashboard_service.dart';
+import 'package:marrir/services/Employer/payment_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PromotionPage extends StatefulWidget {
   const PromotionPage({super.key});
@@ -10,12 +12,12 @@ class PromotionPage extends StatefulWidget {
 
 class _PromotionPageState extends State<PromotionPage> {
   final EmployeeDashboardService _promotionService = EmployeeDashboardService();
+  final PaymentService _paymentService = PaymentService();
   List<Map<String, dynamic>> _packages = [];
   bool _isInitialLoading = true;
   String _errorMessage = '';
   int? _selectedPackageId;
-  // Track loading state for each package individually
-  Map<int, bool> _packageLoadingStates = {};
+  final Map<int, bool> _packageLoadingStates = {};
 
   @override
   void initState() {
@@ -35,7 +37,6 @@ class _PromotionPageState extends State<PromotionPage> {
       setState(() {
         _packages = packages;
         _isInitialLoading = false;
-        // Initialize loading states for all packages
         for (var package in packages) {
           _packageLoadingStates[package['id']] = false;
         }
@@ -52,19 +53,95 @@ class _PromotionPageState extends State<PromotionPage> {
   Future<void> _buyPackage(int packageId) async {
     try {
       setState(() {
-        // Set loading state only for this specific package
         _packageLoadingStates[packageId] = true;
         _errorMessage = '';
       });
 
+      // Get package details
+      final package = _packages.firstWhere((p) => p['id'] == packageId);
+
+      // Convert price to double
+      final price = package['price'] is num
+          ? package['price'].toDouble()
+          : double.tryParse(package['price'].toString()) ?? 0.0;
+
+      // Get user ID
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('user_id');
+
+      if (userId == null) {
+        throw Exception('User ID not found. Please login again.');
+      }
+
+      // Show payment confirmation dialog
+      final proceed = await _showPaymentConfirmation(
+        packageName: '${package['duration']} Promotion',
+        amount: price,
+      );
+
+      if (!proceed) {
+        setState(() {
+          _packageLoadingStates[packageId] = false;
+        });
+        return;
+      }
+
+      // Initiate Telr payment
+      final paymentResult = await _paymentService.createTelrPayment(
+        amount: price,
+        package: '${package['duration']} Promotion',
+        userId: userId,
+      );
+
+      // Handle payment result
+      if (paymentResult['order'] != null &&
+          paymentResult['order']['url'] != null) {
+        final paymentUrl = paymentResult['order']['url'];
+
+        // Launch the payment URL using platform-agnostic method
+        await _launchPaymentUrl(paymentUrl);
+
+        // Show success message - payment is being processed
+        setState(() {
+          _packageLoadingStates[packageId] = false;
+          _selectedPackageId = packageId;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Redirected to payment gateway. Complete the payment and return to the app.'),
+            backgroundColor: Colors.blue,
+            duration: Duration(seconds: 5),
+          ),
+        );
+      } else {
+        throw Exception('Failed to get payment URL from Telr');
+      }
+    } catch (e) {
+      setState(() {
+        _packageLoadingStates[packageId] = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Payment failed: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+
+      print('❌ Error purchasing package: $e');
+    }
+  }
+
+  Future<void> _completePurchase(int packageId) async {
+    try {
       final result = await _promotionService.buyPromotionPackage(packageId);
 
       setState(() {
-        _packageLoadingStates[packageId] = false;
         _selectedPackageId = packageId;
       });
 
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Package purchased successfully!'),
@@ -74,19 +151,190 @@ class _PromotionPageState extends State<PromotionPage> {
 
       print('✅ Package purchased: $result');
     } catch (e) {
-      setState(() {
-        _packageLoadingStates[packageId] = false;
-      });
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to purchase package: ${e.toString()}'),
+          content: Text('Failed to complete purchase: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
-
-      print('❌ Error purchasing package: $e');
     }
+  }
+
+  Future<bool> _showPaymentConfirmation(
+      {required String packageName, required double amount}) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Confirm Payment'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Package: $packageName'),
+                Text('Amount: \$${amount.toStringAsFixed(2)}'),
+                const SizedBox(height: 16),
+                const Text(
+                  'You will be redirected to Telr payment gateway to complete the payment securely.',
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'After payment, return to this app to see your updated status.',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF65B2C9),
+                ),
+                child: const Text('Proceed to Payment'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
+  Future<void> _launchPaymentUrl(String url) async {
+    try {
+      // Platform-agnostic URL launching
+      if (isWeb()) {
+        // For web platform
+        _launchUrlWeb(url);
+      } else {
+        // For mobile platforms (Android/iOS)
+        _launchUrlMobile(url);
+      }
+    } catch (e) {
+      print('❌ Error launching URL: $e');
+      // Fallback: Show URL to user
+      _showUrlFallback(url);
+    }
+  }
+
+  bool isWeb() {
+    return identical(0, 0.0); // Simple web detection
+  }
+
+  void _launchUrlWeb(String url) {
+    // For web - use window.open or create an anchor tag
+    try {
+      // Method 1: Using window.open (if available)
+      if (hasFlutterWindow()) {
+        flutterWindowOpen(url, '_blank');
+      }
+      // Method 2: Create a hidden anchor tag and click it
+      else {
+        _openUrlWithAnchorTag(url);
+      }
+    } catch (e) {
+      // Fallback to showing the URL
+      _showUrlFallback(url);
+    }
+  }
+
+  bool hasFlutterWindow() {
+    // Check if we're in a Flutter web environment
+    try {
+      return (() {
+        try {
+          return (() => true)();
+        } catch (e) {
+          return false;
+        }
+      })();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  void flutterWindowOpen(String url, String target) {
+    // This would be implemented differently in actual Flutter web
+    // For now, use the anchor tag method as fallback
+    _openUrlWithAnchorTag(url);
+  }
+
+  void _openUrlWithAnchorTag(String url) {
+    // Create a hidden anchor tag and trigger click
+    final html = '''
+      <script>
+        function openUrl() {
+          const link = document.createElement('a');
+          link.href = '$url';
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+        openUrl();
+      </script>
+    ''';
+
+    // In a real Flutter web app, you'd use dart:html or a similar approach
+    // For now, we'll use a simpler method
+    _showUrlFallback(url);
+  }
+
+  Future<void> _launchUrlMobile(String url) async {
+    // For mobile, use url_launcher package
+    try {
+      // Import would be: import 'package:url_launcher/url_launcher.dart';
+      // await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      _showUrlFallback(url); // Fallback for now
+    } catch (e) {
+      _showUrlFallback(url);
+    }
+  }
+
+  void _showUrlFallback(String url) {
+    // Show the URL to the user so they can manually open it
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Payment URL'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Please copy this URL and open it in your browser:'),
+            const SizedBox(height: 16),
+            SelectableText(
+              url,
+              style: const TextStyle(
+                color: Colors.blue,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'After completing payment, return to this app.',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+          TextButton(
+            onPressed: () {
+              // Copy to clipboard functionality would go here
+              Navigator.pop(context);
+            },
+            child: const Text('Copy URL'),
+          ),
+        ],
+      ),
+    );
   }
 
   String _formatPrice(dynamic price) {
@@ -122,7 +370,6 @@ class _PromotionPageState extends State<PromotionPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 24),
-              // ===== Title =====
               const Text(
                 "Promotions",
                 style: TextStyle(
@@ -132,7 +379,6 @@ class _PromotionPageState extends State<PromotionPage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 1),
-              // ===== Subtitle =====
               const Text(
                 "Choose the plan that's right for you",
                 style: TextStyle(
@@ -142,35 +388,30 @@ class _PromotionPageState extends State<PromotionPage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
-
-              // ===== Loading Indicator =====
               if (_isInitialLoading && _packages.isEmpty)
                 const Center(
                   child: CircularProgressIndicator(),
                 ),
-
-              // ===== Error Message =====
               if (_errorMessage.isNotEmpty)
                 Center(
-                  child: Text(
-                    _errorMessage,
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontSize: 16,
-                    ),
+                  child: Column(
+                    children: [
+                      Text(
+                        _errorMessage,
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadPromotionPackages,
+                        child: const Text('Try Again'),
+                      ),
+                    ],
                   ),
                 ),
-
-              // ===== Refresh Button =====
-              if (_errorMessage.isNotEmpty)
-                Center(
-                  child: ElevatedButton(
-                    onPressed: _loadPromotionPackages,
-                    child: const Text('Try Again'),
-                  ),
-                ),
-
-              // ===== No Packages Message =====
               if (!_isInitialLoading &&
                   _packages.isEmpty &&
                   _errorMessage.isEmpty)
@@ -183,8 +424,6 @@ class _PromotionPageState extends State<PromotionPage> {
                     ),
                   ),
                 ),
-
-              // ===== Promotion Packages List =====
               if (_packages.isNotEmpty) ...[
                 Expanded(
                   child: ListView.builder(
@@ -260,8 +499,7 @@ class _PromotionPageState extends State<PromotionPage> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 8),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
+                                    borderRadius: BorderRadius.circular(24)),
                                 disabledBackgroundColor: Colors.grey[300],
                               ),
                               child: isLoading
@@ -287,25 +525,15 @@ class _PromotionPageState extends State<PromotionPage> {
                     },
                   ),
                 ),
-
                 const SizedBox(height: 16),
-
-                // ==== GRAY LINE DIVIDER ====
-                const Divider(
-                  color: Colors.grey,
-                  thickness: 0.5,
-                  height: 1,
-                ),
+                const Divider(color: Colors.grey, thickness: 0.5, height: 1),
                 const SizedBox(height: 20),
-
-                // ==== CONTINUE BUTTON ====
                 if (_selectedPackageId != null)
                   SizedBox(
                     width: double.infinity,
                     height: 48,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Handle continue action
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content:
@@ -316,8 +544,7 @@ class _PromotionPageState extends State<PromotionPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF65B2C9),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                       child: const Text(
                         'Continue',

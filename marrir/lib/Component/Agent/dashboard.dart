@@ -1,62 +1,57 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:marrir/services/user.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
+class ADashboardPage extends StatefulWidget {
+  const ADashboardPage({super.key});
 
   @override
-  State<DashboardPage> createState() => _DashboardPageState();
+  State<ADashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
-  String firstName = "";
-  String lastName = "";
-  String createdAt = "";
+class _DashboardPageState extends State<ADashboardPage> {
+  Map<String, dynamic>? userInfo;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadUserInfo();
+    _fetchUserInfo();
   }
 
-  Future<void> _loadUserInfo() async {
+  Future<void> _fetchUserInfo() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString("access_token") ?? "";
-      final userId = prefs.getString("user_id") ?? "";
+      final token = prefs.getString("access_token");
+      final userId = prefs.getString("user_id");
 
-      if (token.isEmpty || userId.isEmpty) return;
-
-      final response = await http.post(
-        Uri.parse("http://10.0.2.2:8000/api/v1/dashboard/"),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
-       body: jsonEncode({
-    "id": userId,   
-  }),
-      );
-
-      if (response.statusCode == 200) {
-        final res = jsonDecode(response.body);
-
-        if (res["error"] == false && res["data"] != null) {
-          setState(() {
-            firstName = res["data"]["firstName"] ?? "";
-            lastName = res["data"]["lastName"] ?? "";
-            createdAt = res["data"]["createdAt"] ?? "";
-          });
-        } else {
-          debugPrint("Error fetching user info: ${res['message'] ?? 'Unknown error'}");
-        }
-      } else {
-        debugPrint("Server error: ${response.statusCode} - ${response.body}");
+      if (token != null && userId != null) {
+        final info = await ApiService.getUserInfo(
+          id: userId,
+          Token: token,
+        );
+        setState(() {
+          userInfo = info;
+          isLoading = false;
+        });
       }
     } catch (e) {
-      debugPrint("Failed to fetch user info: $e");
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to load user info: $e")),
+      );
+    }
+  }
+
+  String _formatDate(String dateString) {
+    try {
+      final dateTime = DateTime.parse(dateString);
+      return DateFormat('MMMM dd, yyyy').format(dateTime);
+    } catch (e) {
+      return dateString;
     }
   }
 
@@ -72,7 +67,8 @@ class _DashboardPageState extends State<DashboardPage> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border.all(color: const Color.fromARGB(255, 220, 220, 220)),
+              border:
+                  Border.all(color: const Color.fromARGB(255, 220, 220, 220)),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
@@ -82,44 +78,82 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ],
             ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: const Color(0xFFDDDDDD),
-                  child: Text(
-                    firstName.isNotEmpty ? firstName[0] : "M",
-                    style: const TextStyle(
-                      fontSize: 22,
-                      color: Colors.black87,
-                      fontWeight: FontWeight.bold,
-                    ),
+            child: isLoading
+                ? const Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: Color(0xFFDDDDDD),
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Loading...",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            "Please wait",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: const Color(0xFFDDDDDD),
+                        child: Text(
+                          userInfo?['first_name'] != null &&
+                                  userInfo!['first_name'].isNotEmpty
+                              ? userInfo!['first_name'][0].toUpperCase()
+                              : "E",
+                          style: const TextStyle(
+                            fontSize: 22,
+                            color: Colors.black87,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Hi, ${userInfo?['first_name'] ?? ''} ${userInfo?['last_name'] ?? 'Employer'}",
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Date Created: ${userInfo?['created_at'] != null ? _formatDate(userInfo!['created_at']) : 'Not available'}",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Hi, ${firstName.isNotEmpty ? '$firstName $lastName' : 'Agency Firm Name'}",
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "Date Created: ${createdAt.isNotEmpty ? createdAt : 'January 15, 2024'}",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
           ),
           const SizedBox(height: 20),
 
@@ -208,7 +242,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   // ==== Helper Widget for Overview Cards ====
-  static Widget _buildStatCard(String title, String value, String subtitle) {
+  Widget _buildStatCard(String title, String value, String subtitle) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -257,7 +291,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   // ==== Helper Widget for Progress Cards ====
-  static Widget _buildProgressCard(String section, String title, double progress) {
+  Widget _buildProgressCard(String section, String title, double progress) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

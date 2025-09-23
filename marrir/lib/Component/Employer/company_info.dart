@@ -190,7 +190,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
         "user_id": userId, // <-- add this
       };
 
-      final response = await CompanyInfoService.createUpdateCompanyInfo(
+      await CompanyInfoService.createUpdateCompanyInfo(
         companyData: companyData,
         companyLicense: companyLicenseFile,
         companyLogo: companyLogoFile,

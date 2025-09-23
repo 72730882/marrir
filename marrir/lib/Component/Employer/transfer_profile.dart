@@ -15,7 +15,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
   List<dynamic> _unrelatedUsers = [];
   List<dynamic> _allEmployees = [];
   List<dynamic> _filteredEmployees = [];
-  List<dynamic> _selectedEmployees = [];
+  final List<dynamic> _selectedEmployees = [];
   bool _isLoading = true;
   String _errorMessage = '';
 
@@ -243,14 +243,14 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                   child: Column(
                     children: [
                       // Employee Search Header
-                      Row(
+                      const Row(
                         children: [
-                          const Text(
+                          Text(
                             "Search Employees",
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
-                          const Spacer(),
+                          Spacer(),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -523,7 +523,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                       child: const Text('Select'),
                     ),
                   );
-                }).toList(),
+                }),
                 if (filteredUsers.isEmpty)
                   const Text(
                     "No matching results found",

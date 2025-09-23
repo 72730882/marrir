@@ -36,12 +36,12 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
   final List<Widget> _pages = const [
     DashboardPage(),
     CompanyInfoPage(),
-    EmployeePage(),
-    EmployeeRatingPage(),
-    PromotionPage(),
-    TransferPage(),
+    REmployeePage(),
+    REmployeeRatingPage(),
+    RecruitmentPromotionPage(),
+    RTransferProfilePage(),
     ReservePage(),
-    TransferProfilePage(),
+    RTransferHistoryPage(),
     PaymentPage(),
     ReserveHistoryPage(),
     HelpPage(),
@@ -220,7 +220,8 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
                         );
                       } else {
                         return ListTile(
-                          leading: const Icon(Icons.logout, color: Colors.black54),
+                          leading:
+                              const Icon(Icons.logout, color: Colors.black54),
                           title: const Text(
                             "Logout",
                             style: TextStyle(
@@ -237,7 +238,8 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
                                   title: const Text(
                                     "End Session",
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                   content: const Text(
                                     "Are you sure you want to log out?",
@@ -247,21 +249,24 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
                                     TextButton(
                                       onPressed: () async {
                                         final userProvider =
-                                            Provider.of<UserProvider>(context, listen: false);
+                                            Provider.of<UserProvider>(context,
+                                                listen: false);
                                         await userProvider.logout();
 
                                         Navigator.of(context).pop();
                                         Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => const LoginScreen(),
+                                            builder: (context) =>
+                                                const LoginScreen(),
                                           ),
                                         );
                                       },
                                       child: const Text("Yes"),
                                     ),
                                     TextButton(
-                                      onPressed: () => Navigator.of(context).pop(),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
                                       child: const Text("Cancel"),
                                     ),
                                   ],

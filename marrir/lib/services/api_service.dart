@@ -462,6 +462,34 @@ static Future<Map<String, dynamic>> getEmployee({
   }
 }
 
+static Future<void> reserveCv({
+  required String token,
+  required String reserverId,
+  required List<int> cvIds, // 👈 must be integers
+  String reason = "Reserved by agent",
+}) async {
+  final url = Uri.parse("$baseUrl/api/v1/reserve/");
+
+  final body = {
+    "reserver_id": reserverId,
+    "status": "accepted",
+    "reason": reason,
+    "cv_id": cvIds, // ✅ integers, not strings
+  };
+
+  final response = await http.post(
+    url,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    },
+    body: jsonEncode(body),
+  );
+
+  if (response.statusCode != 201) {
+    throw Exception("Failed to reserve: ${response.body}");
+  }
+}
 
 
   

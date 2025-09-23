@@ -5,13 +5,11 @@ import 'package:marrir/Page/Employer/employer_page.dart';
 import 'package:marrir/Page/Recruitment/recruitment_page.dart';
 import 'register_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../../services/api_service.dart';
 
 // import '../../services/user.dart'; // make sure this file exists
 
 import 'package:shared_preferences/shared_preferences.dart';
-
 // Social login packages
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -340,21 +338,42 @@ class _LoginScreenState extends State<LoginScreen> {
               content: Text("Invalid user data returned from server")),
         );
         return;
-      }
 
-      // Check if the role and email match
-      if (apiRole != selectedRole || apiEmail != email.toLowerCase()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              "Invalid login. Make sure you're using the correct email and role you registered with.",
+        // Navigate to dashboard based on role, passing token
+        Widget page;
+        switch (userData["role"].toLowerCase()) {
+          case "employee":
+            page =
+                EmployeePage(token: userData["access_token"]); // ✅ pass token
+            break;
+          case "agent":
+            page = const AgentPage(); // If needed
+            break;
+          case "employer":
+            page = const EmployerPage(); // If needed
+            break;
+          case "recruitment":
+            page = const RecruitmentPage(); // If needed
+            break;
+          default:
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Unknown role: ${userData["role"]}")),
+            );
+            return;
+        }
+
+        if (apiRole != selectedRole || apiEmail != email.toLowerCase()) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Invalid login. Make sure you're using the correct email and role you registered with.",
+              ),
             ),
-          ),
-        );
-        return;
+          );
+          return;
+        }
       }
 
-      // If everything is valid, save and redirect
       await _saveAndRedirect(userData);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

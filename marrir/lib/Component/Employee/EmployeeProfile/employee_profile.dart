@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:marrir/services/user.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/EditProfile/edit_profile.dart';
-import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeHelp/help.dart';
+// import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeHelp/help.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSecurity/security.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSetting/setting.dart';
 import 'package:marrir/Component/Employee/wave_background.dart';
@@ -146,12 +146,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 Icons.settings,
                 SettingPage(onChildSelected: widget.onChildSelected),
               ),
-              _buildProfileOption(
-                context,
-                "Help",
-                Icons.help,
-                HelpFAQPage(onChildSelected: widget.onChildSelected),
-              ),
+              // _buildProfileOption(
+              //   context,
+              //   "Help",
+              //   Icons.help,
+              //   HelpFAQPage(onChildSelected: widget.onChildSelected),
+              // ),
               _buildProfileOption(
                 context,
                 "Logout",

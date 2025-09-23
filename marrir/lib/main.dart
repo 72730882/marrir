@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'Component/splash/splash_screen.dart';
 import 'providers/user_provider.dart';
+import 'providers/user_info_provider.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => UserInfoProvider()), // ✅ add this
       ],
       child: const MyApp(),
     ),

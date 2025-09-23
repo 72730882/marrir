@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:marrir/Component/Recruitment/employee.dart';
+import 'package:marrir/Component/Recruitment/employee_rating.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:marrir/providers/user_provider.dart';
@@ -11,8 +13,6 @@ import '../../Component/auth/login_screen.dart';
 // Import your Recruitment components
 import '../../Component/Recruitment/dashboard.dart';
 import '../../Component/Recruitment/company_info.dart';
-import '../../Component/Recruitment/employee.dart';
-import '../../Component/Recruitment/employee_rating.dart';
 import '../../Component/Recruitment/promotion.dart';
 import '../../Component/Recruitment/transfer.dart';
 import '../../Component/Recruitment/reserve.dart';
@@ -40,7 +40,7 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
     REmployeeRatingPage(),
     RecruitmentPromotionPage(),
     RTransferProfilePage(),
-    ReservePage(),
+    ReserveProfilePage(),
     RTransferHistoryPage(),
     PaymentPage(),
     ReserveHistoryPage(),

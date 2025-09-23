@@ -34,13 +34,13 @@ class _AgentPageState extends State<AgentPage> {
   bool isLoading = true;
 
   final List<Widget> _pages = const [
-    ADashboardPage(),
+    DashboardPage(),
     CompanyInfoPage(),
     AgencyEmployeePage(),
     EmployeeRatingPage(),
     AgentPromotionPage(),
     TransferHistoryPage(),
-    ReservePage(),
+    ReserveProfilePage(),
     TransferProfilePage(),
     AgentPaymentPage(),
     ReserveHistoryPage(),

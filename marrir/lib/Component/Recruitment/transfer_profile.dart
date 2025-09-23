@@ -450,7 +450,7 @@ class _TransferProfilePageState extends State<RTransferProfilePage> {
                                     ],
                                   ),
                                 );
-                              }).toList(),
+                              }),
                             ],
                           ),
                         ),

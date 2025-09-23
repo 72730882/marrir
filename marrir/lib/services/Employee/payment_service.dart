@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PaymentService {
   // Create a separate Dio instance without baseUrl
   static final Dio _paymentDio = Dio(BaseOptions(
-    baseUrl: "http://10.13.65.219:8000/", // <-- add your domain only, no api/v1
+    baseUrl: "https://api.marrir.com", // <-- add your domain only, no api/v1
 
     // baseUrl: "http://127.0.0.1:8000/",
     connectTimeout: const Duration(seconds: 30),

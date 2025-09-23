@@ -8,7 +8,7 @@ class PaymentService {
       : _dio = Dio(
           BaseOptions(
             // baseUrl: "http://127.0.0.1:8000",
-            baseUrl: "http://10.242.120.219:8000",
+            baseUrl: "https://api.marrir.com",
             connectTimeout: const Duration(seconds: 30),
             receiveTimeout: const Duration(seconds: 30),
           ),

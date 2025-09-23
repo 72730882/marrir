@@ -61,8 +61,9 @@ class _RecruitmentPromotionPageState extends State<RecruitmentPromotionPage> {
 
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id');
-      if (userId == null)
+      if (userId == null) {
         throw Exception('User ID not found. Please login again.');
+      }
 
       final proceed = await _showPaymentConfirmation(
         packageName: '${package['duration']} Promotion',
@@ -189,7 +190,7 @@ class _RecruitmentPromotionPageState extends State<RecruitmentPromotionPage> {
                               ? const Color(0xFFE8F4F8)
                               : Colors.white,
                           borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
+                          boxShadow: const [
                             BoxShadow(color: Colors.black12, blurRadius: 6)
                           ],
                           border: isSelected

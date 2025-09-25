@@ -278,7 +278,7 @@ void toggleSelection(int id) {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Container(height: 1, color: Colors.grey.shade300),
+                  Container(height: 1, color: const Color.fromRGBO(224, 224, 224, 1)),
                   const SizedBox(height: 12),
 
                   // Employee list

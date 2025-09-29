@@ -17,7 +17,6 @@ import 'package:marrir/Component/auth/ForgotPassword/forgot_password_screen.dart
 import 'package:marrir/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -333,7 +332,6 @@ class _LoginScreenState extends State<LoginScreen> {
       final apiEmail = (userData['email'] ?? '').toString().toLowerCase();
       final selectedRole = _selectedAccountType!.toLowerCase();
 
-
       if (apiRole.isEmpty || apiEmail.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -341,39 +339,39 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         return;
 
-      // Navigate to dashboard based on role, passing token
-      Widget page;
-      switch (userData["role"].toLowerCase()) {
-        case "employee":
-          page = EmployeePage(token: userData["access_token"]); // ✅ pass token
-          break;
-        case "agent":
-          page = const AgentPage(); // If needed
-          break;
-        case "employer":
-          page = const EmployerPage(); // If needed
-          break;
-        case "recruitment":
-          page = const RecruitmentPage(); // If needed
-          break;
-        default:
+        // Navigate to dashboard based on role, passing token
+        Widget page;
+        switch (userData["role"].toLowerCase()) {
+          case "employee":
+            page =
+                EmployeePage(token: userData["access_token"]); // ✅ pass token
+            break;
+          case "agent":
+            page = const AgentPage(); // If needed
+            break;
+          case "employer":
+            page = const EmployerPage(); // If needed
+            break;
+          case "recruitment":
+            page = const RecruitmentPage(); // If needed
+            break;
+          default:
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Unknown role: ${userData["role"]}")),
+            );
+            return;
+        }
+
+        if (apiRole != selectedRole || apiEmail != email.toLowerCase()) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Unknown role: ${userData["role"]}")),
+            const SnackBar(
+              content: Text(
+                "Invalid login. Make sure you're using the correct email and role you registered with.",
+              ),
+            ),
           );
           return;
-
-      }
-
-      if (apiRole != selectedRole || apiEmail != email.toLowerCase()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              "Invalid login. Make sure you're using the correct email and role you registered with.",
-            ),
-          ),
-        );
-        return;
-      }
+        }
       }
 
       await _saveAndRedirect(userData);
@@ -403,8 +401,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Get the authorization code (backend expects this)
       final String? authCode = googleAuth.serverAuthCode;
-      if (authCode == null)
+      if (authCode == null) {
         throw Exception("No authorization code returned by Google");
+      }
 
       // Call your backend API with the authCode
       final userData = await ApiService.loginWithGoogle(authCode);
@@ -458,10 +457,8 @@ class _LoginScreenState extends State<LoginScreen> {
     await prefs.setString("user_id", userData["user_id"]);
 
     // ✅ Update the provider so app knows user is logged in
-  final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     await userProvider.login(userData['role']);
-
-
 
     Widget page;
     switch (userData["role"].toLowerCase()) {

@@ -1,302 +1,191 @@
 import 'package:flutter/material.dart';
+import 'package:marrir/services/Employer/transfer_service.dart';
 
-class TransferProfilePage extends StatelessWidget {
-  const TransferProfilePage({super.key});
+class RTransferProfilePage extends StatefulWidget {
+  const RTransferProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ===== Page Title =====
-              const Text(
-                "Transfer",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                "You can search for an employee that you want to transfer",
-                style: TextStyle(fontSize: 14, color: Colors.black),
-              ),
-              const SizedBox(height: 20),
+  State<RTransferProfilePage> createState() => _TransferProfilePageState();
+}
 
-              // ===== Approved Agreement User =====
-              _buildTransferCard(
-                title: "Transfer to Approved Agreement User",
-                subtitle:
-                    "These users have a pre-approved agreement with you. Transfers are free",
-              ),
+class _TransferProfilePageState extends State<RTransferProfilePage> {
+  final TransferService _transferService = TransferService();
 
-              const SizedBox(height: 20),
+  List<dynamic> _relatedUsers = [];
+  List<dynamic> _unrelatedUsers = [];
+  List<dynamic> _allEmployees = [];
+  List<dynamic> _filteredEmployees = [];
+  final List<dynamic> _selectedEmployees = [];
+  bool _isLoading = true;
+  String _errorMessage = '';
 
-              // ===== Non-Agreement User =====
-              _buildTransferCard(
-                title: "Transfer to Non-Agreement User",
-                subtitle:
-                    "These users do not have a pre-approved agreement with you. Transfers fee is required",
-              ),
+  final TextEditingController _employeeSearchController =
+      TextEditingController();
+  final TextEditingController _approvedSearchController =
+      TextEditingController();
+  final TextEditingController _nonApprovedSearchController =
+      TextEditingController();
 
-              const SizedBox(height: 20),
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+    _employeeSearchController.addListener(_onEmployeeSearchChanged);
+  }
 
-              // ===== RESULTS CARD =====
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade300),
-                ),
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  children: [
-                    // Header Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Results",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            OutlinedButton(
-                              onPressed: () {},
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 10),
-                                side: const BorderSide(color: Colors.grey),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                              ),
-                              child: const Text(
-                                "Show Selected (0)",
-                                style: TextStyle(color: Colors.black87),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            OutlinedButton(
-                              onPressed: () {},
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 10),
-                                side: const BorderSide(color: Colors.grey),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                              ),
-                              child: const Text(
-                                "Remove All",
-                                style: TextStyle(color: Colors.black87),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
+  @override
+  void dispose() {
+    _employeeSearchController.dispose();
+    _approvedSearchController.dispose();
+    _nonApprovedSearchController.dispose();
+    super.dispose();
+  }
 
-                    // Divider line
-                    Container(
-                      height: 1,
-                      width: double.infinity,
-                      color: Colors.grey.shade300,
-                    ),
-                    const SizedBox(height: 12),
+  void _onEmployeeSearchChanged() {
+    setState(() {
+      _filterEmployees();
+    });
+  }
 
-                    // Employee Cards (3 samples)
-                    Column(
-                      children: [
-                        // === Card 1 ===
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // Left side info
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "John Smith",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text("Software Engineer"),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    "Agreement: Approved",
-                                    style: TextStyle(color: Colors.black54),
-                                  ),
-                                ],
-                              ),
-                              // Right side status
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.greenAccent.shade100,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: const Text(
-                                      "Available",
-                                      style: TextStyle(
-                                          color:
-                                              Color.fromARGB(255, 40, 118, 42),
-                                          fontSize: 12),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+  void _filterEmployees() {
+    final query = _employeeSearchController.text.toLowerCase();
+    if (query.isEmpty) {
+      _filteredEmployees = List.from(_allEmployees);
+    } else {
+      _filteredEmployees = _allEmployees.where((employee) {
+        final name = employee['name']?.toString().toLowerCase() ?? '';
+        final jobTitle = employee['job_title']?.toString().toLowerCase() ?? '';
+        return name.contains(query) || jobTitle.contains(query);
+      }).toList();
+    }
+  }
 
-                        // === Card 2 ===
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // Left side info
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Sarah Johnson",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text("Project Manager"),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    "Agreement: Non-Agreement",
-                                    style: TextStyle(color: Colors.black54),
-                                  ),
-                                ],
-                              ),
-                              // Right side status
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.greenAccent.shade100,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: const Text(
-                                      "Available",
-                                      style: TextStyle(
-                                          color:
-                                              Color.fromARGB(255, 40, 118, 42),
-                                          fontSize: 12),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+  List<dynamic> _getFilteredUsers(
+      List<dynamic> users, TextEditingController controller) {
+    final query = controller.text.toLowerCase();
+    if (query.isEmpty) return users;
+    return users.where((user) {
+      final name = user['name']?.toString().toLowerCase() ?? '';
+      return name.contains(query);
+    }).toList();
+  }
 
-                        // === Card 3 ===
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // Left side info
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Mike Davis",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text("Designer"),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    "Agreement: Aproved",
-                                    style: TextStyle(color: Colors.black54),
-                                  ),
-                                ],
-                              ),
-                              // Right side status
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.shade200,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: const Text(
-                                      "Tranferred",
-                                      style: TextStyle(
-                                          color: Colors.black, fontSize: 12),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ],
+  Future<void> _loadData() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = '';
+      });
+
+      final agencyData = await _transferService.getAgencyRecruitment();
+      final employees = await _transferService.searchTransferEmployees();
+
+      setState(() {
+        _relatedUsers = agencyData['related'] ?? [];
+        _unrelatedUsers = agencyData['unrelated'] ?? [];
+        _allEmployees = employees;
+        _filteredEmployees = List.from(_allEmployees);
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Failed to load data: $e';
+      });
+    }
+  }
+
+  void _toggleEmployeeSelection(dynamic employee) {
+    setState(() {
+      if (_selectedEmployees.any((e) => e['user_id'] == employee['user_id'])) {
+        _selectedEmployees
+            .removeWhere((e) => e['user_id'] == employee['user_id']);
+      } else {
+        _selectedEmployees.add(employee);
+      }
+    });
+  }
+
+  Future<void> _handleTransfer(String receiverId) async {
+    if (_selectedEmployees.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select employees to transfer'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      final userIds =
+          _selectedEmployees.map((e) => e['user_id'].toString()).toList();
+      final result = await _transferService.transferEmployee(
+        userIds: userIds,
+        receiverId: receiverId,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message'] ?? 'Transfer initiated successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      setState(() {
+        _selectedEmployees.clear();
+        _employeeSearchController.clear();
+        _approvedSearchController.clear();
+        _nonApprovedSearchController.clear();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to transfer: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _showSelectedEmployees() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Selected Employees'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: _selectedEmployees.length,
+            itemBuilder: (context, index) {
+              final employee = _selectedEmployees[index];
+              return ListTile(
+                title: Text(employee['name'] ?? 'Unknown'),
+                subtitle: Text(employee['job_title'] ?? ''),
+              );
+            },
           ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
       ),
     );
   }
 
-  // ===== Transfer Card (Search + Filter + Buttons) =====
-  static Widget _buildTransferCard(
-      {required String title, required String subtitle}) {
+  Widget _buildTransferCard({
+    required String title,
+    required String subtitle,
+    required List<dynamic> users,
+    required TextEditingController searchController,
+    required VoidCallback onTransfer,
+  }) {
+    final filteredUsers = _getFilteredUsers(users, searchController);
+
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade300),
@@ -308,176 +197,266 @@ class TransferProfilePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title,
-              style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 0, 0, 0))),
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          Text(subtitle,
-              style: const TextStyle(fontSize: 14, color: Colors.black)),
+          Text(subtitle, style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 7),
-
-          // Divider line
-          Container(
-            width: double.infinity,
-            height: 1,
-            color: Colors.grey.shade300,
+          const Divider(height: 1, color: Colors.grey),
+          const SizedBox(height: 12),
+          TextField(
+            controller: searchController,
+            decoration: InputDecoration(
+              hintText: "Search transfer destination...",
+              prefixIcon: const Icon(Icons.search, size: 18),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+              isDense: true,
+            ),
+            style: const TextStyle(fontSize: 12),
+            onChanged: (value) => setState(() {}),
           ),
           const SizedBox(height: 12),
-
-          // Search fields row with labels
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Search Employee",
-                      style: TextStyle(fontSize: 15, color: Colors.black),
-                    ),
-                    const SizedBox(height: 4),
-                    TextField(
-                      decoration: InputDecoration(
-                        hintText: "Search employee",
-                        hintStyle: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 12), // Grey hint and smaller
-                        prefixIcon:
-                            const Icon(Icons.search, size: 18), // smaller icon
-                        // reduce gap
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        isDense: true,
-                      ),
-                      style: const TextStyle(fontSize: 12), // smaller text
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Transfer To",
-                        style: TextStyle(fontSize: 15, color: Colors.black)),
-                    const SizedBox(height: 4),
-                    TextField(
-                      decoration: InputDecoration(
-                        hintText: "Enter transfer destination",
-                        hintStyle: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 14), // Grey hint and smaller
-
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        isDense: true,
-                      ),
-                      style: const TextStyle(fontSize: 12), // smaller text
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-
-          // Search + Filter Row
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 0),
-            child: Row(
+          if (searchController.text.isNotEmpty)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Container(
-                    height: 40, // minimized height
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(
-                          255, 240, 239, 239), // gray background
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey, width: 1),
+                const Text(
+                  "Matching Results:",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                ...filteredUsers.take(3).map((user) {
+                  return ListTile(
+                    title: Text(user['name'] ?? 'Unknown'),
+                    trailing: ElevatedButton(
+                      onPressed: () {
+                        searchController.text = user['name'] ?? '';
+                        setState(() {});
+                      },
+                      child: const Text('Select'),
                     ),
-                    child: Row(
+                  );
+                }),
+                if (filteredUsers.isEmpty)
+                  const Text(
+                    "No matching results found",
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+              ],
+            ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: onTransfer,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF65b2c9),
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 48),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6)),
+            ),
+            child: const Text("Transfer Selected Employees"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _errorMessage.isNotEmpty
+                  ? Center(
+                      child: Column(
+                        children: [
+                          Text(_errorMessage,
+                              style: const TextStyle(color: Colors.red)),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                              onPressed: _loadData, child: const Text('Retry')),
+                        ],
+                      ),
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(width: 8),
-                        const SizedBox(width: 4),
-                        const Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Filter by",
-                              hintStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                              ),
-                              border: InputBorder.none, // remove inner borders
-                              isDense: true,
-                              contentPadding:
-                                  EdgeInsets.symmetric(vertical: 10),
-                            ),
-                            style: TextStyle(fontSize: 12),
-                          ),
+                        const Text("Transfer",
+                            style: TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        const Text(
+                          "You can search for an employee that you want to transfer",
+                          style: TextStyle(fontSize: 14, color: Colors.black),
                         ),
+                        const SizedBox(height: 20),
+                        _buildTransferCard(
+                          title: "Transfer to Approved Agreement User",
+                          subtitle:
+                              "These users have a pre-approved agreement with you. Transfers are free",
+                          users: _relatedUsers,
+                          searchController: _approvedSearchController,
+                          onTransfer: () {
+                            final filtered = _getFilteredUsers(
+                                _relatedUsers, _approvedSearchController);
+                            if (filtered.isNotEmpty) {
+                              _handleTransfer(
+                                  filtered.first['user_id'].toString());
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        _buildTransferCard(
+                          title: "Transfer to Non-Agreement User",
+                          subtitle:
+                              "These users do not have a pre-approved agreement with you. Transfers fee is required",
+                          users: _unrelatedUsers,
+                          searchController: _nonApprovedSearchController,
+                          onTransfer: () {
+                            final filtered = _getFilteredUsers(
+                                _unrelatedUsers, _nonApprovedSearchController);
+                            if (filtered.isNotEmpty) {
+                              _handleTransfer(
+                                  filtered.first['user_id'].toString());
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        // Employee results card
                         Container(
-                          margin: const EdgeInsets.only(right: 4),
-                          padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: Colors.grey, width: 1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey.shade300),
                           ),
-                          child: const Icon(Icons.filter_list,
-                              size: 18, color: Colors.grey),
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text("Results",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold)),
+                                  Row(
+                                    children: [
+                                      OutlinedButton(
+                                        onPressed: _selectedEmployees.isNotEmpty
+                                            ? _showSelectedEmployees
+                                            : null,
+                                        child: Text(
+                                            "Show Selected (${_selectedEmployees.length})"),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      OutlinedButton(
+                                        onPressed: _selectedEmployees.isNotEmpty
+                                            ? () => setState(() =>
+                                                _selectedEmployees.clear())
+                                            : null,
+                                        child: const Text("Remove All"),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              const Divider(color: Colors.grey),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _employeeSearchController,
+                                decoration: InputDecoration(
+                                  hintText:
+                                      "Search employees by name or job title...",
+                                  prefixIcon: const Icon(Icons.search),
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8)),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              ..._filteredEmployees.map((employee) {
+                                final isSelected = _selectedEmployees.any(
+                                    (e) => e['user_id'] == employee['user_id']);
+                                final hasAgreement = _relatedUsers.any(
+                                    (u) => u['user_id'] == employee['user_id']);
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? Colors.blue.shade50
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        color: isSelected
+                                            ? Colors.blue
+                                            : Colors.grey.shade300),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(employee['name'] ?? 'Unknown',
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            const SizedBox(height: 4),
+                                            Text(employee['job_title'] ?? ''),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                                "Agreement: ${hasAgreement ? 'Approved' : 'Non-Agreement'}",
+                                                style: const TextStyle(
+                                                    color: Colors.black54)),
+                                          ],
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.greenAccent.shade100,
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: const Text("Available",
+                                                style: TextStyle(
+                                                    color: Color.fromARGB(
+                                                        255, 40, 118, 42),
+                                                    fontSize: 12)),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Checkbox(
+                                            value: isSelected,
+                                            onChanged: (value) =>
+                                                _toggleEmployeeSelection(
+                                                    employee),
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          // Buttons
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            child: Row(
-              children: [
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF65b2c9),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
-                  child: const Text("Search"),
-                ),
-                const SizedBox(width: 12),
-                OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
-                    side: const BorderSide(color: Colors.grey),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
-                  child: const Text(
-                    "Transfer",
-                    style: TextStyle(color: Colors.black87),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

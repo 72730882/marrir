@@ -1,7 +1,244 @@
 import 'package:flutter/material.dart';
+import 'package:marrir/services/Employer/get_reserve.dart';
+import 'package:marrir/model/recerve_model.dart';
+import 'package:marrir/Dio/dio.dart';
 
-class ReserveHistoryPage extends StatelessWidget {
+class ReserveHistoryPage extends StatefulWidget {
   const ReserveHistoryPage({super.key});
+
+  @override
+  State<ReserveHistoryPage> createState() => _ReserveHistoryPageState();
+}
+
+class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
+  final ReserveHistoryService _reserveHistoryService =
+      ReserveHistoryService(DioClient());
+
+  // Data lists
+  List<ReserveHistory> _reserveHistory = [];
+  List<IncomingReserveRequest> _incomingRequests = [];
+  List<ReserveDetail> _selectedBatchDetails = [];
+
+  // Loading states
+  bool _isLoadingHistory = false;
+  bool _isLoadingRequests = false;
+  bool _isLoadingDetails = false;
+
+  // Error messages
+  String _historyError = '';
+  String _requestsError = '';
+
+  // Pagination
+  int _historyLimit = 5;
+  int _requestsLimit = 5;
+
+  // Selected batch for details
+  int? _selectedBatchId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReserveHistory();
+    _loadIncomingRequests();
+  }
+
+  Future<void> _loadReserveHistory() async {
+    setState(() {
+      _isLoadingHistory = true;
+      _historyError = '';
+    });
+
+    final response = await _reserveHistoryService.getReserveHistory(
+      limit: _historyLimit,
+    );
+
+    setState(() {
+      _isLoadingHistory = false;
+      if (response.success) {
+        _reserveHistory = response.data ?? [];
+      } else {
+        _historyError = response.message;
+      }
+    });
+  }
+
+  Future<void> _loadIncomingRequests() async {
+    setState(() {
+      _isLoadingRequests = true;
+      _requestsError = '';
+    });
+
+    final response = await _reserveHistoryService.getIncomingReserveRequests(
+      limit: _requestsLimit,
+    );
+
+    setState(() {
+      _isLoadingRequests = false;
+      if (response.success) {
+        _incomingRequests = response.data ?? [];
+      } else {
+        _requestsError = response.message;
+      }
+    });
+  }
+
+  Future<void> _loadReserveDetails(int batchReserveId) async {
+    setState(() {
+      _isLoadingDetails = true;
+      _selectedBatchId = batchReserveId;
+    });
+
+    final response =
+        await _reserveHistoryService.getReserveRequestDetails(batchReserveId);
+
+    setState(() {
+      _isLoadingDetails = false;
+      if (response.success) {
+        _selectedBatchDetails = response.data ?? [];
+      } else {
+        _selectedBatchDetails = [];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response.message)),
+        );
+      }
+    });
+  }
+
+  Future<void> _updateReserveStatus({
+    required int batchReserveId,
+    required List<int> cvIds,
+    required String status,
+    String? reason,
+  }) async {
+    final response = await _reserveHistoryService.updateReserveStatus(
+      batchReserveId: batchReserveId,
+      cvIds: cvIds,
+      status: status,
+      reason: reason,
+    );
+
+    if (response.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response.message)),
+      );
+      // Reload data
+      _loadIncomingRequests();
+      if (_selectedBatchId == batchReserveId) {
+        _loadReserveDetails(batchReserveId);
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response.message)),
+      );
+    }
+  }
+
+  void _showReserveDetailsDialog(IncomingReserveRequest request) {
+    _loadReserveDetails(request.id);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Reserve Details - Batch #${request.id}'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: _isLoadingDetails
+              ? const Center(child: CircularProgressIndicator())
+              : _selectedBatchDetails.isEmpty
+                  ? const Text('No details found')
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (final detail in _selectedBatchDetails)
+                          ListTile(
+                            title: Text(detail.employeeName),
+                            subtitle: Text('Occupation: ${detail.occupation}'),
+                            trailing: Text(detail.status.toUpperCase()),
+                          ),
+                      ],
+                    ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+          if (_selectedBatchDetails.isNotEmpty)
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      final cvIds =
+                          _selectedBatchDetails.map((d) => d.cvId).toList();
+                      _updateReserveStatus(
+                        batchReserveId: request.id,
+                        cvIds: cvIds,
+                        status: 'accepted',
+                      );
+                      Navigator.pop(context);
+                    },
+                    style: TextButton.styleFrom(backgroundColor: Colors.green),
+                    child: const Text('Accept All',
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      _showDeclineDialog(request.id);
+                      Navigator.pop(context);
+                    },
+                    style: TextButton.styleFrom(backgroundColor: Colors.red),
+                    child: const Text('Decline All',
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeclineDialog(int batchReserveId) {
+    final reasonController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Decline Reserve Request'),
+        content: TextField(
+          controller: reasonController,
+          decoration: const InputDecoration(
+            hintText: 'Enter reason for declining...',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 3,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              final cvIds = _selectedBatchDetails.map((d) => d.cvId).toList();
+              _updateReserveStatus(
+                batchReserveId: batchReserveId,
+                cvIds: cvIds,
+                status: 'declined',
+                reason: reasonController.text,
+              );
+              Navigator.pop(context);
+            },
+            child: const Text('Confirm Decline'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -9,17 +246,16 @@ class ReserveHistoryPage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          // make page scrollable
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ===== Employee Summary Card =====
+              // ===== Header =====
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Transfers",
+                    "Reserve History",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -34,22 +270,22 @@ class ReserveHistoryPage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // ===== Two Cards Side by Side =====
+              // ===== Summary Cards =====
               Row(
                 children: [
                   Expanded(
                     child: _buildSummaryCard(
                       title: "Reserves Requested",
-                      value: "0",
-                      count: "N/A",
+                      value: _reserveHistory.length.toString(),
+                      count: _reserveHistory.length.toString(),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildSummaryCard(
                       title: "Reserves Requests",
-                      value: "0",
-                      count: "N/A",
+                      value: _incomingRequests.length.toString(),
+                      count: _incomingRequests.length.toString(),
                     ),
                   ),
                 ],
@@ -58,138 +294,12 @@ class ReserveHistoryPage extends StatelessWidget {
               const SizedBox(height: 40),
 
               // ===== Incoming Reserve Requests Section =====
-              const Text(
-                "Incoming Reserve Requests",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 117, 97, 229),
-                ),
-              ),
-              const SizedBox(height: 30),
-
-              _buildShowRowsDropdown(),
-
-              const SizedBox(height: 20),
-
-              // ===== First Table =====
-              Card(
-                color: Colors.white,
-                elevation: 4,
-                shadowColor: Colors.black54,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF65b2c9),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
-                        ),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 16),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "From",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            "Created At",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                    _buildTableRow("Hanan N", "2024-03-15"),
-                    _buildTableRow("Hanan N", "2024-03-15"),
-                    _buildTableRow("Hanan N", "2024-03-15"),
-                  ],
-                ),
-              ),
+              _buildIncomingRequestsSection(),
 
               const SizedBox(height: 40),
 
-              // ===== Process Reserve Request Section =====
-              const Text(
-                "Process Reserve Request",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 117, 97, 229),
-                ),
-              ),
-              const SizedBox(height: 30),
-
-              _buildShowRowsDropdown(),
-
-              const SizedBox(height: 20),
-
-              // ===== Second Table =====
-              Card(
-                color: Colors.white,
-                elevation: 4,
-                shadowColor: Colors.black54,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF65b2c9),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
-                        ),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 16),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              "Batch No.",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              "Transfer To",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              "Created At",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    _buildTableRow3("001", "Hanan", "2024-03-15"),
-                    _buildTableRow3("002", "Hanan", "2024-03-15"),
-                    _buildTableRow3("003", "Hanan", "2024-03-15"),
-                  ],
-                ),
-              ),
+              // ===== Reserve History Section =====
+              _buildReserveHistorySection(),
             ],
           ),
         ),
@@ -197,8 +307,7 @@ class ReserveHistoryPage extends StatelessWidget {
     );
   }
 
-  // ===== Helper for Summary Card =====
-  static Widget _buildSummaryCard({
+  Widget _buildSummaryCard({
     required String title,
     required String value,
     required String count,
@@ -264,119 +373,273 @@ class ReserveHistoryPage extends StatelessWidget {
     );
   }
 
-  // ===== Helper for "Show Rows" Dropdown =====
-  static Widget _buildShowRowsDropdown() {
+  Widget _buildIncomingRequestsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Incoming Reserve Requests",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 117, 97, 229),
+          ),
+        ),
+        const SizedBox(height: 30),
+        _buildRowsDropdown(
+          value: _requestsLimit,
+          onChanged: (value) {
+            setState(() {
+              _requestsLimit = value;
+            });
+            _loadIncomingRequests();
+          },
+        ),
+        const SizedBox(height: 20),
+        Card(
+          color: Colors.white,
+          elevation: 4,
+          shadowColor: Colors.black54,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          child: Column(
+            children: [
+              // Table Header
+              Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFF65b2c9),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("From",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text("Role",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text("Created At",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text("Action",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+
+              // Table Rows
+              if (_isLoadingRequests)
+                const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: CircularProgressIndicator())
+              else if (_requestsError.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Text(_requestsError,
+                      style: const TextStyle(color: Colors.red)),
+                )
+              else if (_incomingRequests.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text("No incoming reserve requests"),
+                )
+              else
+                ..._incomingRequests
+                    .map((request) => _buildIncomingRequestRow(request)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIncomingRequestRow(IncomingReserveRequest request) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                  child: Text(request.reserverName,
+                      style: const TextStyle(fontWeight: FontWeight.bold))),
+              Expanded(child: Text(request.reserverRole)),
+              Expanded(child: Text(_formatDate(request.createdAt))),
+              Expanded(
+                child: TextButton(
+                  onPressed: () => _showReserveDetailsDialog(request),
+                  child: const Text("View Details",
+                      style: TextStyle(color: Color(0xFF65b2c9))),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const Divider(color: Colors.grey, height: 1, thickness: 0.6),
+      ],
+    );
+  }
+
+  Widget _buildReserveHistorySection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Reserve History",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 117, 97, 229),
+          ),
+        ),
+        const SizedBox(height: 30),
+        _buildRowsDropdown(
+          value: _historyLimit,
+          onChanged: (value) {
+            setState(() {
+              _historyLimit = value;
+            });
+            _loadReserveHistory();
+          },
+        ),
+        const SizedBox(height: 20),
+        Card(
+          color: Colors.white,
+          elevation: 4,
+          shadowColor: Colors.black54,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          child: Column(
+            children: [
+              // Table Header
+              Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFF65b2c9),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
+                child: const Row(
+                  children: [
+                    Expanded(
+                        child: Text("Batch No.",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold))),
+                    Expanded(
+                        child: Text("Reserved To",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold))),
+                    Expanded(
+                        child: Text("Created At",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold))),
+                    Expanded(
+                        child: Text("Employees",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold))),
+                  ],
+                ),
+              ),
+
+              // Table Rows
+              if (_isLoadingHistory)
+                const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: CircularProgressIndicator())
+              else if (_historyError.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Text(_historyError,
+                      style: const TextStyle(color: Colors.red)),
+                )
+              else if (_reserveHistory.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text("No reserve history found"),
+                )
+              else
+                ..._reserveHistory.map((history) => _buildHistoryRow(history)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHistoryRow(ReserveHistory history) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+          child: Row(
+            children: [
+              Expanded(
+                  child: Text("#${history.id}",
+                      style: const TextStyle(fontWeight: FontWeight.bold))),
+              Expanded(child: Text(history.reserverName)),
+              Expanded(child: Text(_formatDate(history.createdAt))),
+              Expanded(child: Text("${history.reserves.length} employees")),
+            ],
+          ),
+        ),
+        const Divider(color: Colors.grey, height: 1, thickness: 0.6),
+      ],
+    );
+  }
+
+  Widget _buildRowsDropdown({
+    required int value,
+    required Function(int) onChanged,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          "Show rows:",
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.black87,
-          ),
-        ),
+        const Text("Show rows:",
+            style: TextStyle(fontSize: 16, color: Colors.black87)),
         Container(
           width: 80,
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(6),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 6,
-                offset: const Offset(2, 2),
-              ),
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 6,
+                  offset: const Offset(2, 2))
             ],
           ),
-          child: const Row(
-            children: [
-              Text("5"),
-              Icon(Icons.arrow_drop_down),
-            ],
+          child: DropdownButton<int>(
+            value: value,
+            underline: const SizedBox(),
+            isExpanded: true,
+            items: [5, 10, 20, 50].map((int value) {
+              return DropdownMenuItem<int>(
+                value: value,
+                child: Text(value.toString()),
+              );
+            }).toList(),
+            onChanged: (newValue) => onChanged(newValue!),
           ),
         ),
       ],
     );
   }
 
-  // ===== Helper for Table Row (2 Columns) =====
-  static Widget _buildTableRow(String from, String date) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                from,
-                style: const TextStyle(
-                  color: Colors.black87,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                date,
-                style: const TextStyle(
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const Divider(
-          color: Colors.grey,
-          height: 1,
-          thickness: 0.6,
-        ),
-      ],
-    );
-  }
-
-  // ===== Helper for Table Row (3 Columns) =====
-  static Widget _buildTableRow3(String batch, String to, String date) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  batch,
-                  style: const TextStyle(
-                    color: Colors.black87,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  to,
-                  style: const TextStyle(
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  date,
-                  style: const TextStyle(
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const Divider(
-          color: Colors.grey,
-          height: 1,
-          thickness: 0.6,
-        ),
-      ],
-    );
+  String _formatDate(DateTime date) {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:marrir/Component/Agent/promotion.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:marrir/providers/user_provider.dart';
@@ -11,7 +12,7 @@ import '../../Component/auth/login_screen.dart';
 import '../../Component/Agent/dashboard.dart';
 import '../../Component/Agent/company_info.dart';
 import '../../Component/Agent/agency_employee.dart';
-import '../../Component/Agent/promotion.dart';
+// import '../../Component/Agent/promotion.dart';
 import '../../Component/Agent/transfer.dart';
 import '../../Component/Agent/reserve.dart';
 import '../../Component/Agent/transfer_profile.dart';
@@ -37,11 +38,11 @@ class _AgentPageState extends State<AgentPage> {
     CompanyInfoPage(),
     AgencyEmployeePage(),
     EmployeeRatingPage(),
-    PromotionPage(),
-    TransferPage(),
-    ReservePage(),
+    AgentPromotionPage(),
+    TransferHistoryPage(),
+    ReserveProfilePage(),
     TransferProfilePage(),
-    PaymentPage(),
+    AgentPaymentPage(),
     ReserveHistoryPage(),
     HelpPage(),
   ];

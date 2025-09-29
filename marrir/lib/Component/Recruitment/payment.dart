@@ -1,7 +1,118 @@
 import 'package:flutter/material.dart';
+import 'package:marrir/services/Employer/payment_service.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class PaymentPage extends StatelessWidget {
+class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
+
+  @override
+  State<PaymentPage> createState() => _PaymentPageState();
+}
+
+class _PaymentPageState extends State<PaymentPage> {
+  final PaymentService _paymentService = PaymentService();
+  List<dynamic> _payments = [];
+  bool _isLoading = true;
+  String _errorMessage = '';
+  int _totalPayments = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthAndLoadData();
+  }
+
+  Future<void> _checkAuthAndLoadData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('access_token');
+
+      if (token == null || token.isEmpty) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = 'Please login to access payments';
+        });
+        return;
+      }
+
+      await _loadPayments();
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Error loading payments: $e';
+      });
+    }
+  }
+
+  Future<void> _loadPayments() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = '';
+      });
+
+      final payments = await _paymentService.getUserPayments();
+
+      setState(() {
+        _payments = payments;
+        _totalPayments = payments.length;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Failed to load payments: $e';
+      });
+    }
+  }
+
+  String _formatDate(String dateString) {
+    try {
+      final date = DateTime.parse(dateString);
+      return DateFormat('yyyy-MM-dd').format(date);
+    } catch (e) {
+      return dateString;
+    }
+  }
+
+  String _formatAmount(dynamic amount) {
+    if (amount == null) return '0.00 AED';
+    if (amount is num) return '${amount.toStringAsFixed(2)} AED';
+    if (amount is String) {
+      return '${double.tryParse(amount)?.toStringAsFixed(2) ?? '0.00'} AED';
+    }
+    return '0.00 AED';
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'paid':
+      case 'accepted':
+      case 'active':
+        return Colors.green;
+      case 'pending':
+        return Colors.orange;
+      case 'declined':
+      case 'failed':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String _formatStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'paid':
+        return 'Completed';
+      case 'pending':
+        return 'Pending';
+      case 'failed':
+        return 'Failed';
+      default:
+        return status;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +124,7 @@ class PaymentPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// ==== bar === ///
+              /// ==== Total Payments Card === ///
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -28,25 +139,26 @@ class PaymentPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Total Employees",
+                      const Text(
+                        "Total Payments",
                         style: TextStyle(fontSize: 14, color: Colors.black),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
-                        "0",
-                        style: TextStyle(
+                        _totalPayments.toString(),
+                        style: const TextStyle(
                             fontSize: 28, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        "+0%",
-                        style: TextStyle(
+                        "+$_totalPayments%",
+                        style: const TextStyle(
                           fontSize: 17,
                           color: Colors.purple,
                         ),
@@ -58,65 +170,97 @@ class PaymentPage extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              // ===== Process Transfer Request Section =====
-              const Text(
-                "The list of payments",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 15),
-
-              // ===== Scrollable Horizontal Table =====
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Card(
-                  color: Colors.white,
-                  elevation: 4,
-                  shadowColor: Colors.black54,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+              if (_isLoading)
+                const Center(child: CircularProgressIndicator())
+              else if (_errorMessage.isNotEmpty)
+                Center(
                   child: Column(
                     children: [
-                      // Table Header
-                      Container(
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF65b2c9),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10),
-                          ),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 15, horizontal: 16),
-                        child: const Row(
-                          children: [
-                            _TableHeaderCell("Bank", 100),
-                            _TableHeaderCell("Transaction ID", 120),
-                            _TableHeaderCell("Amount", 80),
-                            _TableHeaderCell("Date", 100),
-                            _TableHeaderCell("Screenshot", 100),
-                            _TableHeaderCell("Status", 80),
-                          ],
-                        ),
+                      Text(
+                        _errorMessage,
+                        style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
                       ),
-
-                      // Table Rows
-                      _buildTableRow("CBE", "Type", "10000", "2024-1-15",
-                          Icons.image, "Active"),
-                      _buildTableRow("CBE", "Type", "10000", "2024-1-15",
-                          Icons.image, "Active"),
-                      _buildTableRow("CBE", "Type", "10000", "2024-1-15",
-                          Icons.image, "Active"),
-                      _buildTableRow("CBE", "Type", "10000", "2024-1-15",
-                          Icons.image, "Active"),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _checkAuthAndLoadData,
+                        child: const Text('Retry'),
+                      ),
                     ],
                   ),
+                )
+              else ...[
+                const Text(
+                  "The list of payments",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
-              ),
+                const SizedBox(height: 15),
+
+                // ===== Scrollable Horizontal Table =====
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Card(
+                    color: Colors.white,
+                    elevation: 4,
+                    shadowColor: Colors.black54,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: [
+                        // Table Header
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF65b2c9),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              topRight: Radius.circular(10),
+                            ),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 16),
+                          child: const Row(
+                            children: [
+                              _TableHeaderCell("Bank", 100),
+                              _TableHeaderCell("Transaction ID", 120),
+                              _TableHeaderCell("Amount", 80),
+                              _TableHeaderCell("Date", 100),
+                              _TableHeaderCell("Screenshot", 100),
+                              _TableHeaderCell("Status", 80),
+                            ],
+                          ),
+                        ),
+
+                        // Table Rows
+                        if (_payments.isEmpty)
+                          const Padding(
+                            padding: EdgeInsets.all(20.0),
+                            child: Text("No payments found"),
+                          )
+                        else
+                          ..._payments.map((payment) {
+                            final bank = payment['bank']?.toString() ?? 'N/A';
+                            final txnId = payment['ref']?.toString() ?? 'N/A';
+                            final amount = _formatAmount(payment['amount']);
+                            final date = _formatDate(
+                                payment['created_at']?.toString() ?? '');
+                            final screenshot =
+                                payment['screenshot']?.toString() ?? '';
+                            final status =
+                                payment['status']?.toString() ?? 'pending';
+
+                            return _buildTableRow(
+                                bank, txnId, amount, date, screenshot, status);
+                          }),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -125,8 +269,8 @@ class PaymentPage extends StatelessWidget {
   }
 
   // ===== Table Row =====
-  static Widget _buildTableRow(String bank, String txnId, String amount,
-      String date, IconData screenshot, String status) {
+  Widget _buildTableRow(String bank, String txnId, String amount, String date,
+      String screenshotUrl, String status) {
     return Column(
       children: [
         Padding(
@@ -137,17 +281,36 @@ class PaymentPage extends StatelessWidget {
               _TableCell(txnId, 120),
               _TableCell(amount, 80),
               _TableCell(date, 100),
-              _TableCellIcon(screenshot, 100),
+
+              // Screenshot Column
+              SizedBox(
+                width: 100,
+                child: screenshotUrl.isNotEmpty
+                    ? GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => Dialog(
+                              child: Image.network(screenshotUrl),
+                            ),
+                          );
+                        },
+                        child: const Icon(Icons.image,
+                            size: 20, color: Colors.grey),
+                      )
+                    : const Icon(Icons.image_not_supported,
+                        size: 20, color: Colors.red),
+              ),
+
+              // Status Column
               SizedBox(
                 width: 80,
                 child: Text(
-                  status,
+                  _formatStatus(status),
                   style: TextStyle(
-                    color: status.trim().toLowerCase() == "active"
-                        ? Colors.green[400]
-                        : Colors.black87,
+                    color: _getStatusColor(status),
                     fontWeight: FontWeight.bold,
-                    fontSize: 12, // smaller font
+                    fontSize: 12,
                   ),
                 ),
               ),
@@ -155,7 +318,7 @@ class PaymentPage extends StatelessWidget {
           ),
         ),
         const SizedBox(
-          width: 600, // sum of all cell widths
+          width: 600,
           child: Divider(
             color: Colors.grey,
             height: 0.5,
@@ -181,7 +344,8 @@ class _TableHeaderCell extends StatelessWidget {
         title,
         style: const TextStyle(
           color: Colors.white,
-          fontSize: 12, // smaller font
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -202,25 +366,10 @@ class _TableCell extends StatelessWidget {
         text,
         style: const TextStyle(
           color: Colors.black87,
-          fontSize: 12, // smaller font
+          fontSize: 12,
         ),
+        overflow: TextOverflow.ellipsis,
       ),
-    );
-  }
-}
-
-// ===== Table Cell Icon =====
-class _TableCellIcon extends StatelessWidget {
-  final IconData icon;
-  final double width;
-  const _TableCellIcon(this.icon, this.width);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      alignment: Alignment.center,
-      child: Icon(icon, size: 20, color: Colors.grey), // smaller icon
     );
   }
 }

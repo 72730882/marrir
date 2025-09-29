@@ -1,121 +1,137 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../services/api_service.dart';
-import '../auth/login_screen.dart';
+import 'package:marrir/services/Employer/reserve_service.dart';
+import 'package:marrir/model/model.dart';
+import 'package:marrir/Dio/dio.dart';
 
-class ReservePage extends StatefulWidget {
-  const ReservePage({super.key});
+class ReserveProfilePage extends StatefulWidget {
+  const ReserveProfilePage({super.key});
 
   @override
-  State<ReservePage> createState() => _ReservePageState();
+  State<ReserveProfilePage> createState() => _ReserveProfilePageState();
 }
 
-class _ReservePageState extends State<ReservePage> {
-  List<Map<String, dynamic>> employees = [];
-  
-  bool isLoading = true;
-  String? token;
-  String? userId;
- bool isReserving = false;
- final Set<int> selectedIds = {}; // ✅ must be integers
+class _ReserveProfilePageState extends State<ReserveProfilePage> {
+  final ReserveService _reserveService = ReserveService(DioClient());
+  final TextEditingController _searchController = TextEditingController();
 
+  List<UnreservedEmployee> _employees = [];
+  List<UnreservedEmployee> _selectedEmployees = [];
+  bool _isLoading = false;
+  String _errorMessage = '';
+  bool _isSearching = false;
 
   @override
   void initState() {
     super.initState();
-    _initAndFetchEmployees();
+    _loadUnreservedEmployees();
   }
 
-  Future<void> _initAndFetchEmployees() async {
-    final prefs = await SharedPreferences.getInstance();
-    token = prefs.getString("access_token") ?? "";
-    userId = prefs.getString("user_id") ?? "";
+  Future<void> _loadUnreservedEmployees() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
 
-    if (token!.isEmpty || userId!.isEmpty) {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
-        );
+    final response = await _reserveService.getUnreservedEmployees();
+
+    setState(() {
+      _isLoading = false;
+      if (response.success) {
+        _employees = response.data ?? [];
+      } else {
+        _errorMessage = response.message;
       }
+    });
+  }
+
+  Future<void> _searchEmployees() async {
+    if (_searchController.text.isEmpty) {
+      _loadUnreservedEmployees();
       return;
     }
 
-    await fetchEmployees();
+    setState(() {
+      _isSearching = true;
+      _errorMessage = '';
+    });
+
+    final response = await _reserveService.searchEmployees(
+      search: _searchController.text,
+    );
+
+    setState(() {
+      _isSearching = false;
+      if (response.success) {
+        _employees = response.data ?? [];
+      } else {
+        _errorMessage = response.message;
+      }
+    });
   }
 
-  Future<void> fetchEmployees() async {
-    setState(() => isLoading = true);
-    try {
-      final data = await ApiService.getEmployees(
-        token: token!,
-        managerId: userId!,
+  Future<void> _reserveSelectedEmployees() async {
+    if (_selectedEmployees.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select at least one employee')),
       );
-      setState(() {
-        employees = data.map((e) => {
- "id": e['id'],  // convert String -> int
-  "name": "${e['first_name']} ${e['last_name']}",
-  "role": e['occupation'] ?? "Unknown Role",
-  "experience": e['experience'] ?? "N/A",
-  "status": e['disabled'] == true ? "Reserved" : "Available",
-}).toList();
-
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() => isLoading = false);
-      debugPrint("Error fetching employees: $e");
+      return;
     }
-  }
-void toggleSelection(int id) {
-  setState(() {
-    if (selectedIds.contains(id)) {
-      selectedIds.remove(id);
+
+    // Extract CV IDs from selected employees
+    final cvIds = _selectedEmployees
+        .where((employee) => employee.cv?['id'] != null)
+        .map((employee) => employee.cv!['id'] as int)
+        .toList();
+
+    if (cvIds.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No valid CV IDs found')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final response = await _reserveService.reserveCVs(cvIds);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (response.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response.message)),
+      );
+      // Clear selection after successful reservation
+      setState(() {
+        _selectedEmployees.clear();
+      });
+      // Reload the list
+      _loadUnreservedEmployees();
     } else {
-      selectedIds.add(id);
-    }
-  });
-}
-
-  void clearSelection() {
-    setState(() => selectedIds.clear());
-  }
-
-  Future<void> reserveEmployees() async {
-  if (selectedIds.isEmpty || token == null || userId == null) return;
-
-  setState(() => isReserving = true);
-  try {
-  await ApiService.reserveCv(
-  token: token!,
-  reserverId: userId!,      // string UUID ✅
-  cvIds: selectedIds.toList(), // List<int> ✅
-  reason: "Reserved by agent",
-  
-);
-
-
-
-    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Reserved successfully ✅")),
-      );
-      setState(() {
-        selectedIds.clear();
-      });
-    }
-  } catch (e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+        SnackBar(content: Text(response.message)),
       );
     }
-  } finally {
-    if (mounted) setState(() => isReserving = false);
   }
-}
 
+  void _toggleEmployeeSelection(UnreservedEmployee employee) {
+    setState(() {
+      if (_selectedEmployees.contains(employee)) {
+        _selectedEmployees.remove(employee);
+      } else {
+        _selectedEmployees.add(employee);
+      }
+    });
+  }
 
+  void _clearAllSelection() {
+    setState(() {
+      _selectedEmployees.clear();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,248 +145,34 @@ void toggleSelection(int id) {
             // ===== TITLE =====
             const Text(
               "Reserve",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
             const Text(
               "You can search for an employee that you want to reserve",
-              style: TextStyle(fontSize: 14, color: Colors.black),
+              style: TextStyle(fontSize: 14, color: Colors.black54),
             ),
             const SizedBox(height: 20),
 
             // ===== SEARCH BOX CARD =====
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    child: const Text("Search Employees",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                  ),
-                  Container(height: 1, color: Colors.grey.shade300),
-
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Search transfers...",
-                              prefixIcon: Icon(Icons.search,
-                                  color: Colors.grey.withOpacity(0.6)),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8)),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          child: const Icon(Icons.filter_list),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Row(
-                      children: [
-                      ElevatedButton(
-  onPressed: selectedIds.isEmpty ? null : reserveEmployees,
-  style: ElevatedButton.styleFrom(
-    backgroundColor: selectedIds.isNotEmpty ? Colors.blue : Colors.grey,
-  ),
-  child: isReserving
-      ? const SizedBox(
-          width: 16,
-          height: 16,
-          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-        )
-      : const Text("Reserve"),
-),
-
-
-                        const SizedBox(width: 12),
-                        OutlinedButton(
-                          onPressed: () {
-                            setState(() => selectedIds.clear());
-                          },
-                          child: const Text("Reverse"),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
+            _buildSearchCard(),
             const SizedBox(height: 20),
 
-
-       
+            // ===== LOADING/ERROR =====
+            if (_isLoading) _buildLoadingIndicator(),
+            if (_errorMessage.isNotEmpty) _buildErrorMessage(),
 
             // ===== RESULTS CARD =====
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                children: [
-                  // Header Row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("Results",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold)),
-                      Row(
-                        children: [
-                          OutlinedButton(
-                            onPressed: selectedIds.isEmpty
-                                ? null
-                                : () {
-                                    debugPrint(
-                                        "Selected: $selectedIds"); // you can show dialog here
-                                  },
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 10),
-                              side: const BorderSide(color: Colors.grey),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                            ),
-                            child: Text(
-                              "Show Selected (${selectedIds.length})",
-                              style: const TextStyle(color: Colors.black87),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          OutlinedButton(
-                            onPressed:
-                                selectedIds.isEmpty ? null : clearSelection,
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 10),
-                              side: const BorderSide(color: Colors.grey),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                            ),
-                            child: const Text(
-                              "Remove All",
-                              style: TextStyle(color: Colors.black87),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Container(height: 1, color: const Color.fromRGBO(224, 224, 224, 1)),
-                  const SizedBox(height: 12),
-
-                  // Employee list
-                  isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : employees.isEmpty
-                          ? const Text("No employees found")
-                          : Column(
-                              children: employees.map((emp) {
-                               final empIdStr = emp['id'].toString();
-final bool isSelected = selectedIds.contains(int.tryParse(empIdStr) ?? -1);
-                                return Container(
-                                  key: ValueKey(empIdStr),
-                                  margin: const EdgeInsets.only(bottom: 10),
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                        color: Colors.grey.shade300),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      // Left side info
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(emp['name'],
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14)),
-                                          const SizedBox(height: 4),
-                                          Text(emp['role']),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            "${emp['experience']} experience",
-                                            style: const TextStyle(
-                                                color: Colors.black54),
-                                          ),
-                                        ],
-                                      ),
-                                      // Right side
-                                      Row(
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 8, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              color: emp['status'] ==
-                                                      "Available"
-                                                  ? Colors.green.shade100
-                                                  : Colors.grey.shade200,
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                            ),
-                                            child: Text(
-                                              emp['status'],
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: emp['status'] ==
-                                                        "Available"
-                                                    ? Colors.green
-                                                    : Colors.black54,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Checkbox(
-                                            value: isSelected,
-                                            onChanged: (_) =>
-                                                toggleSelection(emp['id']),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                ],
-              ),
-            ),
+            _buildResultsCard(),
           ],
         ),
       ),
     );
   }
 
-  // Extracted search card for clarity
   Widget _buildSearchCard() {
     return Container(
       decoration: BoxDecoration(
@@ -381,21 +183,32 @@ final bool isSelected = selectedIds.contains(int.tryParse(empIdStr) ?? -1);
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
-            child: const Text("Search Employees",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            child: const Text(
+              "Search Employees",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
           ),
+
+          // Divider line
           Container(height: 1, color: Colors.grey.shade300),
+
+          // Search bar + filter icon
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
+                    controller: _searchController,
                     decoration: InputDecoration(
-                      hintText: "Search transfers...",
+                      hintText: "Search employees...",
                       hintStyle: TextStyle(color: Colors.grey.withOpacity(0.6)),
                       prefixIcon: Icon(Icons.search,
                           color: Colors.grey.withOpacity(0.6)),
@@ -416,25 +229,32 @@ final bool isSelected = selectedIds.contains(int.tryParse(empIdStr) ?? -1);
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: const BorderSide(
-                            color: Color.fromARGB(255, 228, 227, 227),
-                            width: 2),
+                            color: Color(0xFF65b2c9), width: 2),
                       ),
                     ),
+                    onSubmitted: (_) => _searchEmployees(),
                   ),
                 ),
                 const SizedBox(width: 8),
-                Container(
-                    padding: const EdgeInsets.all(12),
-                    child: const Icon(Icons.filter_list)),
+                IconButton(
+                  onPressed: () {
+                    // TODO: Implement filter dialog
+                    _showFilterDialog();
+                  },
+                  icon: const Icon(Icons.filter_list),
+                  tooltip: 'Filter',
+                ),
               ],
             ),
           ),
+
+          // Buttons
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _searchEmployees,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF65b2c9),
                     foregroundColor: Colors.white,
@@ -443,11 +263,19 @@ final bool isSelected = selectedIds.contains(int.tryParse(empIdStr) ?? -1);
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6)),
                   ),
-                  child: const Text("Search"),
+                  child: _isSearching
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Text("Search"),
                 ),
                 const SizedBox(width: 12),
                 OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _searchController.clear();
+                    _loadUnreservedEmployees();
+                  },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
@@ -455,7 +283,7 @@ final bool isSelected = selectedIds.contains(int.tryParse(empIdStr) ?? -1);
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6)),
                   ),
-                  child: const Text("Reverse",
+                  child: const Text("Clear",
                       style: TextStyle(color: Colors.black87)),
                 ),
               ],
@@ -464,5 +292,205 @@ final bool isSelected = selectedIds.contains(int.tryParse(empIdStr) ?? -1);
         ],
       ),
     );
+  }
+
+  Widget _buildLoadingIndicator() {
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  Widget _buildErrorMessage() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.red.shade50,
+        border: Border.all(color: Colors.red.shade200),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.error, color: Colors.red.shade600),
+          const SizedBox(width: 8),
+          Expanded(
+              child: Text(_errorMessage,
+                  style: TextStyle(color: Colors.red.shade600))),
+          IconButton(
+            onPressed: _loadUnreservedEmployees,
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Retry',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResultsCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        children: [
+          // Header Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text("Results",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Row(
+                children: [
+                  OutlinedButton(
+                    onPressed: _selectedEmployees.isNotEmpty
+                        ? _reserveSelectedEmployees
+                        : null,
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
+                      side: const BorderSide(color: Colors.grey),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6)),
+                    ),
+                    child:
+                        Text("Reserve Selected (${_selectedEmployees.length})"),
+                  ),
+                  const SizedBox(width: 8),
+                  OutlinedButton(
+                    onPressed: _selectedEmployees.isNotEmpty
+                        ? _clearAllSelection
+                        : null,
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
+                      side: const BorderSide(color: Colors.grey),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6)),
+                    ),
+                    child: const Text("Remove All"),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(height: 1, color: Colors.grey.shade300),
+          const SizedBox(height: 12),
+
+          // Employee Cards
+          if (_employees.isEmpty && !_isLoading)
+            const Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Text("No employees found", textAlign: TextAlign.center),
+            )
+          else
+            Column(
+              children: _employees
+                  .map((employee) => _buildEmployeeCard(employee))
+                  .toList(),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmployeeCard(UnreservedEmployee employee) {
+    final isSelected = _selectedEmployees.contains(employee);
+    final isAvailable =
+        true; // You can add availability logic based on your data
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isSelected ? const Color(0xFFE8F4F8) : Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isSelected ? const Color(0xFF65b2c9) : Colors.grey.shade300,
+          width: isSelected ? 2 : 1,
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Left side info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  employee.displayName,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                const SizedBox(height: 4),
+                Text(employee.displayOccupation),
+                const SizedBox(height: 4),
+                Text(
+                  employee.experienceInfo,
+                  style: const TextStyle(color: Colors.black54),
+                ),
+                if (employee.nationality != null) ...[
+                  const SizedBox(height: 4),
+                  Text("Nationality: ${employee.nationality}",
+                      style: const TextStyle(fontSize: 12)),
+                ],
+              ],
+            ),
+          ),
+
+          // Right side status and checkbox
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isAvailable
+                      ? Colors.green.shade100
+                      : Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  isAvailable ? "Available" : "Reserved",
+                  style: TextStyle(
+                    color: isAvailable ? Colors.green : Colors.black54,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Checkbox(
+                value: isSelected,
+                onChanged: (val) => _toggleEmployeeSelection(employee),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFilterDialog() {
+    // TODO: Implement filter dialog based on ReserveCVFilter model
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Filter Employees'),
+        content: const Text('Filter functionality to be implemented'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 }

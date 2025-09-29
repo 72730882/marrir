@@ -1,65 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../services/api_service.dart';
-import '../auth/login_screen.dart';
+import 'package:marrir/services/Employer/employee_rating.dart';
 
-class EmployeeRatingPage extends StatefulWidget {
-  const EmployeeRatingPage({super.key});
+class REmployeeRatingPage extends StatefulWidget {
+  const REmployeeRatingPage({super.key});
 
   @override
-  State<EmployeeRatingPage> createState() => _EmployeeRatingPageState();
+  State<REmployeeRatingPage> createState() => _EmployeeRatingPageState();
 }
 
-class _EmployeeRatingPageState extends State<EmployeeRatingPage> {
-  List<Map<String, dynamic>> employees = [];
-  bool isLoading = true;
-  String? token;
-  String? userId;
+class _EmployeeRatingPageState extends State<REmployeeRatingPage> {
+  final RatingService _ratingService = RatingService();
+  List<dynamic> _employees = [];
+  bool _isLoading = true;
+  String _errorMessage = '';
 
   @override
   void initState() {
     super.initState();
-    _initAndFetchEmployees();
+    _loadEmployeeRatings();
   }
 
-  Future<void> _initAndFetchEmployees() async {
-    final prefs = await SharedPreferences.getInstance();
-    token = prefs.getString("access_token") ?? "";
-    userId = prefs.getString("user_id") ?? "";
-
-    if (token!.isEmpty || userId!.isEmpty) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
-      return;
-    }
-
-    await fetchEmployees();
-  }
-
-  Future<void> fetchEmployees() async {
-    setState(() => isLoading = true);
+  Future<void> _loadEmployeeRatings() async {
     try {
-      final data = await ApiService.getEmployees(
-        token: token!,
-        managerId: userId!,
-      );
+      setState(() {
+        _isLoading = true;
+        _errorMessage = '';
+      });
+
+      final employees = await _ratingService.getEmployeeRatings();
 
       setState(() {
-        employees = data
-            .map((e) => {
-                  "id": e['id'],
-                  "name": "${e['first_name']} ${e['last_name']}",
-                  "rating": (e['rating'] ?? 0).toDouble(), // 👈 assume backend sends rating
-                })
-            .toList();
-        isLoading = false;
+        _employees = employees;
+        _isLoading = false;
       });
     } catch (e) {
-      setState(() => isLoading = false);
-      debugPrint("Error fetching employees for rating: $e");
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Failed to load employee ratings';
+      });
+      print('❌ Error loading employee ratings: $e');
     }
+  }
+
+  // Helper method to calculate overall rating
+  double _calculateOverallRating(Map<String, dynamic> employee) {
+    final ratings = employee['ratings'] ?? {};
+    final adminRating = ratings['admin_rating'] ?? 0.0;
+    final selfRating = ratings['self_rating'] ?? 0.0;
+    final sponsorRating = ratings['sponsor_rating'] ?? 0.0;
+
+    // Calculate average or use a weighted formula based on your requirements
+    return (adminRating + selfRating + sponsorRating) / 3;
+  }
+
+  // Helper method to get employee name
+  String _getEmployeeName(Map<String, dynamic> employee) {
+    final user = employee['user'] ?? {};
+    final firstName = user['first_name'] ?? '';
+    final lastName = user['last_name'] ?? '';
+
+    if (firstName.isNotEmpty && lastName.isNotEmpty) {
+      return '$firstName $lastName';
+    } else if (firstName.isNotEmpty) {
+      return firstName;
+    } else if (lastName.isNotEmpty) {
+      return lastName;
+    }
+
+    return 'Unknown Employee';
   }
 
   @override
@@ -82,125 +90,178 @@ class _EmployeeRatingPageState extends State<EmployeeRatingPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 50),
+              const SizedBox(height: 30),
 
-              // ===== Card Container =====
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
+              // ===== Loading Indicator =====
+              if (_isLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
                 ),
-                child: Column(
-                  children: [
-                    // ===== Table Header =====
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 16),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF65B2C9),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
-                        ),
-                      ),
-                      child: const Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              "Reserve Name",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              "CV Rating",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
 
-                    // ===== Table Rows =====
-                    if (isLoading)
-                      const Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Center(child: CircularProgressIndicator()),
-                      )
-                    else if (employees.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Center(child: Text("No employees found")),
-                      )
-                    else
-                      ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: employees.length,
-                        separatorBuilder: (context, index) => const Divider(
-                          height: 0.5,
-                          thickness: 0.7,
-                          color: Colors.grey,
+              // ===== Error Message =====
+              if (_errorMessage.isNotEmpty)
+                Center(
+                  child: Text(
+                    _errorMessage,
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+
+              // ===== Refresh Button =====
+              if (_errorMessage.isNotEmpty)
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _loadEmployeeRatings,
+                    child: const Text('Try Again'),
+                  ),
+                ),
+
+              // ===== No Employees Message =====
+              if (!_isLoading && _employees.isEmpty && _errorMessage.isEmpty)
+                const Center(
+                  child: Text(
+                    'No employees found',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+
+              // ===== Employee Ratings Table =====
+              if (!_isLoading && _employees.isNotEmpty) ...[
+                const SizedBox(height: 20),
+
+                // ===== Card Container =====
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
                         ),
-                        itemBuilder: (context, index) {
-                          final emp = employees[index];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 28, horizontal: 20),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    emp['name'],
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        // ===== Table Header =====
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 16),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF65B2C9),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                            ),
+                          ),
+                          child: const Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  "Employee Name",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        emp['rating'].toString(),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "Rating",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.right,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // ===== Table Rows =====
+                        Expanded(
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            itemCount: _employees.length,
+                            separatorBuilder: (context, index) => const Divider(
+                              height: 0.5,
+                              thickness: 0.7,
+                              color: Colors.grey,
+                            ),
+                            itemBuilder: (context, index) {
+                              final employee = _employees[index];
+                              final overallRating =
+                                  _calculateOverallRating(employee);
+                              final employeeName = _getEmployeeName(employee);
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 20, horizontal: 16),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        employeeName,
                                         style: const TextStyle(
-                                          fontWeight: FontWeight.w500,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
                                         ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      const SizedBox(width: 4),
-                                      const Icon(
-                                        Icons.star,
-                                        color: Colors.amber,
-                                        size: 16,
+                                    ),
+                                    Expanded(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            overallRating.toStringAsFixed(1),
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          const Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                            size: 16,
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                  ],
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
         ),
+      ),
+
+      // ===== Refresh Button in App Bar =====
+      floatingActionButton: FloatingActionButton(
+        onPressed: _loadEmployeeRatings,
+        backgroundColor: const Color(0xFF65B2C9),
+        child: const Icon(Icons.refresh, color: Colors.white),
       ),
     );
   }

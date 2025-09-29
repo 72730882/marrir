@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:marrir/Component/Recruitment/employee.dart';
+import 'package:marrir/Component/Recruitment/employee_rating.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:marrir/providers/user_provider.dart';
@@ -11,8 +13,6 @@ import '../../Component/auth/login_screen.dart';
 // Import your Recruitment components
 import '../../Component/Recruitment/dashboard.dart';
 import '../../Component/Recruitment/company_info.dart';
-import '../../Component/Recruitment/employee.dart';
-import '../../Component/Recruitment/employee_rating.dart';
 import '../../Component/Recruitment/promotion.dart';
 import '../../Component/Recruitment/transfer.dart';
 import '../../Component/Recruitment/reserve.dart';
@@ -36,12 +36,12 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
   final List<Widget> _pages = const [
     DashboardPage(),
     CompanyInfoPage(),
-    EmployeePage(),
-    EmployeeRatingPage(),
-    PromotionPage(),
-    TransferPage(),
-    ReservePage(),
-    TransferProfilePage(),
+    REmployeePage(),
+    REmployeeRatingPage(),
+    RecruitmentPromotionPage(),
+    RTransferProfilePage(),
+    ReserveProfilePage(),
+    RTransferHistoryPage(),
     PaymentPage(),
     ReserveHistoryPage(),
     HelpPage(),
@@ -220,7 +220,8 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
                         );
                       } else {
                         return ListTile(
-                          leading: const Icon(Icons.logout, color: Colors.black54),
+                          leading:
+                              const Icon(Icons.logout, color: Colors.black54),
                           title: const Text(
                             "Logout",
                             style: TextStyle(
@@ -237,7 +238,8 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
                                   title: const Text(
                                     "End Session",
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                   content: const Text(
                                     "Are you sure you want to log out?",
@@ -247,21 +249,24 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
                                     TextButton(
                                       onPressed: () async {
                                         final userProvider =
-                                            Provider.of<UserProvider>(context, listen: false);
+                                            Provider.of<UserProvider>(context,
+                                                listen: false);
                                         await userProvider.logout();
 
                                         Navigator.of(context).pop();
                                         Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => const LoginScreen(),
+                                            builder: (context) =>
+                                                const LoginScreen(),
                                           ),
                                         );
                                       },
                                       child: const Text("Yes"),
                                     ),
                                     TextButton(
-                                      onPressed: () => Navigator.of(context).pop(),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
                                       child: const Text("Cancel"),
                                     ),
                                   ],

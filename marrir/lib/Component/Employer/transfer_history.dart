@@ -106,11 +106,6 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
         '${receiver['first_name'] ?? ''} ${receiver['last_name'] ?? ''}'.trim();
   }
 
-  int _getTransferCount(dynamic transfer) {
-    final transfers = transfer['transfers'] ?? [];
-    return transfers.length;
-  }
-
   // ===== END OF HELPER METHODS =====
 
   @override

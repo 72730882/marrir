@@ -363,14 +363,6 @@ class EmployeeDashboardService {
   }
 
   // Update the _getHeaders method to be static
-  Future<Map<String, String>> _getHeader() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('access_token');
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    };
-  }
 
   // Get all promotion packages using Dio
   Future<List<Map<String, dynamic>>> getPromotionPackages() async {

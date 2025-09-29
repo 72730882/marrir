@@ -86,9 +86,9 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ===== Employee Summary Card =====
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
+                children: [
                   Text(
                     "Employee",
                     style: TextStyle(
@@ -113,7 +113,7 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
                       color: Colors.black.withOpacity(0.2),
                       spreadRadius: 2,
                       blurRadius: 8,
-                      offset: Offset(0, 2),
+                      offset: const Offset(0, 2),
                     )
                   ],
                 ),
@@ -130,7 +130,6 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
                           style: const TextStyle(
                               fontSize: 28, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 4),
-                     
                     ],
                   ),
                 ),
@@ -229,8 +228,8 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
-                                        child: Row(
-                                          children: const [
+                                        child: const Row(
+                                          children: [
                                             SizedBox(
                                                 width: 150,
                                                 child: Text("Name",

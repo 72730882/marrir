@@ -9,7 +9,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
-                ChangeNotifierProvider(create: (_) => UserInfoProvider()), // ✅ add this
+        ChangeNotifierProvider(create: (_) => UserInfoProvider()), // ✅ add this
       ],
       child: const MyApp(),
     ),
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-       home: const SplashScreen(),
+      home: const SplashScreen(),
     );
   }
 }

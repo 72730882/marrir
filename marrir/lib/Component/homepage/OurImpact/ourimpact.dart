@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/auth/login_screen.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
 
 class OurImpact extends StatelessWidget {
   const OurImpact({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context);
+
     return SingleChildScrollView(
       child: Column(
         children: [
           // FULL-WIDTH BACKGROUND (Who we are)
           Container(
             width: double.infinity,
-            height: 330,
+            height: 410,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -27,45 +32,44 @@ class OurImpact extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Welcome to Marrir',
-                    style: TextStyle(
-                      fontSize: 35,
+                  Text(
+                    lang.t('welcome'),
+                    style: const TextStyle(
+                      fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 255, 255, 255),
+                      color: Colors.white,
                     ),
                   ),
-                  // const SizedBox(height: 20),
-                  const Text.rich(
-                    TextSpan(
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Color.fromARGB(255, 255, 255, 255),
-                      ),
-                      children: [
-                        TextSpan(
-                          text:
-                             'We are a modern technology solution that aims to enhance the RECRUITMENT FIRMS matching activities via our platform Marrir.com. Marrir.com is an all-encompassing ONLINE PLATFORM dedicated to assessing human capabilities and energies. It functions as an effective link between qualified professionals and employers, agency Firms, staffing Offices, and RECRUITMENT FIRMS.'
-                        ),
-                      ],
+                  const SizedBox(height: 5),
+                  Text(
+                    lang.t('description'),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Colors.white,
                     ),
+                    textAlign: TextAlign.start,
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 10),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFFFFF),
+                      backgroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
+                          horizontal: 24, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(13),
                       ),
                     ),
-                    child: const Text(
-                      'Get Started',
-                      style: TextStyle(
+                    child: Text(
+                      lang.t('get_started'),
+                      style: const TextStyle(
                         color: Color(0xFF65b2c9),
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -85,18 +89,19 @@ class OurImpact extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 13),
               child: Column(
                 children: [
-                  const Text(
-                    'Our Impact',
-                    style: TextStyle(
+                  Text(
+                    lang.t('our_impact'),
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF333333),
                     ),
                   ),
                   const SizedBox(height: 1),
-                  const Text(
-                    'Connecting talent with opportunities worldwide',
-                    style: TextStyle(fontSize: 15, color: Color(0xFF666666)),
+                  Text(
+                    lang.t('impact_subtitle'),
+                    style:
+                        const TextStyle(fontSize: 15, color: Color(0xFF666666)),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
@@ -108,10 +113,10 @@ class OurImpact extends StatelessWidget {
                     mainAxisSpacing: 20,
                     childAspectRatio: 1.2,
                     children: [
-                      _buildStatCard('500K+', 'Employees'),
-                      _buildStatCard('1K+', 'Foreign Employment\nAgencies'),
-                      _buildStatCard('1K+', 'Recruitment Firms'),
-                      _buildStatCard('3K+', 'Employers'),
+                      _buildStatCard('500K+', lang.t('employees')),
+                      _buildStatCard('1K+', lang.t('agencies')),
+                      _buildStatCard('1K+', lang.t('recruitment_firms')),
+                      _buildStatCard('3K+', lang.t('employers')),
                     ],
                   ),
                 ],
@@ -137,7 +142,6 @@ class OurImpact extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),

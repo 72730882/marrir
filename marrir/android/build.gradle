@@ -1,9 +1,35 @@
+// Top-level build.gradle
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.3.0'
+    }
+}
+
 allprojects {
     repositories {
         google()
         mavenCentral()
     }
+
+    configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'net.bytebuddy') {
+                details.useVersion '1.12.22' // Java 17 safe
+            }
+            if (details.requested.group == 'org.bouncycastle' &&
+                details.requested.name == 'bcprov-jdk18on') {
+                // redirect to the artifact that actually exists
+                details.useTarget "org.bouncycastle:bcprov-jdk15to18:1.70"
+            }
+        }
+    }
 }
+
 
 rootProject.buildDir = '../build'
 subprojects {

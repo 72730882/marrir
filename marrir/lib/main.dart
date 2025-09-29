@@ -3,13 +3,15 @@ import 'package:provider/provider.dart';
 import 'Component/splash/splash_screen.dart';
 import 'providers/user_provider.dart';
 import 'providers/user_info_provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => UserInfoProvider()), // ✅ add this
+        ChangeNotifierProvider(create: (_) => UserInfoProvider()),
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
       ],
       child: const MyApp(),
     ),

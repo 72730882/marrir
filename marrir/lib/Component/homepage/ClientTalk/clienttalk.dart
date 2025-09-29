@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:marrir/Component/about/about_screen.dart';
 
 class Clienttalk extends StatelessWidget {
   const Clienttalk({super.key});
@@ -110,7 +111,15 @@ class Clienttalk extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const AboutScreen(), // Replace with your AboutPage widget
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: const Color(0xFF65b2c9),

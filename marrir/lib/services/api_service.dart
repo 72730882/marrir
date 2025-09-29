@@ -9,6 +9,7 @@ class ApiService {
   static final DioClient _client = DioClient();
   static Dio get _dio => _client.dio;
   static const String baseUrl = "https://api.marrir.com"; // for your device
+  // static const String baseUrl = "http://127.0.0.1:8000"; // for your device
 
   // ===== Register User =====
   static Future<dynamic> registerUser(Map<String, dynamic> data) async {

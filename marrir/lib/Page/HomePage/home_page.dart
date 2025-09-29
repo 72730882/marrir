@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             OurImpact(),
-            SizedBox(height: 15),
+            SizedBox(height: 10),
             PromotedCVsScreen(),
             SizedBox(height: 15),
             ServicesApp(),

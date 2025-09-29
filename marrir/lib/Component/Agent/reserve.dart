@@ -15,7 +15,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
   final TextEditingController _searchController = TextEditingController();
 
   List<UnreservedEmployee> _employees = [];
-  List<UnreservedEmployee> _selectedEmployees = [];
+  final List<UnreservedEmployee> _selectedEmployees = [];
   bool _isLoading = false;
   String _errorMessage = '';
   bool _isSearching = false;
@@ -397,7 +397,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
 
   Widget _buildEmployeeCard(UnreservedEmployee employee) {
     final isSelected = _selectedEmployees.contains(employee);
-    final isAvailable =
+    const isAvailable =
         true; // You can add availability logic based on your data
 
     return Container(
@@ -451,7 +451,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
                       : Colors.grey.shade200,
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: Text(
+                child: const Text(
                   isAvailable ? "Available" : "Reserved",
                   style: TextStyle(
                     color: isAvailable ? Colors.green : Colors.black54,

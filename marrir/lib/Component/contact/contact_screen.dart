@@ -165,8 +165,8 @@ class ContactScreen extends StatelessWidget {
               const SizedBox(height: 1),
 
               // Email
-              const Text(
-  "EJITIAZ PORTAL LLC",
+             Text(
+   lang.t('office_name'),
   textAlign: TextAlign.center,
   style: TextStyle(
     fontSize: 13,
@@ -177,8 +177,8 @@ class ContactScreen extends StatelessWidget {
               const SizedBox(height: 15),
 
               // Address
-              const Text(
-                "Concord Tower - 9th floor - AI Sufah\n - Dubai Media City - Dubai",
+               Text(
+                lang.t('office_address'),
                 style: TextStyle(
                   fontSize: 13,
                 ),

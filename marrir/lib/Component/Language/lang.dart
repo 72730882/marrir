@@ -64,6 +64,79 @@ class AppStrings {
       'At Marrir we strive to enhance transparency, efficiency, and accessibility in the hiring process, ensuring that businesses across the GCC and beyond can easily find the right talent. Through innovation and strategic partnerships, we aim to simplify recruitment, empower job seekers, and create a more dynamic and inclusive job market.',
       'vision_statement1':
       'We aspire to transform the global recruitment landscape by leveraging cutting-edge technology to optimise hiring processes, foster long-term professional relationships, and bridge workforce gaps with unmatched efficiency. By continuously evolving and adapting to industry needs, we aim to drive a future hiring environment where recruitment is faster, more precise, and more important for businesses and job seekers alike.',
+      //footer
+      'office_name': 'EJITIAZ PORTAL LLC',
+      'office_address':'Concord Tower - 9th floor - AI Sufah\n - Dubai Media City - Dubai',
+      //Login screen
+      'login_title':'Welcome back!\nPlease log in to continue using Marrir.',
+      'select_role': 'Choose Account Type',
+      'password': 'Password',
+      'login_with_fb':'Sign in with Facebook',
+      'forgot_password': 'Forgot Password?',
+      'sign_in': 'Sign In',
+      'login_with_google':'Sign in With Google',
+       'dont_have_account': "Don't have an account?",
+       'account_type_required': 'Account Type is required!',
+       //register
+        "employee": "Employee",
+  "employer": "Employer",
+  "rec_firm": "Recruitment Firm",
+  "agency": "Foreign Employment Agencies",
+  "create_account":"Create Account",
+  "company":"Company",
+  'individual': 'Individual',
+  'first_name': 'First Name',
+  'last_name': 'Last Name',
+   'email_address': 'Email Address',
+  'phone_number': 'Phone Number',
+  'country': 'Country',
+  'select_country': 'Select country',
+  'account_type': 'Account Type',
+  'confirm_password': 'Confirm Password',
+  'agree_terms': 'I agree to the terms and conditions',
+  'sign_up': 'Sign Up',
+  'already_have_account': "Already have an account?",
+  'log_in': "Log in",
+  'email_adress': 'Email address',
+
+  
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     },
     'ar': {
       'welcome': 'مرحبًا بكم في مررر',
@@ -130,6 +203,77 @@ class AppStrings {
       'في Marrir نسعى لتعزيز الشفافية والكفاءة وإتاحة الوصول في عملية التوظيف، لضمان أن تتمكن الشركات في دول مجلس التعاون الخليجي وما وراءها من العثور بسهولة على المواهب المناسبة. من خلال الابتكار والشراكات الاستراتيجية، نهدف إلى تبسيط التوظيف، وتمكين الباحثين عن عمل، وخلق سوق عمل أكثر ديناميكية وشمولية.',
       'vision_statement1':
       'نسعى لتحويل مشهد التوظيف العالمي من خلال الاستفادة من أحدث التقنيات لتحسين عمليات التوظيف، وتعزيز العلاقات المهنية طويلة الأمد، وسد الفجوات في القوى العاملة بكفاءة غير مسبوقة. من خلال التطور المستمر والتكيف مع احتياجات الصناعة، نهدف إلى قيادة مستقبل التوظيف حيث تكون العمليات أسرع وأكثر دقة وأهمية للشركات والباحثين عن عمل على حد سواء.',
+    //footer
+    'office_name':'شركة اجتياز للتعامل الإلكتروني ذات مسؤولية محدودة',
+    'office_address':'الإمارات العربية المتحدة، إمارة دبي، مكتب رقم 748-382، برج كونكورد، الطابق التاسع، الصفوح، مدينة دبي للإعلام',
+    //login screen
+    'login_title':'مرحبًا بعودتك!\nيرجى تسجيل الدخول للمتابعة على Marrir.',
+    'select_role': "اختر نوع الحساب",
+    'password': 'كلمة المرور',
+    'login_with_fb':'تسجيل الدخول عبر فيسبوك',
+    'forgot_password': 'هل نسيت كلمة المرور؟',
+    'sign_in': 'تسجيل الدخول',
+    'login_with_google':'تسجيل الدخول باستخدام جوجل',
+    'dont_have_account': 'ليس لديك حساب؟',
+    'account_type_required': 'نوع الحساب مطلوب!',
+    //register
+    'employee':'الموظف',
+    'employer':'صاحب العمل',
+    'rec_firm':'شركات التوظيف',
+    'agency':'وكيل العمالة الأجنبية',
+    "create_account":"نشاء مستخدم",
+    "company":"الشركة",
+    'individual': 'فرد',
+    'first_name': 'الاسم الأول',
+    'last_name': 'اسم العائلة',
+'email_address': 'البريد الإلكتروني',
+  'phone_number': 'رقم الهاتف',
+  'country': 'الدولة',
+'select_country': 'اختر الدولة',
+ 'account_type': 'نوع الحساب',
+
+  'confirm_password': 'تأكيد كلمة المرور',
+  'agree_terms': 'أوافق على الشروط والأحكام',
+  'sign_up': 'إنشاء حساب',
+  'already_have_account': "هل لديك حساب بالفعل؟",
+  'log_in': "تسجيل الدخول",
+  'email_adress': 'البريد الإلكتروني',
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     },
     'am': {
       'welcome': 'እንኳን ወደ Marrir በደህና መጡ',
@@ -162,23 +306,23 @@ class AppStrings {
       'service': 'አገልግሎቶች',
       'service_desc':
           'እኛ ሰዎችን ወደ ስራዎች ብቻ አንያያዝም። ትክክለኛውን ሰው ወደ ትክክለኛው ስራ እንዲያደርስ እንደምንያዝ፣ በፍጥነት፣ በግልጽነትና በእምነት። Marrir በGCC እና ከዚያ በላይ የታመነው የቀጥታ ተግባር አጋርዎ ነው።',
-      'promote_profile': 'Promote Profile',
-      'reserve_profile': 'Reserve Profile',
-      'transfer_profile': 'Transfer Profile',
-      'post_jobs': 'Post Jobs',
-      'assigning_rec': 'Assigning Recruitment Firms to import workers',
-      'duration': 'Duration',
-      '1_month': '1 Month',
-      '6_month': '6 Month',
+    'promote_profile': 'ፕሮፋይል ያስደርሱ',
+  'reserve_profile': 'ፕሮፋይል ይያዙ',
+  'transfer_profile': 'ፕሮፋይል ይከላከሉ',
+  'post_jobs': 'ስራዎች ይለጥፉ',
+  'assigning_rec': 'የስራ አሰራር ኩባንያዎችን ለሰራተኞች ለመጫን ይመደብሩ',
+  'duration': 'ጊዜ አቆጣጠር',
+  '1_month': '1 ወር',
+  '6_month': '6 ወር',
       'see_all': 'ሁሉንም ይመልከቱ',
-      'profiles': 'Profiles',
+      'profiles': 'ፕሮፋይሎች',
       //about us page
       'about_us': 'ስለ እኛ',
-      'who_we_are': 'Who We Are',
+      'who_we_are':  'እኛ ማን ነን',
       'our_vision': 'ራዕያችን',
       'our_mission': 'ተልዕኮታችን',
       'vision_desc':
-          '"To be the leading and most trusted solution for manpower acquisition, setting new industry standards through precision, innovation, and excellence while serving our customers."',
+          '"የሰራተኞች ማግኘት ላይ በተመራ እና በታመነ መፍትሄ ለመሆን፣ በትክክለኛነት፣ አዳዲስ እና በተሻለ ሁኔታ ኢንዱስትሪ ደረጃዎችን ማቀናበር ሲሆን ደንበኞቻችንን ለመገልገል እንገናኛለን።"',
       'learn_more': 'ስለ ኩባንያችን እና እሴቶቻችን ይወቁ',
       // Amharic
       'about_desc1':
@@ -195,7 +339,57 @@ class AppStrings {
       'በMarrir ላይ በቀጥታ እንዲገኙ አስፈላጊ ችሎታዎችን እንዲያገኙ እና እንዲገኙ ለንግድ ተቋማት በGCC እና ከዚያ በላይ የተገቢውን ተቋማት በቀላሉ ማግኘት እንዲችሉ እንሰራለን። በአዳዲስ እና በውስጥ ባለስልጣናት ማህበረሰብ መተባበር እንደምንደርግ እና የስራ ፈላጊዎችን እንማራለን፣ የስራ ገበያን እንደገና እና ዝቅተኛና አንደኛ ያደርጋል።',
       'vision_statement1':
       'እኛ ዓለም አቀፍ የቀጥታ ተግባር እንዲቀየር በቅርብ ቴክኖሎጂ በመጠቀም ሂደቶችን ለማሻሻል፣ ረጅም የሆነ ሙያዊ ግንኙነትን ለማበረታታት እና የሥራ ኃይል ክፍት እንዲሞሉ እንሞክራለን። በኢንዱስትሪ ፍላጎቶች ላይ በቀጥታ ተመሳሳይነት እንደምንለዋወጥ እና ለንግድ ተቋማት እና ለስራ ፈላጊዎች የተገቢ ፈጣንና ትክክለኛ ቀጥታ እንዲሆን እንደምንምከር።',
-      
+      //footer
+      'office_name': 'EJITIAZ PORTAL LLC',
+      'office_address':'Concord Tower - 9th floor - AI Sufah\n - Dubai Media City - Dubai',
+      //login screen
+      'login_title':'እንኳን ደግሞ በደህና መጡ!\nMarrir ን ለመቀጠል እባክዎን ይግቡ።',
+      'select_role': 'የሚሰሩበት ሚና ይምረጡ',
+      'password': 'የሚስጥር ቃል',
+      'login_with_fb':'Sign in with Facebook',
+      'forgot_password': 'የሚስጥር ቃል ረሳዎት?',
+       'sign_in': 'ግባ',
+       'login_with_google':'Sign in With Google',
+       'dont_have_account': 'መለያ የለዎትም?',
+       'account_type_required': 'የመለያ አይነት ያስፈልጋል!',
+       //registration
+       "create_account":"አካውንት ፍጠር",
+       'company': 'ኩባንያ',
+       'individual': 'ግለሰብ',
+       'first_name': 'የመጀመሪያ ስም',
+       'last_name': 'የአያት ስም',
+        'email_address': 'ኢሜል አድራሻ',
+  'phone_number': 'ስልክ ቁጥር',
+    "employee": "ሰራተኛ",
+  "employer": "አሠሪ",
+  "rec_firm": "የቅጥር ተቋም",
+  "agency": "የውጭ ሥራ ወኪል",
+'country': 'አገር',
+'select_country': 'አገር ይምረጡ',
+'account_type': 'የመለያ አይነት',
+
+  'confirm_password': 'የይለፍ ቃል አረጋግጥ',
+  'agree_terms': 'እስከ ውሎ ደንብና ሁኔታዎች እስማማለሁ',
+  'sign_up': 'መዝግብ መለያ',
+  'already_have_account': "አካውንት አለዎት?",
+  'log_in': "ግባ",
+  'email_adress': 'ኢሜል አድራሻ',
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
   };
 }

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
+import 'package:provider/provider.dart';
 
 class ServicesScreen extends StatelessWidget {
   const ServicesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context);
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,11 +28,11 @@ class ServicesScreen extends StatelessWidget {
                 end: Alignment.centerRight,
               ),
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  "Services",
+                  lang.t('service'),
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -37,7 +41,7 @@ class ServicesScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "We don't just connect people to jobs. We connect the right people to the right jobs. with speed, transparency, ans confidence. marrir is your trusted recruitment companion in the GCC and beyond.",
+                  lang.t('service_desc'),
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white,
@@ -51,10 +55,10 @@ class ServicesScreen extends StatelessWidget {
           const SizedBox(height: 30),
 
           // ===== Promote Profile Section =====
-          const Padding(
+          Padding(
             padding: EdgeInsets.fromLTRB(16, 20, 16, 2),
             child: Text(
-              "Promote Profile",
+              lang.t('promote_profile'),
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -84,7 +88,7 @@ class ServicesScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
@@ -94,7 +98,7 @@ class ServicesScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Foreign Employment Agencies",
+                            lang.t('agencies'),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -102,15 +106,15 @@ class ServicesScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            "Duration: 6 month",
-                            style: TextStyle(
+                            "${lang.t('duration')}: ${lang.t('6_month')}",
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.black54,
                             ),
                           ),
                           SizedBox(height: 4),
                           Text(
-                            "Profiles: 250",
+                             lang.t('profiles') + ": 250",
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.blue,
@@ -143,7 +147,7 @@ class ServicesScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
@@ -153,7 +157,7 @@ class ServicesScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Employee",
+                            lang.t('employees'),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -161,15 +165,15 @@ class ServicesScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            "Duration: 1 month",
-                            style: TextStyle(
+                            "${lang.t('duration')}: ${lang.t('1_month')}",
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.black54,
                             ),
                           ),
                           SizedBox(height: 4),
                           Text(
-                            "Profiles: 1",
+                             lang.t('profiles') + ": 50",
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.blue,
@@ -202,7 +206,7 @@ class ServicesScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
@@ -212,7 +216,7 @@ class ServicesScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Recruitment Firms",
+                            lang.t('recruitment_firms'),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -220,15 +224,15 @@ class ServicesScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            "Duration: 6 month",
-                            style: TextStyle(
+                            "${lang.t('duration')}: ${lang.t('6_month')}",
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.black54,
                             ),
                           ),
                           SizedBox(height: 4),
                           Text(
-                            "Profiles: 250",
+                            lang.t('profiles') + ": 250",
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.blue,
@@ -271,8 +275,9 @@ class ServicesScreen extends StatelessWidget {
                 onPressed: () {
                   // Handle "See All"
                 },
-                child: const Text(
-                  "See All",
+                child: Text(
+                  
+                  lang.t('see_all'),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -284,15 +289,14 @@ class ServicesScreen extends StatelessWidget {
           ),
 
           // ===== Reserve Profile Section =====
-          const Padding(
+          Padding(
             padding: EdgeInsets.fromLTRB(16, 30, 16, 2),
             child: Text(
-              "Reserve Profile",
+              lang.t('reserve_profile'),
               style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                 color: Color(0xFF65b2c9)
-              ),
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF65b2c9)),
             ),
           ),
 
@@ -317,7 +321,7 @@ class ServicesScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
@@ -327,7 +331,7 @@ class ServicesScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Foreign Employment\n Agencies",
+                            lang.t('agencies'),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -360,7 +364,7 @@ class ServicesScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
@@ -370,7 +374,7 @@ class ServicesScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Employer",
+                            lang.t('employers'),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -403,7 +407,7 @@ class ServicesScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
@@ -413,7 +417,7 @@ class ServicesScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Recruitment Firms",
+                            lang.t('recruitment_firms'),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -441,15 +445,14 @@ class ServicesScreen extends StatelessWidget {
           const SizedBox(height: 10),
 
           // ===== Transfer Profile Section =====
-          const Padding(
+          Padding(
             padding: EdgeInsets.fromLTRB(16, 30, 16, 2),
             child: Text(
-              "Transfer Profile",
+              lang.t('transfer_profile'),
               style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                 color: Color(0xFF65b2c9)
-              ),
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF65b2c9)),
             ),
           ),
 
@@ -474,7 +477,7 @@ class ServicesScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
@@ -484,7 +487,7 @@ class ServicesScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Foreign Employment Agencies",
+                            lang.t('agencies'),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -517,7 +520,7 @@ class ServicesScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
@@ -527,7 +530,7 @@ class ServicesScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Employer",
+                            lang.t('employers'),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -560,7 +563,7 @@ class ServicesScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
@@ -570,7 +573,7 @@ class ServicesScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Recruitment Firms",
+                            lang.t('recruitment_firms'),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -603,10 +606,9 @@ class ServicesScreen extends StatelessWidget {
             child: Text(
               "Post Jobs",
               style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                 color: Color(0xFF65b2c9)
-              ),
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF65b2c9)),
             ),
           ),
 
@@ -631,7 +633,7 @@ class ServicesScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
@@ -641,7 +643,7 @@ class ServicesScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Recruitment Firms",
+                            lang.t('recruitment_firms'),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -674,7 +676,7 @@ class ServicesScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
@@ -684,7 +686,7 @@ class ServicesScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Employer",
+                            lang.t('employers'),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -712,15 +714,14 @@ class ServicesScreen extends StatelessWidget {
           const SizedBox(height: 10),
 
           // ===== Accept Employer =====
-          const Padding(
+          Padding(
             padding: EdgeInsets.fromLTRB(16, 30, 16, 2),
             child: Text(
-              "Assigning Recruitment Firms to import workers",
+              lang.t('assigning_rec'),
               style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                 color: Color(0xFF65b2c9)
-              ),
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF65b2c9)),
             ),
           ),
 
@@ -745,7 +746,7 @@ class ServicesScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
@@ -755,7 +756,7 @@ class ServicesScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Recuruitment Firms",
+                            lang.t('recruitment_firms'),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -782,7 +783,6 @@ class ServicesScreen extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -795,13 +795,13 @@ class ServicesScreen extends StatelessWidget {
 
               // Email
               const Text(
-  "EJITIAZ PORTAL LLC",
-  textAlign: TextAlign.center,
-  style: TextStyle(
-    fontSize: 13,
-    color: Color(0xFF65b2c9),
-  ),
-),
+                "EJITIAZ PORTAL LLC",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Color(0xFF65b2c9),
+                ),
+              ),
 
               const SizedBox(height: 15),
 

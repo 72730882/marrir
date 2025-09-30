@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
+import 'package:provider/provider.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+  final lang = Provider.of<LanguageProvider>(context);
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,11 +28,11 @@ class AboutScreen extends StatelessWidget {
                 end: Alignment.centerRight,
               ),
             ),
-            child: const Column(
+            child:  Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  "About Us",
+                   lang.t('about_us'),
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -37,7 +41,8 @@ class AboutScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "Learn more about our company and values",
+                  
+                  lang.t('learn_more'),
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white,
@@ -53,7 +58,7 @@ class AboutScreen extends StatelessWidget {
           // ===== WHO WE ARE =====
           _buildWhiteCard(
             icon: Icons.rocket_launch_outlined, // Slim Material outline
-            title: "Who We Are",
+            title:lang.t('who_we_are'),
             titleStyle: const TextStyle(
               fontSize: 25,
               fontWeight: FontWeight.bold,
@@ -63,47 +68,46 @@ class AboutScreen extends StatelessWidget {
             content: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                RichText(
-                  text: const TextSpan(
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                      height: 1.5,
-                    ),
-                    children: [
-                      TextSpan(
-                        text:
-                            "MARRIR is an innovative technology solution as part of (LITARE PORTAL LLC) talent.com in a dedicated ONLINE PLATFORM to bridging workforce gaps through innovation technology-driven services to enhance recruitment, matching and talent search. ",
-                      ),
-                      TextSpan(
-                        text: "MARRIR",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      TextSpan(
-                        text:
-                            ", connects Job Seekers, Employment Firms, International Recruitment Agencies and EMPLOYEES as highly connected parties. ",
-                      ),
-                      TextSpan(
-                        text: "MARRIR",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      TextSpan(
-                        text:
-                            " enables its customers to simplify the hiring process for businesses across the GCC and beyond.",
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
+               RichText(
+  text: TextSpan(
+    style: const TextStyle(
+      fontSize: 16,
+      color: Colors.black87,
+      height: 1.5,
+    ),
+    children: [
+      TextSpan(
+        text: lang.t('about_desc1'),
+      ),
+      TextSpan(
+        text: lang.t('company_name'),
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      TextSpan(
+        text: lang.t('about_desc2'),
+      ),
+      TextSpan(
+       text: lang.t('company_name'),
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      TextSpan(
+        text: lang.t('about_desc3'),
+      ),
+    ],
+  ),
+),
+const SizedBox(height: 16),
+              ]
             ),
+        
           ),
           const SizedBox(height: 24),
 
           // ===== OUR MISSION =====
           _buildWhiteCard(
             icon: Icons.threesixty_outlined, // Slim 360-degree icon
-            title: "Our Mission",
+            title: lang.t('our_mission'),
+            
             titleStyle: const TextStyle(
               fontSize: 25,
               fontWeight: FontWeight.bold,
@@ -114,9 +118,9 @@ class AboutScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(16),
-                  child: const Text(
-                    "\"To revolutionize workforce recruitment by providing a seamless, technology-driven platform that connects Job Seekers, Employment Firms, International Recruitment Agencies and EMPLOYERS.\"",
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                     lang.t('mission_statement'),
                     style: TextStyle(
                       fontSize: 17,
                       fontStyle: FontStyle.italic,
@@ -127,8 +131,8 @@ class AboutScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  " At Marrir we strive to enhance transparency, efficiency, and accessibility in the hiring process, ensuring that businesses across the GCC and beyond can easily find the right talent. Through innovation and strategic partnerships, we aim to simplify recruitment, empower job seekers, and create a more dynamic and inclusive job market",
+                Text(
+                 lang.t('mission_statement1'),
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.black87,
@@ -143,7 +147,7 @@ class AboutScreen extends StatelessWidget {
           // ===== OUR VISION =====
           _buildWhiteCard(
             icon: Icons.lightbulb_outline, // Slim lightbulb
-            title: "Our Vision",
+            title:lang.t('our_vision'),
             titleStyle: const TextStyle(
               fontSize: 25,
               fontWeight: FontWeight.bold,
@@ -154,9 +158,9 @@ class AboutScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(16),
-                  child: const Text(
-                    "\"To be the leading and most trusted solution for manpower acquisition, setting new industry standards through precision, innovation, and excellence while serving our customers.\"",
+                  padding: EdgeInsets.all(16),
+                  child:  Text(
+                   lang.t('vision_statement'),
                     style: TextStyle(
                       fontSize: 17,
                       fontStyle: FontStyle.italic,
@@ -167,8 +171,8 @@ class AboutScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  "We aspire to transform the global recruitment landscape by leveraging cutting-edge technology to optimise hiring processes, foster long-term professional relationships, and bridge workforce gaps with unmarched efficiency. By continuously evolving and adapting to industry needs, we aim to drive a future hiring exclusive where recruitment is minute, faster, and more important for businesses and job seekers a like.",
+                Text(
+                  lang.t('vision_statement1'),
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.black87,

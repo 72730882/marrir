@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
 
 class ContactScreen extends StatelessWidget {
   const ContactScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context);
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,11 +28,12 @@ class ContactScreen extends StatelessWidget {
                 end: Alignment.centerRight,
               ),
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  "Contact Us",
+                  lang.t('landing_contact_us'),
+                  
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -37,7 +42,7 @@ class ContactScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "Do you have any questions? Please leave us a message",
+                  lang.t('contact_us_description'),
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white,
@@ -60,9 +65,9 @@ class ContactScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     // Full Name Input with underline only
-                    const TextField(
+                    TextField(
                       decoration: InputDecoration(
-                        labelText: 'Full Name',
+                        labelText: lang.t('full_name'), 
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey),
                         ),
@@ -76,10 +81,10 @@ class ContactScreen extends StatelessWidget {
                     const SizedBox(height: 30),
 
                     // Email Input with underline only
-                    const TextField(
+                    TextField(
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                        labelText: 'Email',
+                         labelText: lang.t('email'),
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey),
                         ),
@@ -93,10 +98,10 @@ class ContactScreen extends StatelessWidget {
                     const SizedBox(height: 10),
 
                     // Message Input with underline only (multiline)
-                    const TextField(
+                    TextField(
                       maxLines: 3,
                       decoration: InputDecoration(
-                        labelText: 'Message',
+                       labelText: lang.t('message'),
                         hintText: 'Message here...',
                         alignLabelWithHint:
                             true, // important for multiline so label aligns properly
@@ -128,8 +133,8 @@ class ContactScreen extends StatelessWidget {
                           onPressed: () {
                             // Handle "See All"
                           },
-                          child: const Text(
-                            "Submit",
+                          child: Text(
+                            lang.t('submit'),
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

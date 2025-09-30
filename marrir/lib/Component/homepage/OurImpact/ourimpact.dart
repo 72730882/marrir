@@ -13,7 +13,7 @@ class OurImpact extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // FULL-WIDTH BACKGROUND (Who we are)
+          // FULL-WIDTH BACGROUND (Who we are)
           Container(
             width: double.infinity,
             height: 410,

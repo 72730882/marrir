@@ -16,6 +16,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:marrir/Component/auth/ForgotPassword/forgot_password_screen.dart';
 import 'package:marrir/providers/user_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -29,15 +30,19 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
   String? _selectedAccountType;
 
-  final Map<String, String> _accountTypes = {
-    "agent": "Foreign Employment Agent",
-    "recruitment": "Recruitment Firm",
-    "sponsor": "Employer",
-    "employee": "Employee",
-  };
+
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context);
+     final Map<String, String> _accountTypes = {
+  "agent": lang.t('agency'),        // e.g., 'Foreign Employment Agency'
+  "recruitment": lang.t('rec_firm'), // e.g., 'Recruitment Firm'
+  "sponsor": lang.t('employer'),    // e.g., 'Employer'
+  "employee": lang.t('employee'),   // e.g., 'Employee'
+};
+
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -73,10 +78,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
               const SizedBox(height: 25),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  "Welcome Back\nLogin to continue to Marrir",
+                  lang.t('login_title'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20,
@@ -92,8 +97,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Select Role",
+                    Text(
+                      lang.t('select_role'),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -122,26 +127,26 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    const Text(
-                      "Email",
+                    Text(
+                      lang.t('email'),
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
                     _buildTextField(
-                      "Email address",
+                      lang.t('email_adress'),
                       prefixIcon: Icons.email,
                       controller: emailController,
                     ),
                     const SizedBox(height: 15),
-                    const Text(
-                      "Password",
+                    Text(
+                      lang.t('password'),
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
                     _buildTextField(
-                      "Password",
+                       lang.t('password'),
                       obscure: true,
                       controller: passwordController,
                     ),
@@ -158,8 +163,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           );
                         },
-                        child: const Text(
-                          "Forgot Password?",
+                        child: Text(
+                          lang.t('forgot_password'),
                           style: TextStyle(color: Color(0xFF65b2c9)),
                         ),
                       ),
@@ -177,8 +182,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           elevation: 3,
                         ),
-                        child: const Text(
-                          "Sign In",
+                        child: Text(
+                          lang.t('sign_in'),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -198,8 +203,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             FontAwesomeIcons.google,
                             color: Color(0xFF4285F4),
                           ),
-                          label: const Text(
-                            "Sign-in with Google",
+                          label: Text(
+                            lang.t('login_with_google'),
                             style: TextStyle(fontSize: 14, color: Colors.black),
                           ),
                           style: OutlinedButton.styleFrom(
@@ -221,8 +226,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             FontAwesomeIcons.facebook,
                             color: Color(0xFF1877F2),
                           ),
-                          label: const Text(
-                            "Sign-in with Facebook",
+                          label: Text(
+                            lang.t('login_with_fb'),
                             style: TextStyle(fontSize: 14, color: Colors.black),
                           ),
                           style: OutlinedButton.styleFrom(
@@ -239,7 +244,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("Don't have an account?"),
+                        Text(
+                          lang.t(
+                              'dont_have_account'), // e.g., "Don't have an account?"
+                        ),
                         const SizedBox(width: 5),
                         GestureDetector(
                           onTap: () {
@@ -250,9 +258,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             );
                           },
-                          child: const Text(
-                            "Register",
-                            style: TextStyle(
+                          child: Text(
+                            lang.t('register'), // e.g., "Register"
+                            style: const TextStyle(
                               color: Colors.purple,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,

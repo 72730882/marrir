@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/user_info_provider.dart';
 import '../../services/api_service.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
+import 'package:provider/provider.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -72,6 +74,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context);
     final userInfoProvider = Provider.of<UserInfoProvider>(context);
     final userName = userInfoProvider.fullName ?? "Agency Firm Name";
     final initials = (userInfoProvider.fullName ?? "AF")
@@ -142,11 +145,11 @@ class _DashboardPageState extends State<DashboardPage> {
           const SizedBox(height: 20),
 
           // ==== DASHBOARD OVERVIEW HEADER ====
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Dashboard Overview",
+                lang.t('dashboard_overview'),
                 style: TextStyle(
                   fontSize: 19,
                   fontWeight: FontWeight.bold,
@@ -154,7 +157,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ),
               Chip(
-                label: Text("This Month"),
+                label: Text(lang.t('this_month')),
                 backgroundColor: Colors.white,
               ),
             ],
@@ -171,44 +174,45 @@ class _DashboardPageState extends State<DashboardPage> {
             childAspectRatio: 1.5,
             children: [
               _buildStatCard(
-                "Profile Views",
+                lang.t('profile_views'),
                 "${dashboardStats?['profile_view']?['value'] ?? 0}",
-                "Change: ${dashboardStats?['profile_view']?['change'] ?? 0}%",
+                "${lang.t('change')} ${dashboardStats?['profile_view']?['change'] ?? 0}%",
               ),
               _buildStatCard(
-                "Jobs Count",
+                lang.t('jobs_count'),
                 "${dashboardStats?['jobs_posted_count']?['value'] ?? 0}",
-                "Change: ${dashboardStats?['jobs_posted_count']?['change'] ?? 0}%",
+                "${lang.t('change')} ${dashboardStats?['jobs_posted_count']?['change'] ?? 0}%",
               ),
               _buildStatCard(
-                "Completed profiles male",
+                lang.t('completed_profiles_male'),
                 "${dashboardStats?['male_employees_count']?['value'] ?? 0}",
-                "Change: ${dashboardStats?['male_employees_count']?['change'] ?? 0}%",
+                "${lang.t('change')} ${dashboardStats?['male_employees_count']?['change'] ?? 0}%",
               ),
               _buildStatCard(
-                "Completed profiles female",
+                lang.t('completed_profiles_female'),
                 "${dashboardStats?['female_employees_count']?['value'] ?? 0}",
-                "Change: ${dashboardStats?['female_employees_count']?['change'] ?? 0}%",
+                "${lang.t('change')} ${dashboardStats?['female_employees_count']?['change'] ?? 0}%",
               ),
               _buildStatCard(
-                "Booked Profiles",
+                lang.t('booked_profiles'),
                 "${dashboardStats?['employees_count']?['value'] ?? 0}",
-                "Change: ${dashboardStats?['employees_count']?['change'] ?? 0}%",
+                "${lang.t('change')} ${dashboardStats?['employees_count']?['change'] ?? 0}%",
               ),
-              _buildStatCard("Profile transfers", "0", "Count - 0%"),
-              _buildStatCard("Job count", "0", "Count - 0%"),
               _buildStatCard(
-                "Transfer count",
+                  lang.t('profile_transfers'), "0", "${lang.t('count')} 0%"),
+              _buildStatCard(lang.t('job_count'), "0", "${lang.t('count')} 0%"),
+              _buildStatCard(
+                lang.t('transfer_count'),
                 "${dashboardStats?['transfers_count']?['value'] ?? 0}",
-                "Change: ${dashboardStats?['transfers_count']?['change'] ?? 0}%",
+                "${lang.t('change')} ${dashboardStats?['transfers_count']?['change'] ?? 0}%",
               ),
             ],
           ),
           const SizedBox(height: 20),
 
           // ==== COMPANY REGISTRATION ====
-          const Text(
-            "Company Registration",
+          Text(
+            lang.t("company_registration"),
             style: TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.bold,
@@ -216,8 +220,8 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            "Document Required",
+          Text(
+            lang.t("document_required"),
             style: TextStyle(
               fontSize: 15,
               color: Colors.black,
@@ -228,20 +232,23 @@ class _DashboardPageState extends State<DashboardPage> {
             children: [
               Expanded(
                 child: _buildProgressCard(
-                  "Section 1",
-                  "Company Information Progress",
-                  section1Progress, // <- from API
+                  lang.t("section_1"), // translated Section 1
+                  lang.t(
+                      "company_information_progress"), // translated Company Information Progress
+                  section1Progress, // dynamic value from API
                 ),
               ),
               Expanded(
                 child: _buildProgressCard(
-                  "Section 2",
-                  "Company License Progress",
-                  section2Progress, // <- from API
+                  lang.t("section_2"), // translated Section 2
+                  lang.t(
+                      "company_license_progress"), // translated Company License Progress
+                  section2Progress, // dynamic value from API
                 ),
               ),
             ],
           ),
+
           // ==== GRAY LINE DIVIDER ====
           const Divider(
             color: Colors.grey,
@@ -255,6 +262,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   static Widget _buildStatCard(String title, String value, String subtitle) {
+    
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -295,8 +303,10 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  static Widget _buildProgressCard(
+   Widget _buildProgressCard(
+   
       String section, String title, double progress) {
+          final lang = Provider.of<LanguageProvider>(context, listen: false);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -347,7 +357,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6)),
               ),
-              child: const Text("Continue",
+              child: Text(lang.t("continue"),
                   style: TextStyle(color: Colors.white, fontSize: 15)),
             ),
           ),

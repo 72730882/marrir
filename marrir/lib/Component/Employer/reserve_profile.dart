@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:marrir/services/Employer/reserve_service.dart';
 import 'package:marrir/model/model.dart';
 import 'package:marrir/Dio/dio.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class ReserveProfilePage extends StatefulWidget {
   const ReserveProfilePage({super.key});
@@ -71,21 +73,22 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
 
   Future<void> _reserveSelectedEmployees() async {
     if (_selectedEmployees.isEmpty) {
+      final lang = Provider.of<LanguageProvider>(context, listen: false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select at least one employee')),
+        SnackBar(content: Text(lang.t('select_at_least_one'))),
       );
       return;
     }
 
-    // Extract CV IDs from selected employees
     final cvIds = _selectedEmployees
         .where((employee) => employee.cv?['id'] != null)
         .map((employee) => employee.cv!['id'] as int)
         .toList();
 
     if (cvIds.isEmpty) {
+      final lang = Provider.of<LanguageProvider>(context, listen: false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No valid CV IDs found')),
+        SnackBar(content: Text(lang.t('no_valid_cv'))),
       );
       return;
     }
@@ -100,20 +103,16 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
       _isLoading = false;
     });
 
+    final lang = Provider.of<LanguageProvider>(context, listen: false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(response.message)),
+    );
+
     if (response.success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response.message)),
-      );
-      // Clear selection after successful reservation
       setState(() {
         _selectedEmployees.clear();
       });
-      // Reload the list
       _loadUnreservedEmployees();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response.message)),
-      );
     }
   }
 
@@ -135,6 +134,8 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -142,30 +143,23 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ===== TITLE =====
-            const Text(
-              "Reserve",
-              style: TextStyle(
+            Text(
+              lang.t('reserve'),
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              "You can search for an employee that you want to reserve",
-              style: TextStyle(fontSize: 14, color: Colors.black54),
+            Text(
+              lang.t('reserve_hint'),
+              style: const TextStyle(fontSize: 14, color: Colors.black54),
             ),
             const SizedBox(height: 20),
-
-            // ===== SEARCH BOX CARD =====
             _buildSearchCard(),
             const SizedBox(height: 20),
-
-            // ===== LOADING/ERROR =====
             if (_isLoading) _buildLoadingIndicator(),
             if (_errorMessage.isNotEmpty) _buildErrorMessage(),
-
-            // ===== RESULTS CARD =====
             _buildResultsCard(),
           ],
         ),
@@ -174,6 +168,8 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
   }
 
   Widget _buildSearchCard() {
+    final lang = Provider.of<LanguageProvider>(context);
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -183,23 +179,18 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
-            child: const Text(
-              "Search Employees",
-              style: TextStyle(
+            child: Text(
+              lang.t('search_employees'),
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
             ),
           ),
-
-          // Divider line
           Container(height: 1, color: Colors.grey.shade300),
-
-          // Search bar + filter icon
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: Row(
@@ -208,7 +199,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
-                      hintText: "Search employees...",
+                      hintText: lang.t('search_hint'),
                       hintStyle: TextStyle(color: Colors.grey.withOpacity(0.6)),
                       prefixIcon: Icon(Icons.search,
                           color: Colors.grey.withOpacity(0.6)),
@@ -237,18 +228,13 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
                 ),
                 const SizedBox(width: 8),
                 IconButton(
-                  onPressed: () {
-                    // TODO: Implement filter dialog
-                    _showFilterDialog();
-                  },
+                  onPressed: _showFilterDialog,
                   icon: const Icon(Icons.filter_list),
-                  tooltip: 'Filter',
+                  tooltip: lang.t('filter'),
                 ),
               ],
             ),
           ),
-
-          // Buttons
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
@@ -268,7 +254,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
                           width: 16,
                           height: 16,
                           child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text("Search"),
+                      : Text(lang.t('search')),
                 ),
                 const SizedBox(width: 12),
                 OutlinedButton(
@@ -283,8 +269,8 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6)),
                   ),
-                  child: const Text("Clear",
-                      style: TextStyle(color: Colors.black87)),
+                  child: Text(lang.t('clear'),
+                      style: const TextStyle(color: Colors.black87)),
                 ),
               ],
             ),
@@ -299,6 +285,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
   }
 
   Widget _buildErrorMessage() {
+    final lang = Provider.of<LanguageProvider>(context);
     return Container(
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(bottom: 16),
@@ -317,7 +304,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
           IconButton(
             onPressed: _loadUnreservedEmployees,
             icon: const Icon(Icons.refresh),
-            tooltip: 'Retry',
+            tooltip: lang.t('retry'),
           ),
         ],
       ),
@@ -325,6 +312,8 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
   }
 
   Widget _buildResultsCard() {
+    final lang = Provider.of<LanguageProvider>(context);
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -334,12 +323,12 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
-          // Header Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Results",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(lang.t('results'),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
               Row(
                 children: [
                   OutlinedButton(
@@ -353,8 +342,8 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6)),
                     ),
-                    child:
-                        Text("Reserve Selected (${_selectedEmployees.length})"),
+                    child: Text(
+                        "${lang.t('reserve_selected')} (${_selectedEmployees.length})"),
                   ),
                   const SizedBox(width: 8),
                   OutlinedButton(
@@ -368,7 +357,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6)),
                     ),
-                    child: const Text("Remove All"),
+                    child: Text(lang.t('remove_all')),
                   ),
                 ],
               ),
@@ -377,18 +366,15 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
           const SizedBox(height: 12),
           Container(height: 1, color: Colors.grey.shade300),
           const SizedBox(height: 12),
-
-          // Employee Cards
           if (_employees.isEmpty && !_isLoading)
-            const Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Text("No employees found", textAlign: TextAlign.center),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text(lang.t('no_employees'), textAlign: TextAlign.center),
             )
           else
             Column(
-              children: _employees
-                  .map((employee) => _buildEmployeeCard(employee))
-                  .toList(),
+              children:
+                  _employees.map((employee) => _buildEmployeeCard(employee)).toList(),
             ),
         ],
       ),
@@ -396,9 +382,9 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
   }
 
   Widget _buildEmployeeCard(UnreservedEmployee employee) {
+    final lang = Provider.of<LanguageProvider>(context);
     final isSelected = _selectedEmployees.contains(employee);
-    const isAvailable =
-        true; // You can add availability logic based on your data
+    const isAvailable = true;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -414,45 +400,39 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left side info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  employee.displayName,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 14),
-                ),
+                Text(employee.displayName,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 4),
                 Text(employee.displayOccupation),
                 const SizedBox(height: 4),
-                Text(
-                  employee.experienceInfo,
-                  style: const TextStyle(color: Colors.black54),
-                ),
+                Text(employee.experienceInfo,
+                    style: const TextStyle(color: Colors.black54)),
                 if (employee.nationality != null) ...[
                   const SizedBox(height: 4),
-                  Text("Nationality: ${employee.nationality}",
+                  Text("${lang.t('nationality')}: ${employee.nationality}",
                       style: const TextStyle(fontSize: 12)),
                 ],
               ],
             ),
           ),
-
-          // Right side status and checkbox
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: isAvailable
                       ? Colors.green.shade100
                       : Colors.grey.shade200,
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Text(
-                  isAvailable ? "Available" : "Reserved",
+                child: Text(
+                  isAvailable ? lang.t('available') : lang.t('reserved'),
                   style: TextStyle(
                     color: isAvailable ? Colors.green : Colors.black54,
                     fontSize: 12,
@@ -472,16 +452,16 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
   }
 
   void _showFilterDialog() {
-    // TODO: Implement filter dialog based on ReserveCVFilter model
+    final lang = Provider.of<LanguageProvider>(context, listen: false);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Filter Employees'),
-        content: const Text('Filter functionality to be implemented'),
+        title: Text(lang.t('filter_employees')),
+        content: Text(lang.t('filter_hint')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(lang.t('close')),
           ),
         ],
       ),

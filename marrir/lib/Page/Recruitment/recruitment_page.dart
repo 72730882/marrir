@@ -20,6 +20,7 @@ import '../../Component/Recruitment/transfer_profile.dart';
 import '../../Component/Recruitment/payment.dart';
 import '../../Component/Recruitment/reserve_history.dart';
 import '../../Component/Recruitment/help.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class RecruitmentPage extends StatefulWidget {
   const RecruitmentPage({super.key});
@@ -139,6 +140,52 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
 
   @override
   Widget build(BuildContext context) {
+
+            final lang = Provider.of<LanguageProvider>(context);
+
+            final List<Widget> _pages = const [
+    DashboardPage(),
+    CompanyInfoPage(),
+    REmployeePage(),
+    REmployeeRatingPage(),
+    RecruitmentPromotionPage(),
+    RTransferProfilePage(),
+    ReserveProfilePage(),
+    RTransferHistoryPage(),
+    PaymentPage(),
+    ReserveHistoryPage(),
+    HelpPage(),
+  ];
+
+  final List<String> _menuTitles = [
+     lang.t('dashboard'),
+      lang.t('company_info'),
+      lang.t('recruiter_employee'),
+      lang.t('employee_rating'),
+      lang.t('promotion'),
+      lang.t('transfer'),
+      lang.t('reserve'),
+      lang.t('transfer_profile'),
+      lang.t('payment'),
+      lang.t('reserve_history'),
+      lang.t('help'),
+    ];
+
+  final List<IconData> _menuIcons = [
+    Icons.dashboard,
+    Icons.business,
+    Icons.people,
+    Icons.star_rate,
+    Icons.campaign,
+    Icons.swap_horiz,
+    Icons.book_online,
+    Icons.person_search,
+    Icons.payment,
+    Icons.history,
+    Icons.help_outline,
+  ];
+
+
     return WillPopScope(
       onWillPop: () async {
         final prefs = await SharedPreferences.getInstance();
@@ -171,11 +218,24 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
             ),
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications_none),
-              onPressed: () {},
-            ),
-          ],
+    PopupMenuButton<String>(
+      tooltip: "Select Language",
+      icon: const Icon(Icons.translate, color: Colors.purple),
+      onSelected: (value) {
+        Provider.of<LanguageProvider>(context, listen: false)
+            .changeLanguage(value);
+      },
+      itemBuilder: (BuildContext context) => [
+        const PopupMenuItem(value: "en", child: Text("English")),
+        const PopupMenuItem(value: "ar", child: Text("العربية")),
+        const PopupMenuItem(value: "am", child: Text("አማርኛ")),
+      ],
+    ),
+    IconButton(
+      icon: const Icon(Icons.notifications_none),
+      onPressed: () {},
+    ),
+  ],
         ),
         drawer: Drawer(
           backgroundColor: Colors.white,
@@ -222,8 +282,8 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
                         return ListTile(
                           leading:
                               const Icon(Icons.logout, color: Colors.black54),
-                          title: const Text(
-                            "Logout",
+                          title: Text(
+                            lang.t('logout'),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.normal,
@@ -235,14 +295,14 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: const Text(
-                                    "End Session",
+                                  title: Text(
+                                    lang.t('end_session'),
                                     textAlign: TextAlign.center,
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
-                                  content: const Text(
-                                    "Are you sure you want to log out?",
+                                  content: Text(
+                                    lang.t('logout_confirmation'),
                                     textAlign: TextAlign.center,
                                   ),
                                   actions: [
@@ -262,12 +322,12 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
                                           ),
                                         );
                                       },
-                                      child: const Text("Yes"),
+                                      child: Text(lang.t('yes')),
                                     ),
                                     TextButton(
                                       onPressed: () =>
                                           Navigator.of(context).pop(),
-                                      child: const Text("Cancel"),
+                                      child: Text(lang.t('cancel')),
                                     ),
                                   ],
                                 );

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class HelpPage extends StatefulWidget {
   const HelpPage({super.key});
@@ -8,16 +10,19 @@ class HelpPage extends StatefulWidget {
 }
 
 class _HelpPageState extends State<HelpPage> {
-  final List<Map<String, String>> _faqs = [
-    {"q": "How do I add a new employee?", "a": "Go to Dashboard > Add Employee."},
-    {"q": "How can I promote an employee profile?", "a": "Navigate to Employee Profile > Promotion."},
-    {"q": "What is the difference between reserve and transfer?", "a": "Reserve keeps the slot, transfer reassigns it."},
-    {"q": "How do I track payments?", "a": "Go to Payment section for full history."},
-    {"q": "Can I export employee data?", "a": "Yes, from Settings > Export Data."},
-  ];
+  
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context);
+    final List<Map<String, String>> _faqs = [
+    {"q": lang.t('faq_q1'), "a": lang.t('faq_a1')},
+      {"q": lang.t('faq_q2'), "a": lang.t('faq_a2')},
+      {"q": lang.t('faq_q3'), "a": lang.t('faq_a3')},
+      {"q": lang.t('faq_q4'), "a": lang.t('faq_a4')},
+      {"q": lang.t('faq_q5'), "a": lang.t('faq_a5')},
+  ];
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -25,9 +30,7 @@ class _HelpPageState extends State<HelpPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ===== Wrap everything above bottom info cards in one big card =====
             Container(
-              
               decoration: BoxDecoration(
                 color: const Color(0xFFecf5fb),
                 borderRadius: BorderRadius.circular(5),
@@ -36,18 +39,18 @@ class _HelpPageState extends State<HelpPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Heading
-                  const Text(
-                    "Help Center",
-                    style: TextStyle(
+                  Text(
+                    lang.t('help_center'),
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
                       color: Colors.black,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    "Find answers to your questions and get support",
-                    style: TextStyle(fontSize: 14, color: Colors.black),
+                  Text(
+                    lang.t('help_center_hint'),
+                    style: const TextStyle(fontSize: 14, color: Colors.black),
                   ),
                   const SizedBox(height: 16),
 
@@ -58,22 +61,22 @@ class _HelpPageState extends State<HelpPage> {
                       children: [
                         _supportOption(
                           Icons.help_outline,
-                          "FAQ",
-                          "Find answers to common questions",
+                          lang.t('faq'),
+                          lang.t('faq_hint'),
                           Colors.purple,
                         ),
                         const SizedBox(width: 12),
                         _supportOption(
                           Icons.email_outlined,
-                          "Email",
-                          "Email Support",
+                          lang.t('email'),
+                          lang.t('email_hint'),
                           Colors.pink,
                         ),
                         const SizedBox(width: 12),
                         _supportOption(
                           Icons.phone_outlined,
-                          "Phone",
-                          "Phone Support",
+                          lang.t('phone'),
+                          lang.t('phone_hint'),
                           Colors.deepPurple,
                         ),
                       ],
@@ -81,7 +84,7 @@ class _HelpPageState extends State<HelpPage> {
                   ),
                   const SizedBox(height: 15),
 
-                  // ===== Search Box Section =====
+                  // Search Box Section
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -92,9 +95,10 @@ class _HelpPageState extends State<HelpPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Help Questions",
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                        Text(
+                          lang.t('help_questions'),
+                          style: const TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 12),
                         Container(
@@ -105,21 +109,26 @@ class _HelpPageState extends State<HelpPage> {
                         const SizedBox(height: 12),
                         TextField(
                           decoration: InputDecoration(
-                            hintText: "Search help articles...",
+                            hintText: lang.t('search_help_articles'),
                             hintStyle: const TextStyle(color: Colors.grey),
-                            prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                            contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                            prefixIcon:
+                                const Icon(Icons.search, color: Colors.grey),
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 12),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
+                              borderSide: BorderSide(
+                                  color: Colors.grey.shade300, width: 1),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
+                              borderSide: BorderSide(
+                                  color: Colors.grey.shade300, width: 1),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                              borderSide: BorderSide(
+                                  color: Colors.grey.shade400, width: 1.5),
                             ),
                             filled: true,
                             fillColor: Colors.white,
@@ -130,7 +139,7 @@ class _HelpPageState extends State<HelpPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // ===== FAQ Section as Card with Border =====
+                  // FAQ Section
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -141,9 +150,10 @@ class _HelpPageState extends State<HelpPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Frequently Asked Questions",
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                        Text(
+                          lang.t('frequently_asked_questions'),
+                          style: const TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 8),
                         Container(
@@ -155,8 +165,8 @@ class _HelpPageState extends State<HelpPage> {
                         ...List.generate(_faqs.length, (index) {
                           return _buildFAQItem(
                             index,
-                            _faqs[index]["q"]!,
-                            _faqs[index]["a"]!,
+                            lang.t(_faqs[index]["q"]!),
+                            lang.t(_faqs[index]["a"]!),
                           );
                         }),
                       ],
@@ -164,7 +174,7 @@ class _HelpPageState extends State<HelpPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // ===== Contact Support Section as Card with Border =====
+                  // Contact Support Section
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -175,9 +185,10 @@ class _HelpPageState extends State<HelpPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Still Need Help?",
-                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                        Text(
+                          lang.t('still_need_help'),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 15),
                         ),
                         const SizedBox(height: 12),
                         Container(
@@ -186,15 +197,17 @@ class _HelpPageState extends State<HelpPage> {
                           width: double.infinity,
                         ),
                         const SizedBox(height: 15),
-                        const Text(
-                          "Can’t find what you’re looking for? Our support team is here to help.",
-                          style: TextStyle(fontSize: 13, color: Colors.black54),
+                        Text(
+                          lang.t('contact_support_hint'),
+                          style:
+                              const TextStyle(fontSize: 13, color: Colors.black54),
                         ),
                         const SizedBox(height: 12),
                         ElevatedButton(
                           onPressed: () {},
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromRGBO(142, 198, 214, 1),
+                            backgroundColor:
+                                const Color.fromRGBO(142, 198, 214, 1),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                               vertical: 12,
@@ -204,7 +217,7 @@ class _HelpPageState extends State<HelpPage> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: const Text("Contact Support"),
+                          child: Text(lang.t('contact_support')),
                         ),
                       ],
                     ),
@@ -215,7 +228,7 @@ class _HelpPageState extends State<HelpPage> {
 
             const SizedBox(height: 24),
 
-            // ===== Bottom Info Cards with Equal Height & Centered Content =====
+            // Bottom Info Cards
             IntrinsicHeight(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -223,8 +236,8 @@ class _HelpPageState extends State<HelpPage> {
                   Expanded(
                     child: _infoCard(
                       Icons.menu_book_outlined,
-                      "Documentation",
-                      "Detailed guides and API documentation",
+                      lang.t('documentation'),
+                      lang.t('documentation_hint'),
                       Colors.purple,
                     ),
                   ),
@@ -232,8 +245,8 @@ class _HelpPageState extends State<HelpPage> {
                   Expanded(
                     child: _infoCard(
                       Icons.play_circle_outline,
-                      "Tutorials",
-                      "Step-by-step video tutorials and guides",
+                      lang.t('tutorials'),
+                      lang.t('tutorials_hint'),
                       Colors.pink,
                     ),
                   ),
@@ -241,8 +254,8 @@ class _HelpPageState extends State<HelpPage> {
                   Expanded(
                     child: _infoCard(
                       Icons.people_outline,
-                      "Community",
-                      "Join our community forums for discussions and support",
+                      lang.t('community'),
+                      lang.t('community_hint'),
                       Colors.deepPurple,
                     ),
                   ),
@@ -255,7 +268,8 @@ class _HelpPageState extends State<HelpPage> {
     );
   }
 
-  Widget _supportOption(IconData icon, String title, String subtitle, Color color) {
+  Widget _supportOption(
+      IconData icon, String title, String subtitle, Color color) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(14),
@@ -270,9 +284,13 @@ class _HelpPageState extends State<HelpPage> {
           children: [
             Icon(icon, size: 28, color: color),
             const SizedBox(height: 8),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+            Text(title,
+                style:
+                    const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
             const SizedBox(height: 4),
-            Text(subtitle, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            Text(subtitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 12, color: Colors.black54)),
           ],
         ),
       ),
@@ -289,7 +307,9 @@ class _HelpPageState extends State<HelpPage> {
       ),
       child: ExpansionTile(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Text(question, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+        title: Text(question,
+            style:
+                const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
         iconColor: Colors.black,
         collapsedIconColor: Colors.black,
         onExpansionChanged: (expanded) {
@@ -298,7 +318,8 @@ class _HelpPageState extends State<HelpPage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
-            child: Text(answer, style: const TextStyle(fontSize: 13, color: Colors.black54)),
+            child: Text(answer,
+                style: const TextStyle(fontSize: 13, color: Colors.black54)),
           ),
         ],
       ),
@@ -319,9 +340,13 @@ class _HelpPageState extends State<HelpPage> {
         children: [
           Icon(icon, size: 26, color: color),
           const SizedBox(height: 8),
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+          Text(title,
+              style:
+                  const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
           const SizedBox(height: 4),
-          Text(subtitle, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+          Text(subtitle,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 12, color: Colors.black54)),
         ],
       ),
     );

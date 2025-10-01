@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:marrir/services/Employer/get_reserve.dart';
 import 'package:marrir/model/recerve_model.dart';
 import 'package:marrir/Dio/dio.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
+
 
 class ReserveHistoryPage extends StatefulWidget {
   const ReserveHistoryPage({super.key});
@@ -242,6 +245,7 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context); 
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -251,11 +255,11 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ===== Header =====
-              const Row(
+               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Reserve History",
+                    lang.t('reserve_history'),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -263,7 +267,7 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
                     ),
                   ),
                   Chip(
-                    label: Text("This Month"),
+                    label: Text(lang.t('this_month')),
                     backgroundColor: Colors.white,
                   ),
                 ],
@@ -275,7 +279,7 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
                 children: [
                   Expanded(
                     child: _buildSummaryCard(
-                      title: "Reserves Requested",
+                       title: lang.t('reserves_requested'),
                       value: _reserveHistory.length.toString(),
                       count: _reserveHistory.length.toString(),
                     ),
@@ -283,7 +287,7 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildSummaryCard(
-                      title: "Reserves Requests",
+                      title: lang.t('reserves_requests'),
                       value: _incomingRequests.length.toString(),
                       count: _incomingRequests.length.toString(),
                     ),
@@ -374,11 +378,13 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
   }
 
   Widget _buildIncomingRequestsSection() {
+        final lang = Provider.of<LanguageProvider>(context); 
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Incoming Reserve Requests",
+         Text(
+          lang.t('incoming_reserve_requests'),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -414,19 +420,19 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
                 ),
                 padding:
                     const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("From",
+                    Text(lang.t('from'),
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text("Role",
+                    Text(lang.t('role'),
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text("Created At",
+                    Text(lang.t('created_at'),
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text("Action",
+                    Text(lang.t('action'),
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
                   ],
@@ -445,9 +451,9 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
                       style: const TextStyle(color: Colors.red)),
                 )
               else if (_incomingRequests.isEmpty)
-                const Padding(
+                 Padding(
                   padding: EdgeInsets.all(20),
-                  child: Text("No incoming reserve requests"),
+                  child: Text(lang.t('no_incoming_reserve_requests'),),
                 )
               else
                 ..._incomingRequests
@@ -460,6 +466,7 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
   }
 
   Widget _buildIncomingRequestRow(IncomingReserveRequest request) {
+
     return Column(
       children: [
         Padding(
@@ -488,11 +495,13 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
   }
 
   Widget _buildReserveHistorySection() {
+            final lang = Provider.of<LanguageProvider>(context); 
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Reserve History",
+        Text(
+          lang.t("reserve_history"),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -528,25 +537,25 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
                 ),
                 padding:
                     const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
-                child: const Row(
+                child:  Row(
                   children: [
                     Expanded(
-                        child: Text("Batch No.",
+                        child: Text(lang.t('batch_no'),
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold))),
                     Expanded(
-                        child: Text("Reserved To",
+                        child: Text(lang.t('reserved_to'),
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold))),
                     Expanded(
-                        child: Text("Created At",
+                        child: Text(lang.t('created_at'),
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold))),
                     Expanded(
-                        child: Text("Employees",
+                        child: Text(lang.t('employees'),
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold))),
@@ -566,9 +575,9 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
                       style: const TextStyle(color: Colors.red)),
                 )
               else if (_reserveHistory.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(20),
-                  child: Text("No reserve history found"),
+                  child: Text(lang.t('no_reserve_history_found')),
                 )
               else
                 ..._reserveHistory.map((history) => _buildHistoryRow(history)),

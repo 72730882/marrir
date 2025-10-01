@@ -20,6 +20,7 @@ import '../../Component/Agent/payment.dart';
 import '../../Component/Agent/reserve_history.dart';
 import '../../Component/Agent/help.dart';
 import '../../Component/Agent/employee_rating.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class AgentPage extends StatefulWidget {
   const AgentPage({super.key});
@@ -29,51 +30,12 @@ class AgentPage extends StatefulWidget {
 }
 
 class _AgentPageState extends State<AgentPage> {
+  
   int _selectedIndex = 0;
   String? agentName;
   bool isLoading = true;
 
-  final List<Widget> _pages = const [
-    DashboardPage(),
-    CompanyInfoPage(),
-    AgencyEmployeePage(),
-    EmployeeRatingPage(),
-    AgentPromotionPage(),
-    TransferHistoryPage(),
-    ReserveProfilePage(),
-    TransferProfilePage(),
-    AgentPaymentPage(),
-    ReserveHistoryPage(),
-    HelpPage(),
-  ];
-
-  final List<String> _menuTitles = [
-    "Dashboard",
-    "Company Info",
-    "Agency Employee",
-    "Employee Rating",
-    "Promotion",
-    "Transfer",
-    "Reserve",
-    "Transfer Profile",
-    "Payment",
-    "Reserve History",
-    "Help",
-  ];
-
-  final List<IconData> _menuIcons = [
-    Icons.dashboard,
-    Icons.business,
-    Icons.people,
-    Icons.star_rate,
-    Icons.campaign,
-    Icons.swap_horiz,
-    Icons.book_online,
-    Icons.person_search,
-    Icons.payment,
-    Icons.history,
-    Icons.help_outline,
-  ];
+  
 
   @override
   void initState() {
@@ -121,6 +83,7 @@ class _AgentPageState extends State<AgentPage> {
   }
 
   Widget _buildDrawerHeader() {
+    final lang = Provider.of<LanguageProvider>(context);
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -155,6 +118,49 @@ class _AgentPageState extends State<AgentPage> {
 
   @override
   Widget build(BuildContext context) {
+        final lang = Provider.of<LanguageProvider>(context);
+
+        final List<Widget> _pages = const [
+      DashboardPage(),
+      CompanyInfoPage(),
+      AgencyEmployeePage(),
+      EmployeeRatingPage(),
+      AgentPromotionPage(),
+      TransferHistoryPage(),
+      ReserveProfilePage(),
+      TransferProfilePage(),
+      AgentPaymentPage(),
+      ReserveHistoryPage(),
+      HelpPage(),
+    ];
+
+    final List<String> _menuTitles = [
+      lang.t('dashboard'),
+      lang.t('company_info'),
+      lang.t('agency_employee'),
+      lang.t('employee_rating'),
+      lang.t('promotion'),
+      lang.t('transfer'),
+      lang.t('reserve'),
+      lang.t('transfer_profile'),
+      lang.t('payment'),
+      lang.t('reserve_history'),
+      lang.t('help'),
+    ];
+
+    final List<IconData> _menuIcons = [
+      Icons.dashboard,
+      Icons.business,
+      Icons.people,
+      Icons.star_rate,
+      Icons.campaign,
+      Icons.swap_horiz,
+      Icons.book_online,
+      Icons.person_search,
+      Icons.payment,
+      Icons.history,
+      Icons.help_outline,
+    ];
     return WillPopScope(
       onWillPop: () async {
         // Back button closes app if logged in
@@ -179,20 +185,34 @@ class _AgentPageState extends State<AgentPage> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          leading: Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            ),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications_none),
-              onPressed: () {},
-            ),
-          ],
-        ),
+  backgroundColor: Colors.white,
+  leading: Builder(
+    builder: (context) => IconButton(
+      icon: const Icon(Icons.menu),
+      onPressed: () => Scaffold.of(context).openDrawer(),
+    ),
+  ),
+  actions: [
+    PopupMenuButton<String>(
+      tooltip: "Select Language",
+      icon: const Icon(Icons.translate, color: Colors.purple),
+      onSelected: (value) {
+        Provider.of<LanguageProvider>(context, listen: false)
+            .changeLanguage(value);
+      },
+      itemBuilder: (BuildContext context) => [
+        const PopupMenuItem(value: "en", child: Text("English")),
+        const PopupMenuItem(value: "ar", child: Text("العربية")),
+        const PopupMenuItem(value: "am", child: Text("አማርኛ")),
+      ],
+    ),
+    IconButton(
+      icon: const Icon(Icons.notifications_none),
+      onPressed: () {},
+    ),
+  ],
+),
+
         drawer: Drawer(
           backgroundColor: Colors.white,
           child: SafeArea(
@@ -238,8 +258,7 @@ class _AgentPageState extends State<AgentPage> {
                         return ListTile(
                           leading:
                               const Icon(Icons.logout, color: Colors.black54),
-                          title: const Text(
-                            "Logout",
+                         title: Text(lang.t('logout'),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.normal,
@@ -251,15 +270,15 @@ class _AgentPageState extends State<AgentPage> {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: const Text(
-                                    "End Session",
+                                  title: Text(
+                                    lang.t('end_session'),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  content: const Text(
-                                    "Are you sure you want to log out?",
+                                  content:  Text(
+                                     lang.t('logout_confirmation'),
                                     textAlign: TextAlign.center,
                                   ),
                                   actions: [
@@ -279,12 +298,12 @@ class _AgentPageState extends State<AgentPage> {
                                           ),
                                         );
                                       },
-                                      child: const Text("Yes"),
+                                       child: Text(lang.t('yes')),
                                     ),
                                     TextButton(
                                       onPressed: () =>
                                           Navigator.of(context).pop(),
-                                      child: const Text("Cancel"),
+                                       child: Text(lang.t('cancel')),
                                     ),
                                   ],
                                 );

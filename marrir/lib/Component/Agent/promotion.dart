@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:marrir/services/Employee/dashboard_service.dart';
 import 'package:marrir/services/Employer/payment_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
 
 class AgentPromotionPage extends StatefulWidget {
   const AgentPromotionPage({super.key});
@@ -345,6 +347,7 @@ class _AgentPromotionPageState extends State<AgentPromotionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -354,8 +357,8 @@ class _AgentPromotionPageState extends State<AgentPromotionPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 24),
-              const Text(
-                "Promotions",
+               Text(
+                lang.t("promotions"),
                 style: TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
@@ -363,8 +366,8 @@ class _AgentPromotionPageState extends State<AgentPromotionPage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 1),
-              const Text(
-                "Choose the plan that's right for you",
+              Text(
+                 lang.t("choose_plan"),
                 style: TextStyle(
                   fontSize: 15,
                   color: Color.fromARGB(255, 94, 91, 91),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/services/Employer/transfer_service.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
 
 class TransferHistoryPage extends StatefulWidget {
   const TransferHistoryPage({super.key});
@@ -301,6 +303,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
+     final lang = Provider.of<LanguageProvider>(context); 
     final requestedCount = _transferStats['requested']?.toString() ?? '0';
     final receivedCount = _transferStats['received']?.toString() ?? '0';
 
@@ -346,11 +349,11 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                     ],
                   ),
                 if (!_isLoading && _errorMessage.isEmpty) ...[
-                  const Row(
+                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Transfers",
+                       lang.t("transfers"),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -358,7 +361,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                         ),
                       ),
                       Chip(
-                        label: Text("This Month"),
+                        label: Text(lang.t("this_month"),),
                         backgroundColor: Colors.white,
                       ),
                     ],
@@ -368,7 +371,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                     children: [
                       Expanded(
                         child: _buildSummaryCard(
-                          title: "Transfer Requested",
+                          title: lang.t("transfer_requested"),
                           value: requestedCount,
                           count: _processTransfers.length.toString(),
                         ),
@@ -376,7 +379,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildSummaryCard(
-                          title: "Transfers Received",
+                          title: lang.t("transfers_received"),
                           value: receivedCount,
                           count: _incomingTransfers.length.toString(),
                         ),
@@ -384,8 +387,8 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                     ],
                   ),
                   const SizedBox(height: 40),
-                  const Text(
-                    "Incoming Transfer Requests",
+                   Text(
+                    lang.t("incoming_transfer_requests"),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -396,9 +399,9 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                   _buildShowRowsDropdown(),
                   const SizedBox(height: 20),
                   if (_incomingTransfers.isEmpty)
-                    const Center(
+                    Center(
                       child: Text(
-                        "No incoming transfer requests",
+                         lang.t("no_incoming_transfer_requests"),
                         style: TextStyle(color: Colors.grey, fontSize: 16),
                       ),
                     )
@@ -422,18 +425,18 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                             ),
                             padding: const EdgeInsets.symmetric(
                                 vertical: 15, horizontal: 16),
-                            child: const Row(
+                            child:  Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "From",
+                                 lang.t("from"),
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 Text(
-                                  "Created At",
+                                  lang.t("created_at"),
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -447,15 +450,15 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                               .map((transfer) {
                             final requesterName = _getRequesterName(transfer);
                             final createdAt =
-                                _formatDate(_getField(transfer, 'created_at'));
+                                _formatDate(_getField(transfer, lang.t("created_at"),));
                             return _buildTableRow(requesterName, createdAt);
                           }),
                         ],
                       ),
                     ),
                   const SizedBox(height: 40),
-                  const Text(
-                    "Process Transfer Request",
+                   Text(
+                    lang.t("process_transfer_request"),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -466,9 +469,9 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                   _buildShowRowsDropdown(),
                   const SizedBox(height: 20),
                   if (_processTransfers.isEmpty)
-                    const Center(
+                    Center(
                       child: Text(
-                        "No process transfer requests",
+                         lang.t("no_process_transfer_requests"),
                         style: TextStyle(color: Colors.grey, fontSize: 16),
                       ),
                     )
@@ -492,12 +495,12 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                             ),
                             padding: const EdgeInsets.symmetric(
                                 vertical: 15, horizontal: 16),
-                            child: const Row(
+                            child:  Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
                                   child: Text(
-                                    "Batch No.",
+                                    lang.t("batch_no"),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -506,7 +509,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    "Transfer To",
+                                    lang.t("transfer_to"),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -515,7 +518,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    "Created At",
+                                    lang.t("created_at"),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,

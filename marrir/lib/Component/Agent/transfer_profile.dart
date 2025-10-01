@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/services/Employer/transfer_service.dart';
-
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
 class TransferProfilePage extends StatefulWidget {
   const TransferProfilePage({super.key});
 
@@ -182,6 +183,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
   }
 
   Widget _buildTransferCard({
+    
     required String title,
     required String subtitle,
     required List<dynamic> users,
@@ -189,6 +191,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
     required VoidCallback onTransfer,
   }) {
     final filteredUsers = _getFilteredUsers(users, searchController);
+         final lang = Provider.of<LanguageProvider>(context); 
 
     return Container(
       decoration: BoxDecoration(
@@ -240,7 +243,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Matching Results:",
+               Text(lang.t('matching_results'),
                     style:
                         TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
@@ -257,7 +260,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                   );
                 }),
                 if (filteredUsers.isEmpty)
-                  const Text("No matching results found",
+                  Text(lang.t('no_results'),
                       style: TextStyle(color: Colors.grey, fontSize: 12)),
               ],
             ),
@@ -273,7 +276,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6)),
             ),
-            child: const Text("Transfer Selected Employees"),
+            child: Text(lang.t('transfer_selected')),
           ),
         ],
       ),
@@ -282,6 +285,8 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+             final lang = Provider.of<LanguageProvider>(context); 
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -290,11 +295,11 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Transfer",
+               Text(lang.t('transfer'),
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
-              const Text(
-                "You can search for an employee that you want to transfer",
+             Text(
+                lang.t('transfer_hint'),
                 style: TextStyle(fontSize: 14, color: Colors.black),
               ),
               const SizedBox(height: 20),
@@ -315,9 +320,8 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
               else ...[
                 // Approved agreement
                 _buildTransferCard(
-                  title: "Transfer to Approved Agreement User",
-                  subtitle:
-                      "These users have a pre-approved agreement with you. Transfers are free",
+                  title: lang.t('approved_title'),
+                  subtitle: lang.t('approved_subtitle'),
                   users: _relatedUsers,
                   searchController: _approvedSearchController,
                   onTransfer: () {
@@ -349,9 +353,8 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
 
                 // Non-agreement
                 _buildTransferCard(
-                  title: "Transfer to Non-Agreement User",
-                  subtitle:
-                      "These users do not have a pre-approved agreement with you. Transfer fee is required",
+                 title: lang.t('non_approved_title'),
+                  subtitle: lang.t('non_approved_subtitle'),
                   users: _unrelatedUsers,
                   searchController: _nonApprovedSearchController,
                   onTransfer: () {
@@ -391,10 +394,10 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                   padding: const EdgeInsets.all(12),
                   child: Column(
                     children: [
-                      const Row(
+                       Row(
                         children: [
                           Text(
-                            "Search Employees",
+                            lang.t('search_employees'),
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
@@ -417,7 +420,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                                   borderRadius: BorderRadius.circular(6)),
                             ),
                             child: Text(
-                              "Show Selected (${_selectedEmployees.length})",
+                              "${lang.t('show_selected')}  (${_selectedEmployees.length})",
                               style: TextStyle(
                                 color: _selectedEmployees.isNotEmpty
                                     ? Colors.black87
@@ -443,7 +446,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                                   borderRadius: BorderRadius.circular(6)),
                             ),
                             child: Text(
-                              "Remove All",
+                             lang.t('remove_all'),
                               style: TextStyle(
                                 color: _selectedEmployees.isNotEmpty
                                     ? Colors.black87
@@ -459,7 +462,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                       TextField(
                         controller: _employeeSearchController,
                         decoration: InputDecoration(
-                          hintText: "Search employees by name or job title...",
+                          hintText: lang.t('search_hint2'),
                           prefixIcon: const Icon(Icons.search),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8)),
@@ -468,10 +471,10 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                       const SizedBox(height: 12),
                       if (_filteredEmployees.isEmpty &&
                           _employeeSearchController.text.isNotEmpty)
-                        const Padding(
+                         Padding(
                           padding: EdgeInsets.all(16.0),
                           child: Text(
-                            "No employees found matching your search",
+                           lang.t('no_employees_found'),
                             textAlign: TextAlign.center,
                             style: TextStyle(color: Colors.grey),
                           ),
@@ -516,8 +519,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                                         const SizedBox(height: 4),
                                         Text(employee['job_title'] ?? ''),
                                         const SizedBox(height: 4),
-                                        Text(
-                                          "Agreement: ${hasAgreement ? 'Approved' : 'Non-Agreement'}",
+                                        Text("${lang.t('agreement')}: ${hasAgreement ? lang.t('approved') : lang.t('non_agreement')}",
                                           style: const TextStyle(
                                               color: Colors.black54),
                                         ),
@@ -534,8 +536,8 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                                           borderRadius:
                                               BorderRadius.circular(6),
                                         ),
-                                        child: const Text(
-                                          "Available",
+                                        child: Text(
+                                         lang.t('available'),
                                           style: TextStyle(
                                             color: Color.fromARGB(
                                                 255, 40, 118, 42),

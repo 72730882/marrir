@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:marrir/services/Employee/dashboard_service.dart';
 import 'package:marrir/services/Employer/payment_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
 class RecruitmentPromotionPage extends StatefulWidget {
   const RecruitmentPromotionPage({super.key});
 
@@ -140,6 +141,8 @@ class _RecruitmentPromotionPageState extends State<RecruitmentPromotionPage> {
 
   @override
   Widget build(BuildContext context) {
+            final lang = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -149,10 +152,10 @@ class _RecruitmentPromotionPageState extends State<RecruitmentPromotionPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 24),
-              const Text("Promotions",
+               Text(lang.t("promotions"),
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              const Text("Choose the plan that's right for you",
+              Text(lang.t("choose_plan"),
                   style: TextStyle(fontSize: 15, color: Colors.grey)),
               const SizedBox(height: 32),
               if (_isLoading) const Center(child: CircularProgressIndicator()),

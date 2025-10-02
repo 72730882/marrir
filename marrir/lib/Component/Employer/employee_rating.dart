@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/services/Employer/employee_rating.dart';
-
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
 class EmployeeRatingPage extends StatefulWidget {
   const EmployeeRatingPage({super.key});
 
@@ -72,6 +73,8 @@ class _EmployeeRatingPageState extends State<EmployeeRatingPage> {
 
   @override
   Widget build(BuildContext context) {
+        final lang = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -81,9 +84,9 @@ class _EmployeeRatingPageState extends State<EmployeeRatingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ===== Page Title =====
-              const Center(
+             Center(
                 child: Text(
-                  "Employee Ratings",
+                  lang.t("employee_ratings"),
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -162,12 +165,12 @@ class _EmployeeRatingPageState extends State<EmployeeRatingPage> {
                               topRight: Radius.circular(12),
                             ),
                           ),
-                          child: const Row(
+                          child:  Row(
                             children: [
                               Expanded(
                                 flex: 2,
                                 child: Text(
-                                  "Employee Name",
+                                  lang.t("reserve_name"),
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -176,7 +179,7 @@ class _EmployeeRatingPageState extends State<EmployeeRatingPage> {
                               ),
                               Expanded(
                                 child: Text(
-                                  "Rating",
+                                   lang.t("cv_rating"),
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,

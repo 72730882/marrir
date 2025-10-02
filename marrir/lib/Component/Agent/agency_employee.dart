@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/api_service.dart';
 import '../auth/login_screen.dart';
 import './EditCv.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
 
 class AgencyEmployeePage extends StatefulWidget {
   const AgencyEmployeePage({super.key});
@@ -77,6 +79,7 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -86,18 +89,21 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ===== Employee Summary Card =====
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Employee",
+                    lang.t('employee'),
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87),
                   ),
                   Chip(
-                      label: Text("This Month"), backgroundColor: Colors.white),
+                      label: Text(
+                        lang.t('this_month'),
+                      ),
+                      backgroundColor: Colors.white),
                 ],
               ),
               const SizedBox(height: 17),
@@ -123,7 +129,7 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Total Employees",
+                      Text(lang.t("total_employees"),
                           style: TextStyle(fontSize: 14, color: Colors.black)),
                       const SizedBox(height: 8),
                       Text("${employees.length}",
@@ -140,7 +146,7 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Employees",
+                  Text(lang.t("employees"),
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   ElevatedButton(
@@ -151,7 +157,7 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text("+ Add Employee"),
+                    child: Text(lang.t("add_employee_button")),
                   ),
                 ],
               ),
@@ -163,7 +169,7 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
                   Expanded(
                     child: TextField(
                       decoration: InputDecoration(
-                        hintText: "Search employees...",
+                        hintText: lang.t("search_employees"),
                         hintStyle: TextStyle(color: Colors.grey.shade500),
                         prefixIcon: const Icon(Icons.search),
                         filled: true,
@@ -201,7 +207,7 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
               ),
               const SizedBox(height: 12),
 
-// ===== Employee Table Rows =====
+         // ===== Employee Table Rows =====
               Flexible(
                 child: isLoading
                     ? const Center(child: CircularProgressIndicator())
@@ -228,46 +234,46 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
-                                        child: const Row(
+                                        child: Row(
                                           children: [
                                             SizedBox(
                                                 width: 150,
-                                                child: Text("Name",
+                                                child: Text(lang.t("name"),
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors.white))),
                                             SizedBox(
                                                 width: 150,
-                                                child: Text("Email",
+                                                child: Text(lang.t("email"),
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors.white))),
                                             SizedBox(
                                                 width: 120,
-                                                child: Text("Phone",
+                                                child: Text(lang.t("phone"),
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors.white))),
                                             SizedBox(
                                                 width: 120,
-                                                child: Text("Country",
+                                                child: Text(lang.t("country"),
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors.white))),
                                             SizedBox(
                                                 width: 120,
-                                                child: Text("Status",
+                                                child: Text(lang.t("status"),
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors.white))),
                                             SizedBox(
                                                 width: 150,
-                                                child: Text("Actions",
+                                                child: Text(lang.t("actions"),
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
@@ -316,7 +322,7 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
                                                         ),
                                                       );
                                                     },
-                                                    child: const Text("Edit CV",
+                                                    child: Text(lang.t("edit_cv"),
                                                         style: TextStyle(
                                                             fontSize: 12)),
                                                   ),
@@ -324,7 +330,7 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
                                                   PopupMenuButton<String>(
                                                     onSelected: (value) {},
                                                     itemBuilder: (context) =>
-                                                        const [
+                                                         [
                                                       PopupMenuItem(
                                                           value: 'view',
                                                           child: Text(

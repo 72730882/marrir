@@ -6,6 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/api_service.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
+import 'package:provider/provider.dart';
 
 class CompanyInfoPage extends StatefulWidget {
   const CompanyInfoPage({super.key});
@@ -164,6 +166,8 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -187,14 +191,14 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                   ),
                 ],
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Company Information',
+                        lang.t('company_information'),
                         style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -202,7 +206,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        'You can add company information below',
+                        lang.t('add_company_info_desc'),
                         style: TextStyle(fontSize: 15, color: Colors.black54),
                       ),
                     ],
@@ -214,13 +218,22 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
 
             // ==== FORM FIELDS ====
             _buildTextField(
-                'Company Name', companyNameController, 'Enter company name'),
+              lang.t('company_name1'), // label
+              companyNameController,
+              lang.t('enter_company_name'), // placeholder
+            ),
             const SizedBox(height: 12),
-            _buildTextField('Alternative Email', emailController,
-                'Enter Alternative Email'),
+            _buildTextField(
+              lang.t('alternative_email'),
+              emailController,
+              lang.t('enter_alternative_email'),
+            ),
             const SizedBox(height: 12),
-            _buildTextField('Alternative Phone Number', phoneController,
-                'Enter Alternative Phone number'),
+            _buildTextField(
+              lang.t('alternative_phone_number'),
+              phoneController,
+              lang.t('enter_alternative_phone_number'),
+            ),
             const SizedBox(height: 12),
 
             Row(
@@ -229,8 +242,10 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Year of Establishment',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        lang.t('year_of_establishment'),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       const SizedBox(height: 25),
                       DropdownButtonFormField<String>(
                         value: year,
@@ -246,23 +261,39 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _buildTextField('EIN or TIN Number of company',
-                      tinController, '123456789'),
+                  child: _buildTextField(
+                    lang.t('ein_or_tin_number_of_company'), // label
+                    tinController,
+                    lang.t('enter_ein_or_tin'), // placeholder
+                  ),
                 ),
               ],
             ),
+
             const SizedBox(height: 12),
-            _buildTextField('Location', locationController, 'A.A'),
+            _buildTextField(
+              lang.t('location'), // Label
+              locationController,
+              lang.t('enter_location'), // Placeholder
+            ),
 
             const SizedBox(height: 18),
-            // ==== UPLOAD LICENSE ====
-            _buildUploadContainer('Upload Company License',
-                'Tap to upload license', true, licenseFile),
+// ==== UPLOAD LICENSE ====
+            _buildUploadContainer(
+              lang.t('upload_company_license'), // Title
+              lang.t('tap_to_upload_license'), // Subtitle
+              true,
+              licenseFile,
+            ),
 
             const SizedBox(height: 16),
-            // ==== UPLOAD LOGO ====
+// ==== UPLOAD LOGO ====
             _buildUploadContainer(
-                'Upload Company Logo', 'Tap to upload logo', false, logoFile),
+              lang.t('upload_company_logo'), // Title
+              lang.t('tap_to_upload_logo'), // Subtitle
+              false,
+              logoFile,
+            ),
 
             const SizedBox(height: 20),
             Center(
@@ -279,7 +310,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 12),
                   ),
-                  child: const Text('Submit',
+                  child: Text(lang.t('submit'),
                       style: TextStyle(color: Colors.white)),
                 ),
               ),
@@ -296,8 +327,8 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Agreement Table',
+                Text(
+                  lang.t('agreement_table'),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -312,8 +343,8 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Add Agreement',
+                  child: Text(
+                    lang.t('add_agreement'),
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -384,6 +415,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
 
   Widget _buildUploadContainer(
       String title, String hint, bool isLicense, File? file) {
+    final lang = Provider.of<LanguageProvider>(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -416,7 +448,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('Upload',
+                  child: Text(lang.t('upload'),
                       style: TextStyle(color: Colors.black)),
                 ),
               ],
@@ -428,6 +460,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
   }
 
   Widget _buildAgreementTable() {
+    final lang = Provider.of<LanguageProvider>(context);
     return Container(
       margin: const EdgeInsets.only(top: 12),
       decoration: BoxDecoration(
@@ -450,12 +483,12 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
               color: Color(0xFF65b2c9),
               borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Expanded(
                   child: Center(
                     child: Text(
-                      'Reserve Name',
+                      lang.t('reserve_name'),
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -467,7 +500,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                 Expanded(
                   child: Center(
                     child: Text(
-                      'Status',
+                      lang.t('status'),
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

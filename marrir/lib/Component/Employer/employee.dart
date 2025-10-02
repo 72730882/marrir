@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:marrir/services/Employer/employee_create.service.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
 
 class EmployeePage extends StatefulWidget {
   const EmployeePage({super.key});
@@ -415,6 +417,8 @@ class _EmployeePageState extends State<EmployeePage> {
 
   @override
   Widget build(BuildContext context) {
+        final lang = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -424,11 +428,11 @@ class _EmployeePageState extends State<EmployeePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ===== Employee Summary Card =====
-              const Row(
+               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Employee",
+                    lang.t('employee'),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -436,7 +440,7 @@ class _EmployeePageState extends State<EmployeePage> {
                     ),
                   ),
                   Chip(
-                    label: Text("This Month"),
+                    label: Text(lang.t('this_month'),),
                     backgroundColor: Colors.white,
                   ),
                 ],
@@ -464,8 +468,8 @@ class _EmployeePageState extends State<EmployeePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Total Employees",
+                       Text(
+                       lang.t("total_employees"),
                         style: TextStyle(fontSize: 14, color: Colors.black),
                       ),
                       const SizedBox(height: 8),
@@ -494,8 +498,8 @@ class _EmployeePageState extends State<EmployeePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Employees",
+                   Text(
+                   lang.t("employees"),
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   ElevatedButton(
@@ -507,7 +511,7 @@ class _EmployeePageState extends State<EmployeePage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text("+ Add Employee"),
+                    child: Text(lang.t("add_employee_button")),
                   ),
                 ],
               ),
@@ -520,8 +524,7 @@ class _EmployeePageState extends State<EmployeePage> {
                     child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                        hintText:
-                            "Search by name, email, phone, or passport...",
+                        hintText: lang.t("search_employees"),
                         hintStyle: TextStyle(color: Colors.grey.shade500),
                         prefixIcon: const Icon(Icons.search),
                         filled: true,

@@ -21,6 +21,8 @@ import '../../Component/Employer/reserve_history.dart';
 import '../../Component/Employer/help.dart';
 import '../../Component/Employer/employee_rating.dart';
 import '../../Component/Employer/jobs.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
+
 
 class EmployerPage extends StatefulWidget {
   const EmployerPage({super.key});
@@ -34,51 +36,7 @@ class _EmployerPageState extends State<EmployerPage> {
   String? employerName;
   bool isLoading = true;
 
-  final List<Widget> _pages = const [
-    DashboardPage(),
-    CompanyInfoPage(),
-    EmployeePage(),
-    EmployeeRatingPage(),
-    PromotionPage(),
-    TransferHistoryPage(),
-    TransferProfilePage(),
-    ReserveHistoryPage(),
-    JobsPage(),
-    PaymentPage(),
-    ReserveProfilePage(),
-    HelpPage(),
-  ];
-
-  final List<String> _menuTitles = [
-    "Dashboard",
-    "Company Info",
-    "Employees",
-    "Rating",
-    "Promote",
-    "Transfer History",
-    "Transfer Profile",
-    "Reserve History",
-    "Jobs",
-    "Payment",
-    "Reserve Profile",
-    "Help",
-  ];
-
-  final List<IconData> _menuIcons = [
-    Icons.dashboard,
-    Icons.business,
-    Icons.people,
-    Icons.star_rate,
-    Icons.trending_up,
-    Icons.swap_horiz,
-    Icons.history,
-    Icons.import_contacts,
-    Icons.work,
-    Icons.payment,
-    Icons.bookmark,
-    Icons.help_outline,
-  ];
-
+  
   @override
   void initState() {
     super.initState();
@@ -143,6 +101,53 @@ class _EmployerPageState extends State<EmployerPage> {
 
   @override
   Widget build(BuildContext context) {
+            final lang = Provider.of<LanguageProvider>(context);
+
+              final List<Widget> _pages = const [
+      DashboardPage(),
+      CompanyInfoPage(),
+      EmployeePage(),
+      EmployeeRatingPage(),
+      PromotionPage(),
+      TransferHistoryPage(),
+      TransferProfilePage(),
+      ReserveHistoryPage(),
+      JobsPage(),
+      PaymentPage(),
+      ReserveProfilePage(),
+      HelpPage(),
+    ];
+
+    final List<String> _menuTitles = [
+      lang.t('dashboard'),
+      lang.t('company_info'),
+      lang.t('employees'),
+      lang.t('employee_rating'),
+      lang.t('promotion'),
+      lang.t('transfer_history'),
+      lang.t('transfer_profile'),
+      lang.t('reserve_history'),
+      lang.t('jobs'),
+      lang.t('payment'),
+      lang.t('reserve_profile'),
+      lang.t('help'),
+    ];
+
+    final List<IconData> _menuIcons = [
+      Icons.dashboard,
+      Icons.business,
+      Icons.people,
+      Icons.star_rate,
+      Icons.trending_up,
+      Icons.swap_horiz,
+      Icons.history,
+      Icons.import_contacts,
+      Icons.work,
+      Icons.payment,
+      Icons.bookmark,
+      Icons.help_outline,
+    ];
+
     return WillPopScope(
       onWillPop: () async {
         final prefs = await SharedPreferences.getInstance();
@@ -175,11 +180,24 @@ class _EmployerPageState extends State<EmployerPage> {
             ),
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications_none),
-              onPressed: () {},
-            ),
-          ],
+    PopupMenuButton<String>(
+      tooltip: "Select Language",
+      icon: const Icon(Icons.translate, color: Colors.purple),
+      onSelected: (value) {
+        Provider.of<LanguageProvider>(context, listen: false)
+            .changeLanguage(value);
+      },
+      itemBuilder: (BuildContext context) => [
+        const PopupMenuItem(value: "en", child: Text("English")),
+        const PopupMenuItem(value: "ar", child: Text("العربية")),
+        const PopupMenuItem(value: "am", child: Text("አማርኛ")),
+      ],
+    ),
+    IconButton(
+      icon: const Icon(Icons.notifications_none),
+      onPressed: () {},
+    ),
+  ],
         ),
         drawer: Drawer(
           backgroundColor: Colors.white,
@@ -225,8 +243,8 @@ class _EmployerPageState extends State<EmployerPage> {
                       } else {
                         return ListTile(
                           leading: const Icon(Icons.logout, color: Colors.black54),
-                          title: const Text(
-                            "Logout",
+                          title:  Text(
+                           lang.t('logout'),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.normal,
@@ -238,13 +256,13 @@ class _EmployerPageState extends State<EmployerPage> {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: const Text(
-                                    "End Session",
+                                  title:  Text(
+                                    lang.t('end_session'),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(fontWeight: FontWeight.bold),
                                   ),
-                                  content: const Text(
-                                    "Are you sure you want to log out?",
+                                  content:  Text(
+                                    lang.t('logout_confirmation'),
                                     textAlign: TextAlign.center,
                                   ),
                                   actions: [
@@ -261,11 +279,11 @@ class _EmployerPageState extends State<EmployerPage> {
                                           ),
                                         );
                                       },
-                                      child: const Text("Yes"),
+                                      child: Text(lang.t('yes')),
                                     ),
                                     TextButton(
                                       onPressed: () => Navigator.of(context).pop(),
-                                      child: const Text("Cancel"),
+                                     child: Text(lang.t('cancel')),
                                     ),
                                   ],
                                 );

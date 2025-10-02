@@ -192,10 +192,10 @@ class AboutScreen extends StatelessWidget {
               const SizedBox(height: 1),
 
               // Email
-              const Text(
-                "EJITIAZ PORTAL LLC",
+              Text(
+                lang.t('office_name'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
                   color: Color(0xFF65b2c9),
                 ),
@@ -204,9 +204,9 @@ class AboutScreen extends StatelessWidget {
               const SizedBox(height: 15),
 
               // Address
-              const Text(
-                "Concord Tower - 9th floor - AI Sufah\n - Dubai Media City - Dubai",
-                style: TextStyle(
+              Text(
+                lang.t('office_address'),
+                style: const TextStyle(
                   fontSize: 13,
                 ),
                 textAlign: TextAlign.center,
@@ -220,37 +220,27 @@ class AboutScreen extends StatelessWidget {
                   IconButton(
                     icon: const FaIcon(FontAwesomeIcons.linkedin,
                         color: Colors.blue),
-                    onPressed: () {
-                      // TODO: Add LinkedIn link
-                    },
+                    onPressed: () {},
                   ),
                   IconButton(
                     icon: const FaIcon(FontAwesomeIcons.facebook,
                         color: Colors.blueAccent),
-                    onPressed: () {
-                      // TODO: Add Facebook link
-                    },
+                    onPressed: () {},
                   ),
                   IconButton(
                     icon: const FaIcon(FontAwesomeIcons.twitter,
                         color: Colors.lightBlue),
-                    onPressed: () {
-                      // TODO: Add Twitter link
-                    },
+                    onPressed: () {},
                   ),
                   IconButton(
                     icon: const FaIcon(FontAwesomeIcons.instagram,
                         color: Colors.purple),
-                    onPressed: () {
-                      // TODO: Add Instagram link
-                    },
+                    onPressed: () {},
                   ),
                   IconButton(
                     icon: const FaIcon(FontAwesomeIcons.whatsapp,
                         color: Colors.green),
-                    onPressed: () {
-                      // TODO: Add WhatsApp link
-                    },
+                    onPressed: () {},
                   ),
                 ],
               ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:marrir/services/Employer/payment_service.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
 
 class AgentPaymentPage extends StatefulWidget {
   const AgentPaymentPage({super.key});
@@ -116,6 +118,8 @@ class _AgentPaymentPageState extends State<AgentPaymentPage> {
 
   @override
   Widget build(BuildContext context) {
+final lang = Provider.of<LanguageProvider>(context); 
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -145,8 +149,8 @@ class _AgentPaymentPageState extends State<AgentPaymentPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Total Payments",
+                       Text(
+                        lang.t('total_payments'),
                         style: TextStyle(fontSize: 14, color: Colors.black),
                       ),
                       const SizedBox(height: 8),

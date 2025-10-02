@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/services/Employer/transfer_service.dart';
-
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
 class TransferProfilePage extends StatefulWidget {
   const TransferProfilePage({super.key});
 
@@ -157,6 +158,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context); 
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -165,13 +167,13 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Transfer",
+               Text(
+                lang.t('transfer'),
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              const Text(
-                "You can search for an employee that you want to transfer",
+              Text(
+                lang.t('transfer_hint'),
                 style: TextStyle(fontSize: 14, color: Colors.black),
               ),
               const SizedBox(height: 20),

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'login_screen.dart';
 import 'package:country_picker/country_picker.dart';
 import '../../services/user.dart'; // <-- make sure you created this file
-
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
+  
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -17,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? selectedAccountType;
 
   // ===== Controllers =====
+  
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -25,15 +28,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
-  final Map<String, String> accountTypeLabels = {
-
-  "agent": "Foreign Employment Agent",
-  "recruitment": "Recruitment Firm",
-  "sponsor": "Employer",
-  "employee": "Employee",
-  
-};
-
+ 
 List<String> get accountTypeOptions {
   return isCompany
       ? ["agent", "recruitment", "sponsor"]
@@ -44,6 +39,18 @@ List<String> get accountTypeOptions {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context);
+
+     final Map<String, String> accountTypeLabels = {
+
+   "agent": lang.t('agency'),
+  "recruitment": lang.t('rec_firm'),
+  "sponsor": lang.t('employer'),
+  "employee": lang.t('employee'),
+  
+};
+
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -80,8 +87,8 @@ List<String> get accountTypeOptions {
               ),
 
               const SizedBox(height: 25),
-              const Text(
-                "Create Account",
+             Text(
+                lang.t('create_account'),
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
@@ -100,7 +107,7 @@ List<String> get accountTypeOptions {
                     TextButton(
                       onPressed: () => setState(() => isCompany = true),
                       child: Text(
-                        "Company",
+                        lang.t('company'),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight:
@@ -112,7 +119,7 @@ List<String> get accountTypeOptions {
                     TextButton(
                       onPressed: () => setState(() => isCompany = false),
                       child: Text(
-                        "Individual",
+                        lang.t('individual'),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight:
@@ -138,14 +145,14 @@ List<String> get accountTypeOptions {
                       children: [
                         Expanded(
                           child: _buildLabeledField(
-                            "First Name",
+                           lang.t('first_name'),
                             controller: firstNameController,
                           ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: _buildLabeledField(
-                            "Last Name",
+                           lang.t('last_name'),
                             controller: lastNameController,
                           ),
                         ),
@@ -153,16 +160,22 @@ List<String> get accountTypeOptions {
                     ),
                     const SizedBox(height: 15),
 
-                    _buildLabeledField("Email Address",
-                        controller: emailController),
-                    const SizedBox(height: 15),
+                 _buildLabeledField(
+  lang.t('email_address'),
+  controller: emailController,
+),
+const SizedBox(height: 15),
 
-                    _buildLabeledField("Phone Number",
-                        controller: phoneController, prefixIcon: Icons.flag),
-                    const SizedBox(height: 15),
+_buildLabeledField(
+  lang.t('phone_number'),
+  controller: phoneController,
+  prefixIcon: Icons.flag,
+),
+const SizedBox(height: 15),
 
                     // Country picker
-                    const Text("Country",
+                     Text(
+                      lang.t('country'),
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 5),
@@ -188,7 +201,7 @@ List<String> get accountTypeOptions {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(selectedCountry ?? "Select country",
+                            Text(selectedCountry ?? lang.t('select_country'),
                                 style: const TextStyle(fontSize: 16)),
                             const Icon(Icons.arrow_drop_down),
                           ],
@@ -198,7 +211,8 @@ List<String> get accountTypeOptions {
                     const SizedBox(height: 15),
 
                     // Account type checkboxes
-                    const Text("Account Type",
+                    Text(
+                      lang.t('account_type'),
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
@@ -224,13 +238,20 @@ List<String> get accountTypeOptions {
                     ),
                     const SizedBox(height: 15),
 
-                    _buildLabeledField("Password",
-                        controller: passwordController, obscure: true),
-                    const SizedBox(height: 15),
+                  _buildLabeledField(
+  lang.t('password'),
+  controller: passwordController,
+  obscure: true,
+),
+const SizedBox(height: 15),
 
-                    _buildLabeledField("Confirm Password",
-                        controller: confirmPasswordController, obscure: true),
-                    const SizedBox(height: 15),
+_buildLabeledField(
+  lang.t('confirm_password'),
+  controller: confirmPasswordController,
+  obscure: true,
+),
+const SizedBox(height: 15),
+
 
                     // Terms
                     Row(
@@ -240,8 +261,8 @@ List<String> get accountTypeOptions {
                           onChanged: (val) =>
                               setState(() => agreeTerms = val ?? false),
                         ),
-                        const Expanded(
-                          child: Text("I agree to the terms and conditions"),
+                         Expanded(
+                          child: Text(lang.t('agree_terms')),
                         ),
                       ],
                     ),
@@ -258,8 +279,8 @@ List<String> get accountTypeOptions {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: const Text(
-                          "Sign Up",
+                        child: Text(
+                          lang.t('sign_up'),
                           style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -270,29 +291,30 @@ List<String> get accountTypeOptions {
                     const SizedBox(height: 25),
 
                     // Footer
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("Already have an account?"),
-                        const SizedBox(width: 5),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginScreen()),
-                            );
-                          },
-                          child: const Text(
-                            "Log in",
-                            style: TextStyle(
-                                color: Colors.purple,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline),
-                          ),
-                        ),
-                      ],
-                    ),
+                   Row(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    Text(lang.t('already_have_account')),
+    const SizedBox(width: 5),
+    GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      },
+      child: Text(
+        lang.t('log_in'),
+        style: const TextStyle(
+          color: Colors.purple,
+          fontWeight: FontWeight.bold,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+    ),
+  ],
+),
+
                   ],
                 ),
               ),

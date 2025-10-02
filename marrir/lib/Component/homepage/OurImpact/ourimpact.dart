@@ -42,7 +42,7 @@ class OurImpact extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    lang.t('description'),
+                    lang.t('descriptions'),
                     style: const TextStyle(
                       fontSize: 11,
                       color: Colors.white,

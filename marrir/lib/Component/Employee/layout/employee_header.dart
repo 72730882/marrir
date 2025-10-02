@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'package:marrir/services/user.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class EmployeeHeader extends StatefulWidget {
   final VoidCallback onMenuTap;
@@ -52,10 +54,12 @@ class _EmployeeHeaderState extends State<EmployeeHeader> {
   static const _ink = Color(0xFF111111);
   static const _muted = Color(0xFF8E8E93);
   static const _hint = Color(0xFF9BA0A6);
-  static const _searchBg = Color(0xFFF2F2F2);
+  static const _searchBg = Color(0xFFF2F2F7);
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Container(
       color: _bgWhite,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -91,9 +95,10 @@ class _EmployeeHeaderState extends State<EmployeeHeader> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Welcome,',
-                        style: TextStyle(
+                      Text(
+                        languageProvider
+                            .t('welcome'), // Translated welcome text
+                        style: const TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w500,
                           color: _muted,
@@ -102,7 +107,9 @@ class _EmployeeHeaderState extends State<EmployeeHeader> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        userName ?? "Loading...",
+                        userName ??
+                            languageProvider
+                                .t('loading'), // Translated loading text
                         style: const TextStyle(
                           fontSize: 17.5,
                           fontWeight: FontWeight.w700,
@@ -114,11 +121,25 @@ class _EmployeeHeaderState extends State<EmployeeHeader> {
                   ),
                 ],
               ),
-              const Row(
+              Row(
                 children: [
-                  ChatWithTranslateBadge(iconSize: 22, color: _ink),
-                  SizedBox(width: 14),
-                  Icon(Icons.notifications_none, size: 22, color: _ink),
+                  // Language selector in employee header too
+                  PopupMenuButton<String>(
+                    tooltip: languageProvider.t('select_language'),
+                    icon: const Icon(Icons.translate,
+                        color: Colors.purple, size: 22),
+                    onSelected: (value) {
+                      Provider.of<LanguageProvider>(context, listen: false)
+                          .changeLanguage(value);
+                    },
+                    itemBuilder: (BuildContext context) => [
+                      const PopupMenuItem(value: "en", child: Text("English")),
+                      const PopupMenuItem(value: "ar", child: Text("العربية")),
+                      const PopupMenuItem(value: "am", child: Text("አማርኛ")),
+                    ],
+                  ),
+                  const SizedBox(width: 14),
+                  const Icon(Icons.notifications_none, size: 22, color: _ink),
                 ],
               ),
             ],
@@ -135,16 +156,18 @@ class _EmployeeHeaderState extends State<EmployeeHeader> {
                     borderRadius: BorderRadius.circular(22),
                   ),
                   alignment: Alignment.center,
-                  child: const TextField(
+                  child: TextField(
                     cursorColor: _ink,
-                    style: TextStyle(fontSize: 15, color: _ink),
+                    style: const TextStyle(fontSize: 15, color: _ink),
                     decoration: InputDecoration(
                       isCollapsed: true,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                      prefixIcon: Icon(Icons.search, color: _hint, size: 20),
-                      hintText: 'Search',
-                      hintStyle: TextStyle(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 12),
+                      prefixIcon:
+                          const Icon(Icons.search, color: _hint, size: 20),
+                      hintText: languageProvider
+                          .t('search'), // Translated search hint
+                      hintStyle: const TextStyle(
                         color: _hint,
                         fontSize: 15,
                         fontWeight: FontWeight.w500,

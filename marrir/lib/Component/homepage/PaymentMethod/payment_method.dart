@@ -1,29 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart'; // Updated import path
 
 class PaymentMethods extends StatelessWidget {
   const PaymentMethods({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Container(
       padding: const EdgeInsets.all(30),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
-            'Accepted Payment Methods',
-            style: TextStyle(
+          Text(
+            languageProvider.t('accepted_payment_methods'),
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
           const SizedBox(height: 14),
-          const Text(
-            'We accept a wide range of payment methods to\n'
-            'make transactions easier for you. Choose from\n'
-            'trusted brands and make secure payments with ease.',
-            style: TextStyle(
+          Text(
+            languageProvider.t('payment_methods_description'),
+            style: const TextStyle(
               fontSize: 12,
               color: Color.fromARGB(255, 57, 57, 57),
             ),
@@ -43,26 +45,26 @@ class PaymentMethods extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _buildPaymentMethod(
-                  'Visa',
-                  'assets/images/OIP (1).jpeg', // Replace with your asset path
+                  languageProvider.t('visa'),
+                  'assets/images/OIP (1).jpeg',
                   const Color.fromARGB(255, 255, 255, 255),
                 ),
                 const SizedBox(width: 12),
                 _buildPaymentMethod(
-                  'Mastercard',
-                  'assets/images/OIP.jpeg', // Replace with your asset path
+                  languageProvider.t('mastercard'),
+                  'assets/images/OIP.jpeg',
                   const Color.fromARGB(255, 255, 255, 255),
                 ),
                 const SizedBox(width: 12),
                 _buildPaymentMethod(
-                  'Paypal',
-                  'assets/images/OIP.jpeg', // Replace with your asset path
+                  languageProvider.t('paypal'),
+                  'assets/images/OIP.jpeg',
                   const Color.fromARGB(255, 255, 255, 255),
                 ),
                 const SizedBox(width: 12),
                 _buildPaymentMethod(
-                  'Apple Pay',
-                  'assets/images/OIP.jpeg', // Replace with your asset path
+                  languageProvider.t('apple_pay'),
+                  'assets/images/OIP.jpeg',
                   const Color.fromARGB(255, 255, 255, 255),
                 ),
               ],
@@ -90,7 +92,7 @@ class PaymentMethods extends StatelessWidget {
             fit: BoxFit.contain,
           ),
         ),
-        // const SizedBox(height: ),
+        const SizedBox(height: 8),
         Text(
           name,
           style: const TextStyle(

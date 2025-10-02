@@ -33,16 +33,16 @@ class ServicesScreen extends StatelessWidget {
               children: [
                 Text(
                   lang.t('service'),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   lang.t('service_desc'),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.white,
                   ),
@@ -56,10 +56,10 @@ class ServicesScreen extends StatelessWidget {
 
           // ===== Promote Profile Section =====
           Padding(
-            padding: EdgeInsets.fromLTRB(16, 20, 16, 2),
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 2),
             child: Text(
               lang.t('promote_profile'),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF65b2c9),
@@ -89,7 +89,7 @@ class ServicesScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     // Left side text
@@ -99,12 +99,12 @@ class ServicesScreen extends StatelessWidget {
                         children: [
                           Text(
                             lang.t('agencies'),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Text(
                             "${lang.t('duration')}: ${lang.t('6_month')}",
                             style: const TextStyle(
@@ -112,10 +112,10 @@ class ServicesScreen extends StatelessWidget {
                               color: Colors.black54,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
-                             lang.t('profiles') + ": 250",
-                            style: TextStyle(
+                            "${lang.t('profiles')}: 250",
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.blue,
                             ),
@@ -125,7 +125,7 @@ class ServicesScreen extends StatelessWidget {
                     ),
 
                     // Right side price
-                    Text(
+                    const Text(
                       "AED 59", // updated price
                       style: TextStyle(
                         fontSize: 18,
@@ -148,7 +148,7 @@ class ServicesScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     // Left side text
@@ -158,12 +158,12 @@ class ServicesScreen extends StatelessWidget {
                         children: [
                           Text(
                             lang.t('employees'),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Text(
                             "${lang.t('duration')}: ${lang.t('1_month')}",
                             style: const TextStyle(
@@ -171,10 +171,10 @@ class ServicesScreen extends StatelessWidget {
                               color: Colors.black54,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
-                             lang.t('profiles') + ": 50",
-                            style: TextStyle(
+                            "${lang.t('profiles')}: 50",
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.blue,
                             ),
@@ -184,7 +184,7 @@ class ServicesScreen extends StatelessWidget {
                     ),
 
                     // Right side price
-                    Text(
+                    const Text(
                       "AED 19", // updated price
                       style: TextStyle(
                         fontSize: 18,
@@ -207,7 +207,7 @@ class ServicesScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     // Left side text
@@ -217,12 +217,12 @@ class ServicesScreen extends StatelessWidget {
                         children: [
                           Text(
                             lang.t('recruitment_firms'),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Text(
                             "${lang.t('duration')}: ${lang.t('6_month')}",
                             style: const TextStyle(
@@ -230,10 +230,10 @@ class ServicesScreen extends StatelessWidget {
                               color: Colors.black54,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
-                            lang.t('profiles') + ": 250",
-                            style: TextStyle(
+                            "${lang.t('profiles')}: 250",
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.blue,
                             ),
@@ -243,7 +243,7 @@ class ServicesScreen extends StatelessWidget {
                     ),
 
                     // Right side price
-                    Text(
+                    const Text(
                       "AED 59", // updated price
                       style: TextStyle(
                         fontSize: 18,
@@ -276,9 +276,8 @@ class ServicesScreen extends StatelessWidget {
                   // Handle "See All"
                 },
                 child: Text(
-                  
                   lang.t('see_all'),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -290,10 +289,10 @@ class ServicesScreen extends StatelessWidget {
 
           // ===== Reserve Profile Section =====
           Padding(
-            padding: EdgeInsets.fromLTRB(16, 30, 16, 2),
+            padding: const EdgeInsets.fromLTRB(16, 30, 16, 2),
             child: Text(
               lang.t('reserve_profile'),
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF65b2c9)),
@@ -322,7 +321,7 @@ class ServicesScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     // Left side text
@@ -332,7 +331,7 @@ class ServicesScreen extends StatelessWidget {
                         children: [
                           Text(
                             lang.t('agencies'),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                             ),
@@ -342,7 +341,7 @@ class ServicesScreen extends StatelessWidget {
                     ),
 
                     // Right side price
-                    Text(
+                    const Text(
                       "AED 99", // updated price
                       style: TextStyle(
                         fontSize: 18,
@@ -365,7 +364,7 @@ class ServicesScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     // Left side text
@@ -375,7 +374,7 @@ class ServicesScreen extends StatelessWidget {
                         children: [
                           Text(
                             lang.t('employers'),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                             ),
@@ -385,7 +384,7 @@ class ServicesScreen extends StatelessWidget {
                     ),
 
                     // Right side price
-                    Text(
+                    const Text(
                       "AED 99", // updated price
                       style: TextStyle(
                         fontSize: 18,
@@ -408,7 +407,7 @@ class ServicesScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     // Left side text
@@ -418,7 +417,7 @@ class ServicesScreen extends StatelessWidget {
                         children: [
                           Text(
                             lang.t('recruitment_firms'),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                             ),
@@ -428,7 +427,7 @@ class ServicesScreen extends StatelessWidget {
                     ),
 
                     // Right side price
-                    Text(
+                    const Text(
                       "AED 99", // updated price
                       style: TextStyle(
                         fontSize: 18,
@@ -446,10 +445,10 @@ class ServicesScreen extends StatelessWidget {
 
           // ===== Transfer Profile Section =====
           Padding(
-            padding: EdgeInsets.fromLTRB(16, 30, 16, 2),
+            padding: const EdgeInsets.fromLTRB(16, 30, 16, 2),
             child: Text(
               lang.t('transfer_profile'),
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF65b2c9)),
@@ -478,7 +477,7 @@ class ServicesScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     // Left side text
@@ -488,7 +487,7 @@ class ServicesScreen extends StatelessWidget {
                         children: [
                           Text(
                             lang.t('agencies'),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                             ),
@@ -498,7 +497,7 @@ class ServicesScreen extends StatelessWidget {
                     ),
 
                     // Right side price
-                    Text(
+                    const Text(
                       "AED 9", // updated price
                       style: TextStyle(
                         fontSize: 18,
@@ -521,7 +520,7 @@ class ServicesScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     // Left side text
@@ -531,7 +530,7 @@ class ServicesScreen extends StatelessWidget {
                         children: [
                           Text(
                             lang.t('employers'),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                             ),
@@ -541,7 +540,7 @@ class ServicesScreen extends StatelessWidget {
                     ),
 
                     // Right side price
-                    Text(
+                    const Text(
                       "AED 9", // updated price
                       style: TextStyle(
                         fontSize: 18,
@@ -564,7 +563,7 @@ class ServicesScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     // Left side text
@@ -574,7 +573,7 @@ class ServicesScreen extends StatelessWidget {
                         children: [
                           Text(
                             lang.t('recruitment_firms'),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                             ),
@@ -584,7 +583,7 @@ class ServicesScreen extends StatelessWidget {
                     ),
 
                     // Right side price
-                    Text(
+                    const Text(
                       "AED 59", // updated price
                       style: TextStyle(
                         fontSize: 18,
@@ -634,7 +633,7 @@ class ServicesScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     // Left side text
@@ -644,7 +643,7 @@ class ServicesScreen extends StatelessWidget {
                         children: [
                           Text(
                             lang.t('recruitment_firms'),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                             ),
@@ -654,7 +653,7 @@ class ServicesScreen extends StatelessWidget {
                     ),
 
                     // Right side price
-                    Text(
+                    const Text(
                       "AED 29", // updated price
                       style: TextStyle(
                         fontSize: 18,
@@ -677,7 +676,7 @@ class ServicesScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     // Left side text
@@ -687,7 +686,7 @@ class ServicesScreen extends StatelessWidget {
                         children: [
                           Text(
                             lang.t('employers'),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                             ),
@@ -697,7 +696,7 @@ class ServicesScreen extends StatelessWidget {
                     ),
 
                     // Right side price
-                    Text(
+                    const Text(
                       "AED 29", // updated price
                       style: TextStyle(
                         fontSize: 18,
@@ -715,10 +714,10 @@ class ServicesScreen extends StatelessWidget {
 
           // ===== Accept Employer =====
           Padding(
-            padding: EdgeInsets.fromLTRB(16, 30, 16, 2),
+            padding: const EdgeInsets.fromLTRB(16, 30, 16, 2),
             child: Text(
               lang.t('assigning_rec'),
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF65b2c9)),
@@ -747,7 +746,7 @@ class ServicesScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     // Left side text
@@ -757,7 +756,7 @@ class ServicesScreen extends StatelessWidget {
                         children: [
                           Text(
                             lang.t('recruitment_firms'),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                             ),
@@ -767,7 +766,7 @@ class ServicesScreen extends StatelessWidget {
                     ),
 
                     // Right side price
-                    Text(
+                    const Text(
                       "AED 49", // updated price
                       style: TextStyle(
                         fontSize: 18,

@@ -33,17 +33,16 @@ class ContactScreen extends StatelessWidget {
               children: [
                 Text(
                   lang.t('landing_contact_us'),
-                  
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   lang.t('contact_us_description'),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.white,
                   ),
@@ -67,15 +66,15 @@ class ContactScreen extends StatelessWidget {
                     // Full Name Input with underline only
                     TextField(
                       decoration: InputDecoration(
-                        labelText: lang.t('full_name'), 
-                        enabledBorder: UnderlineInputBorder(
+                        labelText: lang.t('full_name'),
+                        enabledBorder: const UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey),
                         ),
-                        focusedBorder: UnderlineInputBorder(
+                        focusedBorder: const UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.black),
                         ),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 0, vertical: 20),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 0, vertical: 20),
                       ),
                     ),
                     const SizedBox(height: 30),
@@ -84,15 +83,15 @@ class ContactScreen extends StatelessWidget {
                     TextField(
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                         labelText: lang.t('email'),
-                        enabledBorder: UnderlineInputBorder(
+                        labelText: lang.t('email'),
+                        enabledBorder: const UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey),
                         ),
-                        focusedBorder: UnderlineInputBorder(
+                        focusedBorder: const UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.black),
                         ),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 0, vertical: 20),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 0, vertical: 20),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -101,18 +100,18 @@ class ContactScreen extends StatelessWidget {
                     TextField(
                       maxLines: 3,
                       decoration: InputDecoration(
-                       labelText: lang.t('message'),
+                        labelText: lang.t('message'),
                         hintText: 'Message here...',
                         alignLabelWithHint:
                             true, // important for multiline so label aligns properly
-                        enabledBorder: UnderlineInputBorder(
+                        enabledBorder: const UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey),
                         ),
-                        focusedBorder: UnderlineInputBorder(
+                        focusedBorder: const UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.black),
                         ),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 0, vertical: 20),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 0, vertical: 20),
                       ),
                     ),
 
@@ -135,7 +134,7 @@ class ContactScreen extends StatelessWidget {
                           },
                           child: Text(
                             lang.t('submit'),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -166,13 +165,13 @@ class ContactScreen extends StatelessWidget {
 
               // Email
               const Text(
-  "EJITIAZ PORTAL LLC",
-  textAlign: TextAlign.center,
-  style: TextStyle(
-    fontSize: 13,
-    color: Color(0xFF65b2c9),
-  ),
-),
+                "EJITIAZ PORTAL LLC",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Color(0xFF65b2c9),
+                ),
+              ),
 
               const SizedBox(height: 15),
 

@@ -14,6 +14,8 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return AppBar(
       backgroundColor: const Color(0xFFDAF1F9), // Light blue like your design
       elevation: 0,
@@ -38,7 +40,7 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text("Login"),
+              child: Text(languageProvider.t('login')),
             ),
             const SizedBox(width: 5),
             ElevatedButton(
@@ -53,7 +55,7 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text("Register"),
+              child: Text(languageProvider.t('register')),
             ),
             const SizedBox(width: 4),
 

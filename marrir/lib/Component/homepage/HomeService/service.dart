@@ -1,90 +1,89 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/lang.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class ServicesApp extends StatelessWidget {
   const ServicesApp({super.key});
 
-  final List<Map<String, dynamic>> services = const [
-    {
-      "title": "Job Posting",
-      "desc":
-          "Efficient and swift selection of candidates based on employers' specified job descriptions.",
-      "icon": Icon(
-        Icons.work_outline,
-        color: Color(0xFF65b2c9),
-        size: 28,
-      ),
-    },
-    {
-      "title": "Profile Reservation",
-      "desc":
-          "Securing candidate profiles for personal interviews and future considerations.",
-      "icon": Icon(
-        Icons.person_outline,
-        color: Color(0xFF65b2c9),
-        size: 28,
-      ),
-    },
-    {
-      "title": "Transfer Profile",
-      "desc":
-          "Enabling seamless transfer of data among relevant parties with utmost security and ease.",
-      "icon": Icon(
-        Icons.swap_horiz,
-        color: Color(0xFF65b2c9),
-        size: 28,
-      ),
-    },
-    {
-      "title": "Profile Selection",
-      "desc":
-          "Selecting the most suitable applied profiles that closely match the requirements of the available vacancies.",
-      "icon": Icon(
-        Icons.check_circle_outline,
-        color: Color(0xFF65b2c9),
-        size: 28,
-      ),
-    },
-    {
-      "title": "Job Applications",
-      "desc":
-          "Employees can apply directly to job postings or users like RECRUITMENT FIRMS can submit applications on behalf of candidates.",
-      "icon": Icon(
-        Icons.assignment_outlined,
-        color: Color(0xFF65b2c9),
-        size: 28,
-      ),
-    },
-    {
-      "title": "Profile Promotion",
-      "desc":
-          "Facilitating the effective promotion of individual professional profiles, enhancing visibility and potential.",
-      "icon": Icon(
-        Icons.trending_up,
-        color: Color(0xFF65b2c9),
-        size: 28,
-      ),
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
+    // Access the language provider
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final strings = AppStrings.translations[languageProvider.currentLang] ??
+        AppStrings.translations['en']!;
+
+    final List<Map<String, dynamic>> services = [
+      {
+        "title": strings['job_posting']!,
+        "desc": strings['job_posting_desc']!,
+        "icon": const Icon(
+          Icons.work_outline,
+          color: Color(0xFF65b2c9),
+          size: 28,
+        ),
+      },
+      {
+        "title": strings['profile_reservation']!,
+        "desc": strings['profile_reservation_desc']!,
+        "icon": const Icon(
+          Icons.person_outline,
+          color: Color(0xFF65b2c9),
+          size: 28,
+        ),
+      },
+      {
+        "title": strings['transfer_profile_service']!,
+        "desc": strings['transfer_profile_desc']!,
+        "icon": const Icon(
+          Icons.swap_horiz,
+          color: Color(0xFF65b2c9),
+          size: 28,
+        ),
+      },
+      {
+        "title": strings['profile_selection']!,
+        "desc": strings['profile_selection_desc']!,
+        "icon": const Icon(
+          Icons.check_circle_outline,
+          color: Color(0xFF65b2c9),
+          size: 28,
+        ),
+      },
+      {
+        "title": strings['job_applications']!,
+        "desc": strings['job_applications_desc']!,
+        "icon": const Icon(
+          Icons.assignment_outlined,
+          color: Color(0xFF65b2c9),
+          size: 28,
+        ),
+      },
+      {
+        "title": strings['profile_promotion']!,
+        "desc": strings['profile_promotion_desc']!,
+        "icon": const Icon(
+          Icons.trending_up,
+          color: Color(0xFF65b2c9),
+          size: 28,
+        ),
+      },
+    ];
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
-            "Services",
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          Text(
+            strings['services_title']!,
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Empowering RECRUITMENT FIRMS, agents,\n'
-            'and EMPLOYER with streamlined tools to\n'
-            'manage job postings, profiles, and talent\n'
-            'acquisition processes efficiently.',
-            style: TextStyle(
+          Text(
+            strings['services_subtitle']!,
+            style: const TextStyle(
               fontSize: 16,
               color: Color.fromARGB(255, 57, 57, 57),
               height: 1.4,

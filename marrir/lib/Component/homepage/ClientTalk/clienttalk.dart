@@ -1,50 +1,82 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:marrir/Component/about/about_screen.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
-class Clienttalk extends StatelessWidget {
+class Clienttalk extends StatefulWidget {
   const Clienttalk({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final List<Map<String, String>> testimonials = [
+  State<Clienttalk> createState() => _ClienttalkState();
+}
+
+class _ClienttalkState extends State<Clienttalk> {
+  late PageController pageController;
+  late ValueNotifier<int> activePage;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    pageController = PageController();
+    activePage = ValueNotifier<int>(0);
+    _startAutoSlide();
+  }
+
+  void _startAutoSlide() {
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (pageController.hasClients) {
+        int nextPage = activePage.value + 1;
+        if (nextPage >= _getTestimonials(context).length) nextPage = 0;
+        pageController.animateToPage(
+          nextPage,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+        activePage.value = nextPage;
+      }
+    });
+  }
+
+  List<Map<String, String>> _getTestimonials(BuildContext context) {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context, listen: false);
+
+    return [
       {
-        "quote":
-            '"This platform revolutionized our hiring process. We found exceptional talent in record time!"',
-        "name": "John Doe",
-        "position": "HR Director",
-        "company": "Marir",
+        "quote": languageProvider.t('testimonial_1_quote'),
+        "name": languageProvider.t('testimonial_1_name'),
+        "position": languageProvider.t('testimonial_1_position'),
+        "company": languageProvider.t('testimonial_1_company'),
       },
       {
-        "quote":
-            '"Using this service saved us weeks of recruitment time and we hired the best candidates!"',
-        "name": "Jane Smith",
-        "position": "Talent Manager",
-        "company": "TechCorp",
+        "quote": languageProvider.t('testimonial_2_quote'),
+        "name": languageProvider.t('testimonial_2_name'),
+        "position": languageProvider.t('testimonial_2_position'),
+        "company": languageProvider.t('testimonial_2_company'),
       },
       {
-        "quote":
-            '"The system is intuitive, efficient, and makes hiring so much easier for our HR team."',
-        "name": "Robert Brown",
-        "position": "HR Manager",
-        "company": "Global Solutions",
+        "quote": languageProvider.t('testimonial_3_quote'),
+        "name": languageProvider.t('testimonial_3_name'),
+        "position": languageProvider.t('testimonial_3_position'),
+        "company": languageProvider.t('testimonial_3_company'),
       },
     ];
+  }
 
-    final PageController pageController = PageController();
-    final ValueNotifier<int> activePage = ValueNotifier<int>(0);
+  @override
+  void dispose() {
+    _timer?.cancel();
+    pageController.dispose();
+    activePage.dispose();
+    super.dispose();
+  }
 
-    // Auto-slide every 3 seconds
-    Timer.periodic(const Duration(seconds: 3), (timer) {
-      int nextPage = activePage.value + 1;
-      if (nextPage >= testimonials.length) nextPage = 0;
-      pageController.animateToPage(
-        nextPage,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
-      activePage.value = nextPage;
-    });
+  @override
+  Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final testimonials = _getTestimonials(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -81,18 +113,18 @@ class Clienttalk extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  "Easily Accessible",
-                  style: TextStyle(
+                Text(
+                  languageProvider.t('easily_accessible'),
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const Text(
-                  "A Better Workflow",
-                  style: TextStyle(
+                Text(
+                  languageProvider.t('better_workflow'),
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -100,9 +132,9 @@ class Clienttalk extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  "Discover a seamless digital experience designed to simplify your workflow. Our web app portal offers an intuitive interface, enabling you to access a wide array of features and tools that enhance productivity and connectivity",
-                  style: TextStyle(
+                Text(
+                  languageProvider.t('workflow_description'),
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.white,
                     height: 1.4,
@@ -115,8 +147,7 @@ class Clienttalk extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            const AboutScreen(), // Replace with your AboutPage widget
+                        builder: (context) => const AboutScreen(),
                       ),
                     );
                   },
@@ -131,18 +162,18 @@ class Clienttalk extends StatelessWidget {
                       horizontal: 35,
                     ),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        "Learn More",
-                        style: TextStyle(
+                        languageProvider.t('learn_more'),
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
                       ),
-                      SizedBox(width: 6),
-                      Icon(Icons.arrow_forward, size: 16),
+                      const SizedBox(width: 6),
+                      const Icon(Icons.arrow_forward, size: 16),
                     ],
                   ),
                 ),
@@ -152,9 +183,9 @@ class Clienttalk extends StatelessWidget {
 
           const SizedBox(height: 30),
 
-          const Text(
-            "What Our Clients Say",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          Text(
+            languageProvider.t('what_clients_say'),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
 
           const SizedBox(height: 20),

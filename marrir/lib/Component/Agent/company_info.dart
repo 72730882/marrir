@@ -53,7 +53,14 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
       final dealerId =
           prefs.getString("user_id") ?? ""; // using logged-in user's id
 
-      if (token.isEmpty || dealerId.isEmpty) {
+      // Define companyId and agentId (replace with actual logic as needed)
+      final companyId = prefs.getString("company_id") ?? "";
+      final agentId = prefs.getString("agent_id") ?? "";
+
+      if (token.isEmpty ||
+          dealerId.isEmpty ||
+          companyId.isEmpty ||
+          agentId.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Login required before uploading.")),
         );
@@ -63,7 +70,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
       var request = http.MultipartRequest(
         'POST',
         Uri.parse(
-            '${ApiService.baseUrl}/api/v1/company_info/assign-agent-recruitment'),
+            '${ApiService.assignAgentRecruitment(token: token, companyId: companyId, agentId: agentId)}/company_info/assign-agent-recruitment'),
       );
 
       request.headers['Authorization'] = 'Bearer $token';

@@ -26,7 +26,7 @@ class AppStrings {
       'email': 'Email',
       'message': 'Message',
       'submit': 'Submit',
-      //sevice
+      // Service
       'service': 'Service',
       'service_desc':
           'We dont just connect people to jobs. We connect the right people to the right jobs. with speed, transparency, ans confidence. marrir is your trusted recruitment companion in the GCC and beyond.',
@@ -40,7 +40,29 @@ class AppStrings {
       '6_month': '6 Month',
       'see_all': 'See All',
       'profiles': 'Profiles',
-      //about us paeg
+      // Service Page Translations
+      'services_title': 'Services',
+      'services_subtitle':
+          'Empowering RECRUITMENT FIRMS, agents,\nand EMPLOYER with streamlined tools to\nmanage job postings, profiles, and talent\nacquisition processes efficiently.',
+      'job_posting': 'Job Posting',
+      'job_posting_desc':
+          'Efficient and swift selection of candidates based on employers\' specified job descriptions.',
+      'profile_reservation': 'Profile Reservation',
+      'profile_reservation_desc':
+          'Securing candidate profiles for personal interviews and future considerations.',
+      'transfer_profile_service': 'Transfer Profile',
+      'transfer_profile_desc':
+          'Enabling seamless transfer of data among relevant parties with utmost security and ease.',
+      'profile_selection': 'Profile Selection',
+      'profile_selection_desc':
+          'Selecting the most suitable applied profiles that closely match the requirements of the available vacancies.',
+      'job_applications': 'Job Applications',
+      'job_applications_desc':
+          'Employees can apply directly to job postings or users like RECRUITMENT FIRMS can submit applications on behalf of candidates.',
+      'profile_promotion': 'Profile Promotion',
+      'profile_promotion_desc':
+          'Facilitating the effective promotion of individual professional profiles, enhancing visibility and potential.',
+      // About us page
       'about_us': 'About Us',
       'who_we_are': 'Who We Are',
       'our_vision': 'Our Vision',
@@ -61,9 +83,63 @@ class AppStrings {
           'To revolutionize workforce recruitment by providing a seamless, technology-driven platform that connects Job Seekers, Employment Firms, International Recruitment Agencies and EMPLOYERS.',
 
       'mission_statement1':
-      'At Marrir we strive to enhance transparency, efficiency, and accessibility in the hiring process, ensuring that businesses across the GCC and beyond can easily find the right talent. Through innovation and strategic partnerships, we aim to simplify recruitment, empower job seekers, and create a more dynamic and inclusive job market.',
+          'At Marrir we strive to enhance transparency, efficiency, and accessibility in the hiring process, ensuring that businesses across the GCC and beyond can easily find the right talent. Through innovation and strategic partnerships, we aim to simplify recruitment, empower job seekers, and create a more dynamic and inclusive job market.',
       'vision_statement1':
-      'We aspire to transform the global recruitment landscape by leveraging cutting-edge technology to optimise hiring processes, foster long-term professional relationships, and bridge workforce gaps with unmatched efficiency. By continuously evolving and adapting to industry needs, we aim to drive a future hiring environment where recruitment is faster, more precise, and more important for businesses and job seekers alike.',
+          'We aspire to transform the global recruitment landscape by leveraging cutting-edge technology to optimise hiring processes, foster long-term professional relationships, and bridge workforce gaps with unmatched efficiency. By continuously evolving and adapting to industry needs, we aim to drive a future hiring environment where recruitment is faster, more precise, and more important for businesses and job seekers alike.',
+      // ClientTalk translations
+      'easily_accessible': 'Easily Accessible',
+      'better_workflow': 'A Better Workflow',
+      'workflow_description':
+          'Discover a seamless digital experience designed to simplify your workflow. Our web app portal offers an intuitive interface, enabling you to access a wide array of features and tools that enhance productivity and connectivity',
+      'learn_more': 'Learn More',
+      'what_clients_say': 'What Our Clients Say',
+      // Testimonials
+      'testimonial_1_quote':
+          '"This platform revolutionized our hiring process. We found exceptional talent in record time!"',
+      'testimonial_1_name': 'John Doe',
+      'testimonial_1_position': 'HR Director',
+      'testimonial_1_company': 'Marir',
+
+      'testimonial_2_quote':
+          '"Using this service saved us weeks of recruitment time and we hired the best candidates!"',
+      'testimonial_2_name': 'Jane Smith',
+      'testimonial_2_position': 'Talent Manager',
+      'testimonial_2_company': 'TechCorp',
+
+      'testimonial_3_quote':
+          '"The system is intuitive, efficient, and makes hiring so much easier for our HR team."',
+      'testimonial_3_name': 'Robert Brown',
+      'testimonial_3_position': 'HR Manager',
+      'testimonial_3_company': 'Global Solutions',
+
+      // Payment Methods translations
+      'accepted_payment_methods': 'Accepted Payment Methods',
+      'payment_methods_description':
+          'We accept a wide range of payment methods to\nmake transactions easier for you. Choose from\ntrusted brands and make secure payments with ease.',
+      'visa': 'Visa',
+      'mastercard': 'Mastercard',
+      'paypal': 'Paypal',
+      'apple_pay': 'Apple Pay',
+//footer
+      'company_address':
+          "Concord Tower - 9th floor - AI Sufah\n - Dubai Media City - Dubai",
+      'copyright': "© 2025 Marrir.com. All rights reserved.",
+
+      // Bottom Navigation Bar
+      'home': 'Home',
+      'about_us': 'About us', // Add this (without _page)
+      'services': 'Services',
+      'contact': 'Contact',
+      'about_us_page': 'About us',
+
+      //employee dashboard
+
+      "loading": "Loading...",
+      "search": "Search",
+      "select_language": "Select Language",
+      "english": "English",
+      "arabic": "العربية",
+      "amharic": "አማርኛ",
     },
     'ar': {
       'welcome': 'مرحبًا بكم في مررر',
@@ -92,7 +168,7 @@ class AppStrings {
       'email': 'البريد الإلكتروني',
       'message': 'الرسالة',
       'submit': 'إرسال',
-      //service
+      // Service
       'service': 'الخدمة',
       'service_desc':
           'نحن لا نوصل الناس بالوظائف فقط، بل نوصل الأشخاص المناسبين إلى الوظائف المناسبة بسرعة وشفافية وثقة. Marrir هو شريكك الموثوق للتوظيف في دول مجلس التعاون الخليجي وما وراءها.',
@@ -106,7 +182,29 @@ class AppStrings {
       '6_month': '6 شهر',
       'see_all': 'عرض الكل',
       'profiles': 'السير الذاتية',
-      //about us page
+      // Service Page Translations - Arabic
+      'services_title': 'الخدمات',
+      'services_subtitle':
+          'تمكين شركات التوظيف والوكلاء وأصحاب العمل بأدوات مبسطة\nلإدارة نشر الوظائف والملفات الشخصية وعمليات\nاكتساب المواهب بكفاءة.',
+      'job_posting': 'نشر الوظائف',
+      'job_posting_desc':
+          'اختيار المرشحين بكفاءة وسرعة بناءً على أوصاف الوظائف المحددة من قبل أصحاب العمل.',
+      'profile_reservation': 'حجز الملف الشخصي',
+      'profile_reservation_desc':
+          'تأمين الملفات الشخصية للمرشحين للمقابلات الشخصية والاعتبارات المستقبلية.',
+      'transfer_profile_service': 'نقل الملف الشخصي',
+      'transfer_profile_desc':
+          'تمكين نقل البيانات بسلاسة بين الأطراف المعنية بأقصى درجات الأمان والسهولة.',
+      'profile_selection': 'اختيار الملف الشخصي',
+      'profile_selection_desc':
+          'اختيار الملفات الشخصية الأكثر ملاءمة التي تتطابق بشكل وثيق مع متطلبات الوظائف الشاغرة.',
+      'job_applications': 'طلبات الوظائف',
+      'job_applications_desc':
+          'يمكن للموظفين التقدم مباشرة إلى الوظائف المنشورة أو يمكن للمستخدمين مثل شركات التوظيف تقديم الطلبات نيابة عن المرشحين.',
+      'profile_promotion': 'ترويج الملف الشخصي',
+      'profile_promotion_desc':
+          'تسهيل الترويج الفعال للملفات الشخصية المهنية الفردية، وتعزيز الظهور والإمكانات.',
+      // About us page
       'about_us': 'معلومات عنا',
       'who_we_are': 'من نحن',
       'our_vision': 'رؤيتنا',
@@ -127,9 +225,63 @@ class AppStrings {
       'mission_statement':
           'لإحداث ثورة في التوظيف من خلال توفير منصة سلسة مدفوعة بالتكنولوجيا تربط الباحثين عن عمل، وشركات التوظيف، والوكالات الدولية للتوظيف، وأصحاب العمل.',
       'mission_statement1':
-      'في Marrir نسعى لتعزيز الشفافية والكفاءة وإتاحة الوصول في عملية التوظيف، لضمان أن تتمكن الشركات في دول مجلس التعاون الخليجي وما وراءها من العثور بسهولة على المواهب المناسبة. من خلال الابتكار والشراكات الاستراتيجية، نهدف إلى تبسيط التوظيف، وتمكين الباحثين عن عمل، وخلق سوق عمل أكثر ديناميكية وشمولية.',
+          'في Marrir نسعى لتعزيز الشفافية والكفاءة وإتاحة الوصول في عملية التوظيف، لضمان أن تتمكن الشركات في دول مجلس التعاون الخليجي وما وراءها من العثور بسهولة على المواهب المناسبة. من خلال الابتكار والشراكات الاستراتيجية، نهدف إلى تبسيط التوظيف، وتمكين الباحثين عن عمل، وخلق سوق عمل أكثر ديناميكية وشمولية.',
       'vision_statement1':
-      'نسعى لتحويل مشهد التوظيف العالمي من خلال الاستفادة من أحدث التقنيات لتحسين عمليات التوظيف، وتعزيز العلاقات المهنية طويلة الأمد، وسد الفجوات في القوى العاملة بكفاءة غير مسبوقة. من خلال التطور المستمر والتكيف مع احتياجات الصناعة، نهدف إلى قيادة مستقبل التوظيف حيث تكون العمليات أسرع وأكثر دقة وأهمية للشركات والباحثين عن عمل على حد سواء.',
+          'نسعى لتحويل مشهد التوظيف العالمي من خلال الاستفادة من أحدث التقنيات لتحسين عمليات التوظيف، وتعزيز العلاقات المهنية طويلة الأمد، وسد الفجوات في القوى العاملة بكفاءة غير مسبوقة. من خلال التطور المستمر والتكيف مع احتياجات الصناعة، نهدف إلى قيادة مستقبل التوظيف حيث تكون العمليات أسرع وأكثر دقيقة وأهمية للشركات والباحثين عن عمل على حد سواء.',
+      // ClientTalk translations - Arabic
+      'easily_accessible': 'سهل الوصول',
+      'better_workflow': 'سير عمل أفضل',
+      'workflow_description':
+          'اكتشف تجربة رقمية سلسة مصممة لتبسيط سير العمل لديك. يوفر بوابة التطبيق الخاص بنا واجهة بديهية، تمكنك من الوصول إلى مجموعة واسعة من الميزات والأدوات التي تعزز الإنتاجية والاتصال',
+      'learn_more': 'تعلم المزيد',
+      'what_clients_say': 'ما يقوله عملاؤنا',
+
+      // Testimonials - Arabic
+      'testimonial_1_quote':
+          '"هذه المنصة أحدثت ثورة في عملية التوظيف لدينا. وجدنا موهبة استثنائية في وقت قياسي!"',
+      'testimonial_1_name': 'جون دو',
+      'testimonial_1_position': 'مدير الموارد البشرية',
+      'testimonial_1_company': 'مارير',
+
+      'testimonial_2_quote':
+          '"استخدام هذه الخدمة وفر لنا أسابيع من وقت التوظيف وقمنا بتوظيف أفضل المرشحين!"',
+      'testimonial_2_name': 'جين سميث',
+      'testimonial_2_position': 'مدير المواهب',
+      'testimonial_2_company': 'تيك كورب',
+
+      'testimonial_3_quote':
+          '"النظام بديهي وفعال ويجعل عملية التوظيف أسهل بكيرة لفريق الموارد البشرية لدينا."',
+      'testimonial_3_name': 'روبرت براون',
+      'testimonial_3_position': 'مدير الموارد البشرية',
+      'testimonial_3_company': 'الحلول العالمية',
+      //payment methods - Arabic
+      'accepted_payment_methods': 'طرق الدفع المقبولة',
+      'payment_methods_description':
+          'نقبل مجموعة واسعة من طرق الدفع لنجعل\nالمعاملات أسهل لك. اختر من بين العلامات\nالتجارية الموثوقة وقم بالدفع بأمان وسهولة.',
+      'visa': 'فيزا',
+      'mastercard': 'ماستركارد',
+      'paypal': 'باي بال',
+      'apple_pay': 'آبل باي',
+
+      //footer
+      'company_address':
+          "برج كونكورد - الطابق التاسع - الصفحة\n - دبي ميديا سيتي - دبي",
+      'copyright': "© 2025 Marrir.com. جميع الحقوق محفوظة.",
+
+      // Bottom Navigation Bar
+      'home': 'الرئيسية',
+      'about_us': 'معلومات عنا', // Add this (without _page)
+      'services': 'الخدمات',
+      'contact': 'اتصل بنا',
+      'about_us_page': 'معلومات عنا',
+
+      //employee dashboard
+      "loading": "جاري التحميل...",
+      "search": "بحث",
+      "select_language": "اختر اللغة",
+      "english": "English",
+      "arabic": "العربية",
+      "amharic": "አማርኛ",
     },
     'am': {
       'welcome': 'እንኳን ወደ Marrir በደህና መጡ',
@@ -158,7 +310,7 @@ class AppStrings {
       'message': 'መልእክት',
       'submit': 'ይግቡ',
 
-      //service
+      // Service
       'service': 'አገልግሎቶች',
       'service_desc':
           'እኛ ሰዎችን ወደ ስራዎች ብቻ አንያያዝም። ትክክለኛውን ሰው ወደ ትክክለኛው ስራ እንዲያደርስ እንደምንያዝ፣ በፍጥነት፣ በግልጽነትና በእምነት። Marrir በGCC እና ከዚያ በላይ የታመነው የቀጥታ ተግባር አጋርዎ ነው።',
@@ -172,7 +324,29 @@ class AppStrings {
       '6_month': '6 Month',
       'see_all': 'ሁሉንም ይመልከቱ',
       'profiles': 'Profiles',
-      //about us page
+      // Service Page Translations - Amharic
+      'services_title': 'አገልግሎቶች',
+      'services_subtitle':
+          'የስራ አሰራር ኩባንያዎችን፣ ወኪሎችን እና የስራ ባለሥልጣናትን ማብራራት\nየስራ ማስታወቂያዎችን፣ መግለጫዎችን እና ብቃት ማግኛ\nሂደቶችን በብቃት ለማስተዳደር ቀላል መሳሪያዎች።',
+      'job_posting': 'የስራ ማስታወቂያ',
+      'job_posting_desc':
+          'በደራቶች የተገለጹትን የስራ መግለጫዎች መሰረት በብቃት እና በፍጥነት ተመራጮችን መምረጥ።',
+      'profile_reservation': 'መግለጫ ማስጠበቅ',
+      'profile_reservation_desc':
+          'የተመራጮችን መግለጫዎች ለግል ቃለ መጠይቅ እና ለወደፊት ግምቶች ማስጠበቅ።',
+      'transfer_profile_service': 'መግለጫ ማስተላለፍ',
+      'transfer_profile_desc':
+          'በተገቢው ወገኖች መካከል የውሂብ ሽግግርን በከፍተኛ ደህንነት እና ቀላልነት ማንቃት።',
+      'profile_selection': 'መግለጫ ምርጫ',
+      'profile_selection_desc':
+          'ከሚገኙት ባዶ የስራ መደቦች መስፈርቶች ጋር በቅርበት የሚጣጣሙ በጣም ተገቢ የሆኑ የተጠቀሱ መግለጫዎችን መምረጥ።',
+      'job_applications': 'የስራ ማመልከቻዎች',
+      'job_applications_desc':
+          'ሰራተኞች በቀጥታ ለሚታዩ የስራ ማስታወቂያዎች ማመልከት ይችላሉ፣ ወይም እንደ የስራ አሰራር ኩባንያዎች ያሉ ተጠቃሚዎች ለተመራጮች ማመልከቻዎችን ማስገባት ይችላሉ።',
+      'profile_promotion': 'መግለጫ ማስተዋወቅ',
+      'profile_promotion_desc':
+          'የግለሰብ ሙያዊ መግለጫዎችን በተግባር ማስተዋወቅን ማመቻቸት፣ ታይነት እና አቅም ማሳደግ።',
+      // About us page
       'about_us': 'ስለ እኛ',
       'who_we_are': 'Who We Are',
       'our_vision': 'ራዕያችን',
@@ -192,10 +366,62 @@ class AppStrings {
       'mission_statement':
           'የሰራተኞች ተቀባይነትን በማቀናበር፣ ተሳሳቢ የቴክኖሎጂ መድረክ ያቀርባል፣ የሚያገናኝ የስራ ፈላጊዎች፣ የስራ ኩባንያዎች፣ የአለም አቀፍ የሰራተኞች ኤጀንሲዎች እና የባለስልጣናት ድርጅቶች።',
       'mission_statement1':
-      'በMarrir ላይ በቀጥታ እንዲገኙ አስፈላጊ ችሎታዎችን እንዲያገኙ እና እንዲገኙ ለንግድ ተቋማት በGCC እና ከዚያ በላይ የተገቢውን ተቋማት በቀላሉ ማግኘት እንዲችሉ እንሰራለን። በአዳዲስ እና በውስጥ ባለስልጣናት ማህበረሰብ መተባበር እንደምንደርግ እና የስራ ፈላጊዎችን እንማራለን፣ የስራ ገበያን እንደገና እና ዝቅተኛና አንደኛ ያደርጋል።',
+          'በMarrir ላይ በቀጥታ እንዲገኙ አስፈላጊ ችሎታዎችን እንዲያገኙ እና እንዲገኙ ለንግድ ተቋማት በGCC እና ከዚያ በላይ የተገቢውን ተቋማት በቀላሉ ማግኘት እንዲችሉ እንሰራለን። በአዳዲስ እና በውስጥ ባለስልጣናት ማህበረሰብ መተባበር እንደምንደርግ እና የስራ ፈላጊዎችን እንማራለን፣ የስራ ገበያን እንደገና እና ዝቅተኛና አንደኛ ያደርጋል።',
       'vision_statement1':
-      'እኛ ዓለም አቀፍ የቀጥታ ተግባር እንዲቀየር በቅርብ ቴክኖሎጂ በመጠቀም ሂደቶችን ለማሻሻል፣ ረጅም የሆነ ሙያዊ ግንኙነትን ለማበረታታት እና የሥራ ኃይል ክፍት እንዲሞሉ እንሞክራለን። በኢንዱስትሪ ፍላጎቶች ላይ በቀጥታ ተመሳሳይነት እንደምንለዋወጥ እና ለንግድ ተቋማት እና ለስራ ፈላጊዎች የተገቢ ፈጣንና ትክክለኛ ቀጥታ እንዲሆን እንደምንምከር።',
-      
+          'እኛ ዓለም አቀፍ የቀጥታ ተግባር እንዲቀየር በቅርብ ቴክኖሎጂ በመጠቀም ሂደቶችን ለማሻሻል፣ ረጅም የሆነ ሙያዊ ግንኙነትን ለማበረታታት እና የሥራ ኃይል ክፍት እንዲሞሉ እንሞክራለን። በኢንዱስትሪ ፍላጎቶች ላይ በቀጥታ ተመሳሳይነት እንደምንለዋወጥ እና ለንግድ ተቋማት እና ለስራ ፈላጊዎች የተገቢ ፈጣንና ትክክለኛ ቀጥታ እንዲሆን እንደምንምከር።',
+      // ClientTalk translations - Amharic
+      'easily_accessible': 'በቀላሉ ሊገኝ የሚችል',
+      'better_workflow': 'ተሻሽሎ የተሰራ የስራ ሂደት',
+      'workflow_description':
+          'የስራ ሂደትዎን ለማቃለል የተዘጋጀ ላልተቋረጠ ዲጂታል ተሞክሮ ያግኙ። የድር መተግበሪያችን ፖርታል ምርታማነትን እና ግንኙነትን የሚያሻሽሉ ሰፊ የሆኑ ባህሪያትን እና መሳሪያዎችን እንዲደርሱ የሚያስችል አመክንዮአዊ በይነገጽ ያቀርባል።',
+      'learn_more': 'ተጨማሪ ለመረዳት',
+      'what_clients_say': 'ደንበኞቻችን የሚሉት',
+
+      // Testimonials - Amharic
+      'testimonial_1_quote':
+          '"ይህ መድረክ የቅጥር ሂደታችንን አብዝቶ አድርጓል። ከፍተኛ ብቃት ያለው ሰው በመዝግብ ጊዜ አገኘን!"',
+      'testimonial_1_name': 'ጆን ዶ',
+      'testimonial_1_position': 'የሰው ሀብት ዳይሬክተር',
+      'testimonial_1_company': 'ማሪር',
+
+      'testimonial_2_quote':
+          '"ይህን አገልግሎት መጠቀም የቅጥር ጊዜ ሳምንታት አስቀረን እና ከፍተኛ ተመራጮችን ቀጠርን!"',
+      'testimonial_2_name': 'ጄን ስሚዝ',
+      'testimonial_2_position': 'የብቃት አስተዳዳሪ',
+      'testimonial_2_company': 'ቴክኮርፕ',
+
+      'testimonial_3_quote':
+          '"ስርአቱ አመክንዮአዊ፣ ብቃት ያለው እና የቅጥር ሂደትን ለHR ቡድናችን በጣም ቀላል ያደርገዋል።"',
+      'testimonial_3_name': 'ሮበርት ብራውን',
+      'testimonial_3_position': 'የሰው ሀብት አስተዳዳሪ',
+      'testimonial_3_company': 'ግሎባል ሶሉሽንስ',
+//payment methods
+      'accepted_payment_methods': 'የሚፈቀዱ የክፍያ ዘዴዎች',
+      'payment_methods_description':
+          'የግብይት ሂደቶችን ለማቃለል ሰፊ የሆኑ የክፍያ ዘዴዎችን እንቀበላለን።\nከታመኑ የንግድ ምልክቶች ይምረጡ እና በደህንነት ይክፈሉ።',
+      'visa': 'ቪዛ',
+      'mastercard': 'ማስተርካርድ',
+      'paypal': 'ፔይፓል',
+      'apple_pay': 'አፕል ፔይ',
+
+      //footer
+      'company_address': "ኮንኮርድ ታወር - 9ኛ ፎቅ - አል ሱፋ\n - ዱባይ ሚዲያ ከተማ - ዱባይ",
+      'copyright': "© 2025 Marrir.com. ሁሉም መብቶች የተጠበቁ ናቸው።",
+
+      // Bottom Navigation Bar
+      'home': 'መነሻ',
+      'about_us': 'ስለ እኛ', // Add this (without _page)
+      'services': 'አገልግሎቶች',
+      'contact': 'መገኛችን',
+      'about_us_page': 'ስለ እኛ',
+
+      //employee dashboard
+      "loading": "በመጫን ላይ...",
+      "search": "ፈልግ",
+      "select_language": "ቋንቋ ይምረጡ",
+      "english": "English",
+      "arabic": "العربية",
+      "amharic": "አማርኛ",
     }
   };
 }

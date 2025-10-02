@@ -8,7 +8,7 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  final lang = Provider.of<LanguageProvider>(context);
+    final lang = Provider.of<LanguageProvider>(context);
 
     return SingleChildScrollView(
       child: Column(
@@ -28,22 +28,21 @@ class AboutScreen extends StatelessWidget {
                 end: Alignment.centerRight,
               ),
             ),
-            child:  Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                   lang.t('about_us'),
-                  style: TextStyle(
+                  lang.t('about_us'),
+                  style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
-                  
                   lang.t('learn_more'),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.white,
                   ),
@@ -58,48 +57,45 @@ class AboutScreen extends StatelessWidget {
           // ===== WHO WE ARE =====
           _buildWhiteCard(
             icon: Icons.rocket_launch_outlined, // Slim Material outline
-            title:lang.t('who_we_are'),
+            title: lang.t('who_we_are'),
             titleStyle: const TextStyle(
               fontSize: 25,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
             centerTitle: true,
-            content: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-               RichText(
-  text: TextSpan(
-    style: const TextStyle(
-      fontSize: 16,
-      color: Colors.black87,
-      height: 1.5,
-    ),
-    children: [
-      TextSpan(
-        text: lang.t('about_desc1'),
-      ),
-      TextSpan(
-        text: lang.t('company_name'),
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-      TextSpan(
-        text: lang.t('about_desc2'),
-      ),
-      TextSpan(
-       text: lang.t('company_name'),
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-      TextSpan(
-        text: lang.t('about_desc3'),
-      ),
-    ],
-  ),
-),
-const SizedBox(height: 16),
-              ]
-            ),
-        
+            content:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              RichText(
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87,
+                    height: 1.5,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: lang.t('about_desc1'),
+                    ),
+                    TextSpan(
+                      text: lang.t('company_name'),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: lang.t('about_desc2'),
+                    ),
+                    TextSpan(
+                      text: lang.t('company_name'),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: lang.t('about_desc3'),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ]),
           ),
           const SizedBox(height: 24),
 
@@ -107,7 +103,7 @@ const SizedBox(height: 16),
           _buildWhiteCard(
             icon: Icons.threesixty_outlined, // Slim 360-degree icon
             title: lang.t('our_mission'),
-            
+
             titleStyle: const TextStyle(
               fontSize: 25,
               fontWeight: FontWeight.bold,
@@ -118,10 +114,10 @@ const SizedBox(height: 16),
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: Text(
-                     lang.t('mission_statement'),
-                    style: TextStyle(
+                    lang.t('mission_statement'),
+                    style: const TextStyle(
                       fontSize: 17,
                       fontStyle: FontStyle.italic,
                       color: Color.fromARGB(255, 72, 155, 180),
@@ -132,8 +128,8 @@ const SizedBox(height: 16),
                 ),
                 const SizedBox(height: 16),
                 Text(
-                 lang.t('mission_statement1'),
-                  style: TextStyle(
+                  lang.t('mission_statement1'),
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.black87,
                     height: 1.5,
@@ -147,7 +143,7 @@ const SizedBox(height: 16),
           // ===== OUR VISION =====
           _buildWhiteCard(
             icon: Icons.lightbulb_outline, // Slim lightbulb
-            title:lang.t('our_vision'),
+            title: lang.t('our_vision'),
             titleStyle: const TextStyle(
               fontSize: 25,
               fontWeight: FontWeight.bold,
@@ -158,10 +154,10 @@ const SizedBox(height: 16),
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: EdgeInsets.all(16),
-                  child:  Text(
-                   lang.t('vision_statement'),
-                    style: TextStyle(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    lang.t('vision_statement'),
+                    style: const TextStyle(
                       fontSize: 17,
                       fontStyle: FontStyle.italic,
                       color: Color.fromARGB(255, 72, 155, 180),
@@ -173,7 +169,7 @@ const SizedBox(height: 16),
                 const SizedBox(height: 16),
                 Text(
                   lang.t('vision_statement1'),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.black87,
                     height: 1.5,
@@ -197,13 +193,13 @@ const SizedBox(height: 16),
 
               // Email
               const Text(
-  "EJITIAZ PORTAL LLC",
-  textAlign: TextAlign.center,
-  style: TextStyle(
-    fontSize: 13,
-    color: Color(0xFF65b2c9),
-  ),
-),
+                "EJITIAZ PORTAL LLC",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Color(0xFF65b2c9),
+                ),
+              ),
 
               const SizedBox(height: 15),
 

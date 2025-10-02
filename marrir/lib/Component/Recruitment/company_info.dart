@@ -10,12 +10,10 @@ class CompanyInfoPage extends StatefulWidget {
   const CompanyInfoPage({super.key});
 
   @override
-  State<CompanyInfoPage> createState() =>
-      _CompanyInfoPageState();
+  State<CompanyInfoPage> createState() => _CompanyInfoPageState();
 }
 
-class _CompanyInfoPageState
-    extends State<CompanyInfoPage> {
+class _CompanyInfoPageState extends State<CompanyInfoPage> {
   String? year;
   final TextEditingController companyNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -74,10 +72,14 @@ class _CompanyInfoPageState
         return;
       }
 
+      // Define companyId and agentId (replace with actual logic to get these values)
+      final companyId = prefs.getString("company_id") ?? "";
+      final agentId = prefs.getString("agent_id") ?? "";
+
       var request = http.MultipartRequest(
         'POST',
         Uri.parse(
-            '${ApiService.baseUrl}/api/v1/company_info/assign-agent-recruitment'),
+            '${ApiService.assignAgentRecruitment(token: token, companyId: companyId, agentId: agentId)}/api/v1/company_info/assign-agent-recruitment'),
       );
 
       request.headers['Authorization'] = 'Bearer $token';

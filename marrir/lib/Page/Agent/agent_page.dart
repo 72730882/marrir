@@ -30,12 +30,9 @@ class AgentPage extends StatefulWidget {
 }
 
 class _AgentPageState extends State<AgentPage> {
-  
   int _selectedIndex = 0;
   String? agentName;
   bool isLoading = true;
-
-  
 
   @override
   void initState() {
@@ -118,9 +115,9 @@ class _AgentPageState extends State<AgentPage> {
 
   @override
   Widget build(BuildContext context) {
-        final lang = Provider.of<LanguageProvider>(context);
+    final lang = Provider.of<LanguageProvider>(context);
 
-        final List<Widget> _pages = const [
+    const List<Widget> pages = [
       DashboardPage(),
       CompanyInfoPage(),
       AgencyEmployeePage(),
@@ -134,7 +131,7 @@ class _AgentPageState extends State<AgentPage> {
       HelpPage(),
     ];
 
-    final List<String> _menuTitles = [
+    final List<String> menuTitles = [
       lang.t('dashboard'),
       lang.t('company_info'),
       lang.t('agency_employee'),
@@ -148,7 +145,7 @@ class _AgentPageState extends State<AgentPage> {
       lang.t('help'),
     ];
 
-    final List<IconData> _menuIcons = [
+    final List<IconData> menuIcons = [
       Icons.dashboard,
       Icons.business,
       Icons.people,
@@ -185,34 +182,33 @@ class _AgentPageState extends State<AgentPage> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-  backgroundColor: Colors.white,
-  leading: Builder(
-    builder: (context) => IconButton(
-      icon: const Icon(Icons.menu),
-      onPressed: () => Scaffold.of(context).openDrawer(),
-    ),
-  ),
-  actions: [
-    PopupMenuButton<String>(
-      tooltip: "Select Language",
-      icon: const Icon(Icons.translate, color: Colors.purple),
-      onSelected: (value) {
-        Provider.of<LanguageProvider>(context, listen: false)
-            .changeLanguage(value);
-      },
-      itemBuilder: (BuildContext context) => [
-        const PopupMenuItem(value: "en", child: Text("English")),
-        const PopupMenuItem(value: "ar", child: Text("العربية")),
-        const PopupMenuItem(value: "am", child: Text("አማርኛ")),
-      ],
-    ),
-    IconButton(
-      icon: const Icon(Icons.notifications_none),
-      onPressed: () {},
-    ),
-  ],
-),
-
+          backgroundColor: Colors.white,
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
+          ),
+          actions: [
+            PopupMenuButton<String>(
+              tooltip: "Select Language",
+              icon: const Icon(Icons.translate, color: Colors.purple),
+              onSelected: (value) {
+                Provider.of<LanguageProvider>(context, listen: false)
+                    .changeLanguage(value);
+              },
+              itemBuilder: (BuildContext context) => [
+                const PopupMenuItem(value: "en", child: Text("English")),
+                const PopupMenuItem(value: "ar", child: Text("العربية")),
+                const PopupMenuItem(value: "am", child: Text("አማርኛ")),
+              ],
+            ),
+            IconButton(
+              icon: const Icon(Icons.notifications_none),
+              onPressed: () {},
+            ),
+          ],
+        ),
         drawer: Drawer(
           backgroundColor: Colors.white,
           child: SafeArea(
@@ -224,18 +220,18 @@ class _AgentPageState extends State<AgentPage> {
                 const SizedBox(height: 20),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: _menuTitles.length + 1,
+                    itemCount: menuTitles.length + 1,
                     itemBuilder: (context, index) {
-                      if (index < _menuTitles.length) {
+                      if (index < menuTitles.length) {
                         return ListTile(
                           leading: Icon(
-                            _menuIcons[index],
+                            menuIcons[index],
                             color: _selectedIndex == index
                                 ? const Color(0xFF65b2c9)
                                 : Colors.black54,
                           ),
                           title: Text(
-                            _menuTitles[index],
+                            menuTitles[index],
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: _selectedIndex == index
@@ -258,8 +254,9 @@ class _AgentPageState extends State<AgentPage> {
                         return ListTile(
                           leading:
                               const Icon(Icons.logout, color: Colors.black54),
-                         title: Text(lang.t('logout'),
-                            style: TextStyle(
+                          title: Text(
+                            lang.t('logout'),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.normal,
                               color: Colors.black87,
@@ -273,12 +270,12 @@ class _AgentPageState extends State<AgentPage> {
                                   title: Text(
                                     lang.t('end_session'),
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  content:  Text(
-                                     lang.t('logout_confirmation'),
+                                  content: Text(
+                                    lang.t('logout_confirmation'),
                                     textAlign: TextAlign.center,
                                   ),
                                   actions: [
@@ -298,12 +295,12 @@ class _AgentPageState extends State<AgentPage> {
                                           ),
                                         );
                                       },
-                                       child: Text(lang.t('yes')),
+                                      child: Text(lang.t('yes')),
                                     ),
                                     TextButton(
                                       onPressed: () =>
                                           Navigator.of(context).pop(),
-                                       child: Text(lang.t('cancel')),
+                                      child: Text(lang.t('cancel')),
                                     ),
                                   ],
                                 );
@@ -321,7 +318,7 @@ class _AgentPageState extends State<AgentPage> {
         ),
         body: IndexedStack(
           index: _selectedIndex,
-          children: _pages,
+          children: pages,
         ),
       ),
     );

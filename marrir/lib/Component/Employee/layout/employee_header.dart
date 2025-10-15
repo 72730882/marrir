@@ -53,8 +53,8 @@ class _EmployeeHeaderState extends State<EmployeeHeader> {
   static const _bgWhite = Color(0xFFFFFFFF);
   static const _ink = Color(0xFF111111);
   static const _muted = Color(0xFF8E8E93);
-  static const _hint = Color(0xFF9BA0A6);
-  static const _searchBg = Color(0xFFF2F2F7);
+  // static const _hint = Color(0xFF9BA0A6);
+  // static const _searchBg = Color(0xFFF2F2F7);
 
   @override
   Widget build(BuildContext context) {
@@ -141,49 +141,6 @@ class _EmployeeHeaderState extends State<EmployeeHeader> {
                   const SizedBox(width: 14),
                   const Icon(Icons.notifications_none, size: 22, color: _ink),
                 ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // Search bar
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: _searchBg,
-                    borderRadius: BorderRadius.circular(22),
-                  ),
-                  alignment: Alignment.center,
-                  child: TextField(
-                    cursorColor: _ink,
-                    style: const TextStyle(fontSize: 15, color: _ink),
-                    decoration: InputDecoration(
-                      isCollapsed: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 12),
-                      prefixIcon:
-                          const Icon(Icons.search, color: _hint, size: 20),
-                      hintText: languageProvider
-                          .t('search'), // Translated search hint
-                      hintStyle: const TextStyle(
-                        color: _hint,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              const TwoLineFilterIcon(
-                color: _ink,
-                width: 26,
-                lineThickness: 2.0,
-                gap: 8,
-                knobRadius: 3.0,
               ),
             ],
           ),

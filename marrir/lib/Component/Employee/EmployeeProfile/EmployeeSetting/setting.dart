@@ -4,6 +4,8 @@ import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSetting/notifi
 import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSetting/password_setting.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/employee_profile.dart';
 import 'package:marrir/Component/Employee/wave_background.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class SettingPage extends StatelessWidget {
   final Function(Widget) onChildSelected;
@@ -12,11 +14,13 @@ class SettingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Column(
       children: [
         // Header with waves
         WaveBackground(
-          title: "Setting",
+          title: _getTranslatedSettingTitle(languageProvider),
           onBack: () {
             onChildSelected(ProfilePage(onChildSelected: onChildSelected));
           },
@@ -29,29 +33,29 @@ class SettingPage extends StatelessWidget {
           child: ListView(
             children: [
               _buildSecurityOption(
-                "Notification Settings",
+                _getTranslatedNotificationSettings(languageProvider),
                 Icons.notifications,
                 onTap: () {
                   onChildSelected(
                     NotificationSettingsPage(onChildSelected: onChildSelected),
                   );
                 },
+                languageProvider: languageProvider,
               ),
               _buildSecurityOption(
-                "Password Settings",
+                _getTranslatedPasswordSettings(languageProvider),
                 Icons.lock,
                 onTap: () {
-                  // Replace with your TermsAndConditionsPage widget
                   onChildSelected(
                     PassWordPinPage(onChildSelected: onChildSelected),
                   );
                 },
+                languageProvider: languageProvider,
               ),
               _buildSecurityOption(
-                "Delete Account",
+                _getTranslatedDeleteAccount(languageProvider),
                 Icons.delete,
                 onTap: () {
-                  // Replace with your TermsAndConditionsPage widget
                   onChildSelected(
                     DeleteAccountPage(
                       onChildSelected: onChildSelected,
@@ -60,6 +64,7 @@ class SettingPage extends StatelessWidget {
                     ),
                   );
                 },
+                languageProvider: languageProvider,
               ),
             ],
           ),
@@ -72,12 +77,13 @@ class SettingPage extends StatelessWidget {
     String title,
     IconData icon, {
     required VoidCallback onTap,
+    required LanguageProvider languageProvider,
   }) {
     return ListTile(
       leading: Icon(
         icon,
         color: const Color(0xFF65B2C9),
-      ), // Add this line to use the icon parameter
+      ),
       title: Text(
         title,
         style: const TextStyle(
@@ -90,6 +96,33 @@ class SettingPage extends StatelessWidget {
       onTap: onTap,
     );
   }
-}
 
-// Add these at the bottom of your file or in separate files:
+  // Translation helper methods
+  String _getTranslatedSettingTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الإعدادات";
+    if (lang == 'am') return "ቅንብሮች";
+    return "Setting";
+  }
+
+  String _getTranslatedNotificationSettings(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إعدادات الإشعارات";
+    if (lang == 'am') return "የማሳወቂያ ቅንብሮች";
+    return "Notification Settings";
+  }
+
+  String _getTranslatedPasswordSettings(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إعدادات كلمة المرور";
+    if (lang == 'am') return "የይለፍ ቃል ቅንብሮች";
+    return "Password Settings";
+  }
+
+  String _getTranslatedDeleteAccount(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "حذف الحساب";
+    if (lang == 'am') return "መለያ ሰርዝ";
+    return "Delete Account";
+  }
+}

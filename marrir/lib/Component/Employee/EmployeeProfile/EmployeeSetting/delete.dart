@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSetting/setting.dart';
 import 'package:marrir/Component/Employee/wave_background.dart';
 import 'package:marrir/services/user.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class DeleteAccountPage extends StatefulWidget {
   final Function(Widget)? onChildSelected;
@@ -39,10 +42,10 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
     super.dispose();
   }
 
-  Future<void> _deleteAccount() async {
+  Future<void> _deleteAccount(LanguageProvider languageProvider) async {
     if (_passwordCtrl.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your password')),
+        SnackBar(content: Text(_getTranslatedEnterPassword(languageProvider))),
       );
       return;
     }
@@ -60,7 +63,9 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
     if (result['success'] == true) {
       // Account deleted successfully
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message'] ?? "Account deleted")),
+        SnackBar(
+            content: Text(result['message'] ??
+                _getTranslatedAccountDeleted(languageProvider))),
       );
 
       // Navigate to login or home screen
@@ -69,7 +74,8 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result['message'] ?? "Something went wrong"),
+          content: Text(result['message'] ??
+              _getTranslatedSomethingWentWrong(languageProvider)),
           backgroundColor: _errorRed,
         ),
       );
@@ -78,6 +84,8 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       body: Stack(
         children: [
@@ -85,7 +93,7 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
             padding: EdgeInsets.zero,
             children: [
               WaveBackground(
-                title: "Delete Account",
+                title: _getTranslatedTitle(languageProvider),
                 onBack: () {
                   if (widget.onChildSelected != null) {
                     widget.onChildSelected!(
@@ -103,7 +111,7 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
                 child: Column(
                   children: [
                     Text(
-                      'Are You Sure You Want To\nDelete Your Account?',
+                      _getTranslatedConfirmationQuestion(languageProvider),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 18,
@@ -126,7 +134,7 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'This action will permanently delete all of your data, and you will not be able to recover it. Please keep the following in mind before proceeding:',
+                            _getTranslatedWarningMessage(languageProvider),
                             style: TextStyle(
                               fontSize: 14,
                               height: 1.45,
@@ -135,13 +143,14 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          _bullet(
-                              'All your expenses, income and associated transactions will be eliminated.'),
+                          _bullet(_getTranslatedBullet1(languageProvider),
+                              languageProvider),
                           const SizedBox(height: 10),
-                          _bullet(
-                              'You will not be able to access your account or any related information.'),
+                          _bullet(_getTranslatedBullet2(languageProvider),
+                              languageProvider),
                           const SizedBox(height: 10),
-                          _bullet('This action cannot be undone.'),
+                          _bullet(_getTranslatedBullet3(languageProvider),
+                              languageProvider),
                         ],
                       ),
                     ),
@@ -151,7 +160,7 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'Please Enter Your Password To Confirm\nDeletion Of Your Account.',
+                        _getTranslatedPasswordConfirmation(languageProvider),
                         style: TextStyle(
                           fontSize: 15.5,
                           fontWeight: FontWeight.w700,
@@ -170,7 +179,7 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
                       chipColor: _chipGrey,
                       pillColor: const Color(0xFFE0EAEE),
                       textColor: _textPrimary,
-                      hintDots: '••••••••',
+                      hintText: _getTranslatedPasswordHint(languageProvider),
                     ),
 
                     const SizedBox(height: 22),
@@ -179,7 +188,9 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _isLoading ? null : _deleteAccount,
+                        onPressed: _isLoading
+                            ? null
+                            : () => _deleteAccount(languageProvider),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _primaryBlueDark,
                           foregroundColor: Colors.white,
@@ -197,9 +208,9 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
                                       AlwaysStoppedAnimation(Colors.white),
                                 ),
                               )
-                            : const Text(
-                                'Yes, Delete Account',
-                                style: TextStyle(
+                            : Text(
+                                _getTranslatedDeleteButton(languageProvider),
+                                style: const TextStyle(
                                     fontSize: 15, fontWeight: FontWeight.w700),
                               ),
                       ),
@@ -230,9 +241,9 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: const StadiumBorder(),
                         ),
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(
+                        child: Text(
+                          _getTranslatedCancelButton(languageProvider),
+                          style: const TextStyle(
                               fontSize: 15, fontWeight: FontWeight.w700),
                         ),
                       ),
@@ -256,7 +267,7 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
     );
   }
 
-  Widget _bullet(String text) {
+  Widget _bullet(String text, LanguageProvider languageProvider) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -286,6 +297,108 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
       ],
     );
   }
+
+  // Translation helper methods
+  String _getTranslatedTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "حذف الحساب";
+    if (lang == 'am') return "መለያ ሰርዝ";
+    return "Delete Account";
+  }
+
+  String _getTranslatedConfirmationQuestion(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "هل أنت متأكد أنك تريد\nحذف حسابك؟";
+    if (lang == 'am') return "መለያህን መሰረዝ እንደምትፈልግ እርግጠኛ ነህ?\n";
+    return "Are You Sure You Want To\nDelete Your Account?";
+  }
+
+  String _getTranslatedWarningMessage(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') {
+      return "هذا الإجراء سيقوم بحذف جميع بياناتك بشكل دائم، ولن تتمكن من استعادتها. يرجى مراعاة ما يلي قبل المتابعة:";
+    }
+    if (lang == 'am') {
+      return "ይህ እርምጃ ሁሉንም የእርስዎ ውሂብ ለዘላለም ያጥፋል፣ እና መመለስ አይችሉም። ከመቀጠልዎ በፊት የሚከተሉትን ያስታውሱ፡";
+    }
+    return "This action will permanently delete all of your data, and you will not be able to recover it. Please keep the following in mind before proceeding:";
+  }
+
+  String _getTranslatedBullet1(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') {
+      return "سيتم حذف جميع نفقاتك ودخلك والمعاملات المرتبطة بها.";
+    }
+    if (lang == 'am') return "ሁሉም ወጪዎችዎ፣ ገቢዎችዎ እና ተዛማጅ ግብይቶች ይጠፋሉ።";
+    return "All your expenses, income and associated transactions will be eliminated.";
+  }
+
+  String _getTranslatedBullet2(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') {
+      return "لن تتمكن من الوصول إلى حسابك أو أي معلومات مرتبطة به.";
+    }
+    if (lang == 'am') return "ወደ መለያዎ ወይም ማንኛውም ተዛማጅ መረጃ መድረስ አይችሉም።";
+    return "You will not be able to access your account or any related information.";
+  }
+
+  String _getTranslatedBullet3(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "لا يمكن التراجع عن هذا الإجراء.";
+    if (lang == 'am') return "ይህ እርምጃ ሊመለስ አይችልም።";
+    return "This action cannot be undone.";
+  }
+
+  String _getTranslatedPasswordConfirmation(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') {
+      return "يرجى إدخال كلمة المرور الخاصة بك لتأكيد\nحذف حسابك.";
+    }
+    if (lang == 'am') return "መለያዎን ለማጥፋት ማረጋገጫ ለማድረግ የይለፍ ቃልዎን ያስገቡ\n.";
+    return "Please Enter Your Password To Confirm\nDeletion Of Your Account.";
+  }
+
+  String _getTranslatedPasswordHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "••••••••";
+    if (lang == 'am') return "••••••••";
+    return "••••••••";
+  }
+
+  String _getTranslatedDeleteButton(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "نعم، احذف الحساب";
+    if (lang == 'am') return "አዎ፣ መለያውን ሰርዝ";
+    return "Yes, Delete Account";
+  }
+
+  String _getTranslatedCancelButton(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إلغاء";
+    if (lang == 'am') return "ሰርዝ";
+    return "Cancel";
+  }
+
+  String _getTranslatedEnterPassword(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "يرجى إدخال كلمة المرور";
+    if (lang == 'am') return "እባክዎ የይለፍ ቃልዎን ያስገቡ";
+    return "Please enter your password";
+  }
+
+  String _getTranslatedAccountDeleted(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تم حذف الحساب";
+    if (lang == 'am') return "መለያው ተሰርዟል";
+    return "Account deleted";
+  }
+
+  String _getTranslatedSomethingWentWrong(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "حدث خطأ ما";
+    if (lang == 'am') return "ስህተት ተከስቷል";
+    return "Something went wrong";
+  }
 }
 
 class _PasswordPillField extends StatelessWidget {
@@ -295,7 +408,7 @@ class _PasswordPillField extends StatelessWidget {
   final Color chipColor;
   final Color pillColor;
   final Color textColor;
-  final String hintDots;
+  final String hintText;
 
   const _PasswordPillField({
     required this.controller,
@@ -304,7 +417,7 @@ class _PasswordPillField extends StatelessWidget {
     required this.chipColor,
     required this.pillColor,
     required this.textColor,
-    required this.hintDots,
+    required this.hintText,
   });
 
   @override
@@ -326,7 +439,7 @@ class _PasswordPillField extends StatelessWidget {
               decoration: InputDecoration(
                 isDense: true,
                 border: InputBorder.none,
-                hintText: hintDots,
+                hintText: hintText,
                 hintStyle: TextStyle(
                   color: textColor.withOpacity(0.6),
                   letterSpacing: 3,

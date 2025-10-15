@@ -5,7 +5,6 @@ import 'package:marrir/Dio/dio.dart';
 import 'package:provider/provider.dart';
 import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
 
-
 class ReserveHistoryPage extends StatefulWidget {
   const ReserveHistoryPage({super.key});
 
@@ -245,7 +244,7 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final lang = Provider.of<LanguageProvider>(context); 
+    final lang = Provider.of<LanguageProvider>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -255,12 +254,12 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ===== Header =====
-               Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     lang.t('reserve_history'),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
@@ -279,7 +278,7 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
                 children: [
                   Expanded(
                     child: _buildSummaryCard(
-                       title: lang.t('reserves_requested'),
+                      title: lang.t('reserves_requested'),
                       value: _reserveHistory.length.toString(),
                       count: _reserveHistory.length.toString(),
                     ),
@@ -378,14 +377,14 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
   }
 
   Widget _buildIncomingRequestsSection() {
-        final lang = Provider.of<LanguageProvider>(context); 
+    final lang = Provider.of<LanguageProvider>(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-         Text(
+        Text(
           lang.t('incoming_reserve_requests'),
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Color.fromARGB(255, 117, 97, 229),
@@ -424,16 +423,16 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(lang.t('from'),
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
                     Text(lang.t('role'),
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
                     Text(lang.t('created_at'),
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
                     Text(lang.t('action'),
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
                   ],
                 ),
@@ -451,9 +450,11 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
                       style: const TextStyle(color: Colors.red)),
                 )
               else if (_incomingRequests.isEmpty)
-                 Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Text(lang.t('no_incoming_reserve_requests'),),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Text(
+                    lang.t('no_incoming_reserve_requests'),
+                  ),
                 )
               else
                 ..._incomingRequests
@@ -466,7 +467,6 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
   }
 
   Widget _buildIncomingRequestRow(IncomingReserveRequest request) {
-
     return Column(
       children: [
         Padding(
@@ -495,14 +495,14 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
   }
 
   Widget _buildReserveHistorySection() {
-            final lang = Provider.of<LanguageProvider>(context); 
+    final lang = Provider.of<LanguageProvider>(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           lang.t("reserve_history"),
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Color.fromARGB(255, 117, 97, 229),
@@ -537,26 +537,26 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
                 ),
                 padding:
                     const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
-                child:  Row(
+                child: Row(
                   children: [
                     Expanded(
                         child: Text(lang.t('batch_no'),
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold))),
                     Expanded(
                         child: Text(lang.t('reserved_to'),
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold))),
                     Expanded(
                         child: Text(lang.t('created_at'),
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold))),
                     Expanded(
                         child: Text(lang.t('employees'),
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold))),
                   ],
@@ -576,7 +576,7 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
                 )
               else if (_reserveHistory.isEmpty)
                 Padding(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   child: Text(lang.t('no_reserve_history_found')),
                 )
               else

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:marrir/services/Employee/cv_service.dart'; // your CVService
+import 'package:marrir/services/Employee/cv_service.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class PersonalInformationStep extends StatefulWidget {
   final VoidCallback onSuccess;
@@ -27,7 +29,7 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
   final _childrenCtrl = TextEditingController(text: "0");
   final _dobCtrl = TextEditingController();
 
-  // Dropdown values (store canonical tokens used in items)
+  // Dropdown values
   String? _sex;
   String _countryCode = "+251";
   String? _maritalStatus;
@@ -100,15 +102,127 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
     "+61"
   ];
 
-  // Pretty label for display while keeping canonical value in state
-  String _prettyLabel(String s) {
-    // Preserve country and birthplace labels as-is
-    if (s.contains('(') && s.contains(')')) return s;
-    return s
-        .replaceAll('_', ' ')
-        .split(' ')
-        .map((w) => w.isEmpty ? w : '${w[0].toUpperCase()}${w.substring(1)}')
-        .join(' ');
+  // Get translated labels for display
+  String _getTranslatedLabel(String value, LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+
+    // Sex translations
+    if (value == "male") {
+      if (lang == 'ar') return "ذكر";
+      if (lang == 'am') return "ወንድ";
+      return "Male";
+    }
+    if (value == "female") {
+      if (lang == 'ar') return "أنثى";
+      if (lang == 'am') return "ሴት";
+      return "Female";
+    }
+
+    // Marital status translations
+    if (value == "single") {
+      if (lang == 'ar') return "أعزب";
+      if (lang == 'am') return "ያላገባ";
+      return "Single";
+    }
+    if (value == "married") {
+      if (lang == 'ar') return "متزوج";
+      if (lang == 'am') return "ያገባ";
+      return "Married";
+    }
+    if (value == "divorced") {
+      if (lang == 'ar') return "مطلق";
+      if (lang == 'am') return "የተፋታ";
+      return "Divorced";
+    }
+    if (value == "widowed") {
+      if (lang == 'ar') return "أرمل";
+      if (lang == 'am') return "የተሰወረ";
+      return "Widowed";
+    }
+    if (value == "separated") {
+      if (lang == 'ar') return "منفصل";
+      if (lang == 'am') return "የተለያየ";
+      return "Separated";
+    }
+
+    // Skin tone translations
+    if (value == "very_light") {
+      if (lang == 'ar') return "فاتح جداً";
+      if (lang == 'am') return "በጣም ቀላል";
+      return "Very Light";
+    }
+    if (value == "light") {
+      if (lang == 'ar') return "فاتح";
+      if (lang == 'am') return "ቀላል";
+      return "Light";
+    }
+    if (value == "medium") {
+      if (lang == 'ar') return "متوسط";
+      if (lang == 'am') return "መካከለኛ";
+      return "Medium";
+    }
+    if (value == "dark") {
+      if (lang == 'ar') return "غامق";
+      if (lang == 'am') return "ጥቁር";
+      return "Dark";
+    }
+    if (value == "very_dark") {
+      if (lang == 'ar') return "غامق جداً";
+      if (lang == 'am') return "በጣም ጥቁር";
+      return "Very Dark";
+    }
+
+    // Religion translations
+    if (value == "none") {
+      if (lang == 'ar') return "لا دين";
+      if (lang == 'am') return "ሃይማኖት የለም";
+      return "None";
+    }
+    if (value == "church_of_the_east") {
+      if (lang == 'ar') return "كنيسة المشرق";
+      if (lang == 'am') return "የምስራቅ ቤተክርስቲያን";
+      return "Church of the East";
+    }
+    if (value == "oriental_orthodoxy") {
+      if (lang == 'ar') return "الأرثوذكسية المشرقية";
+      if (lang == 'am') return "ኦርቶዶክስ ተዋሕዶ";
+      return "Oriental Orthodoxy";
+    }
+    if (value == "eastern_orthodoxy") {
+      if (lang == 'ar') return "الأرثوذكسية الشرقية";
+      if (lang == 'am') return "ምስራቃዊ ኦርቶዶክስ";
+      return "Eastern Orthodoxy";
+    }
+    if (value == "roman_catholicism") {
+      if (lang == 'ar') return "الكاثوليكية الرومانية";
+      if (lang == 'am') return "ሮማን ካቶሊክ";
+      return "Roman Catholicism";
+    }
+    if (value == "protestantism") {
+      if (lang == 'ar') return "البروتستانتية";
+      if (lang == 'am') return "ፕሮቴስታንት";
+      return "Protestantism";
+    }
+    if (value == "islam") {
+      if (lang == 'ar') return "الإسلام";
+      if (lang == 'am') return "እስልምና";
+      return "Islam";
+    }
+    if (value == "buddhism") {
+      if (lang == 'ar') return "البوذية";
+      if (lang == 'am') return "ቡዲስት";
+      return "Buddhism";
+    }
+
+    // For country codes and birth places, return as-is
+    return value;
+  }
+
+  String _getTranslatedHint(String label, LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "اختر $label";
+    if (lang == 'am') return "$label ይምረጡ";
+    return "Select $label";
   }
 
   // Ensure value passed to DropdownButtonFormField is present in items or null
@@ -117,7 +231,7 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
     return items.contains(value) ? value : null;
   }
 
-  // If you ever prefill values (e.g., from API), normalize them here
+  // Normalize skin tone values
   String? _normalizeSkinTone(String? v) {
     if (v == null) return null;
     final s = v.trim().toLowerCase().replaceAll(' ', '_');
@@ -145,6 +259,7 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
     String? hint,
     Widget? suffixIcon,
     Widget? prefixIcon,
+    LanguageProvider? languageProvider,
   }) {
     return InputDecoration(
       hintText: hint,
@@ -187,6 +302,7 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
     required List<T> items,
     required String Function(T) labelOf,
     required void Function(T?) onChanged,
+    required LanguageProvider languageProvider,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,7 +323,7 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
               .toList(),
           onChanged: onChanged,
           decoration: _decoration(
-            hint: "Select $label",
+            hint: _getTranslatedHint(label, languageProvider),
             suffixIcon: const Padding(
               padding: EdgeInsets.only(right: 8),
               child: Icon(
@@ -216,6 +332,7 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
                 size: 22,
               ),
             ),
+            languageProvider: languageProvider,
           ),
           icon: const SizedBox.shrink(),
           borderRadius: BorderRadius.circular(10),
@@ -225,7 +342,7 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
     );
   }
 
-  Future<void> _pickDate() async {
+  Future<void> _pickDate(LanguageProvider languageProvider) async {
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
@@ -253,6 +370,9 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
   }
 
   Future<void> _submitForm() async {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context, listen: false);
+
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     setState(() => _isLoading = true);
@@ -263,7 +383,7 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
       final userId = prefs.getString("user_id") ?? "";
 
       if (token.isEmpty || userId.isEmpty) {
-        throw Exception("User not logged in");
+        throw Exception(_getTranslatedNotLoggedIn(languageProvider));
       }
 
       // Map dropdown values to backend enum
@@ -302,13 +422,16 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Personal info submitted successfully")),
+        SnackBar(content: Text(_getTranslatedSuccessMessage(languageProvider))),
       );
-      // ignore: avoid_print
-      print("Submitted data: $res");
+
+      widget.onSuccess();
+      widget.onNextStep();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+        SnackBar(
+            content: Text(
+                _getTranslatedErrorMessage(e.toString(), languageProvider))),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -317,6 +440,8 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     // If any of these values were prefilled elsewhere and don't match items, _safeValue will null them to avoid the crash.
     final sexValue = _safeValue(_sex, _sexItems);
     final maritalValue = _safeValue(_maritalStatus, _maritalItems);
@@ -332,58 +457,71 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 8),
-            const Text(
-              "Step 3: Personal Information",
-              style: TextStyle(
+            Text(
+              _getTranslatedStepTitle(languageProvider),
+              style: const TextStyle(
                 fontSize: 16,
                 color: _titleColor,
                 fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 14),
-            const Text(
-              "Personal Information",
-              style: TextStyle(
+            Text(
+              _getTranslatedSectionTitle(languageProvider),
+              style: const TextStyle(
                 fontSize: 13,
                 color: _labelColor,
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 8),
-            _fieldLabel("Amharic Full Name"),
+            _fieldLabel(_getTranslatedAmharicNameLabel(languageProvider)),
             TextFormField(
               controller: _amhNameCtrl,
-              decoration: _decoration(hint: "Enter Amharic Full Name"),
+              decoration: _decoration(
+                hint: _getTranslatedAmharicNameHint(languageProvider),
+                languageProvider: languageProvider,
+              ),
             ),
             const SizedBox(height: 12),
-            _fieldLabel("English Full Name"),
+            _fieldLabel(_getTranslatedEnglishNameLabel(languageProvider)),
             TextFormField(
               controller: _engNameCtrl,
-              decoration: _decoration(hint: "Enter English Full Name"),
+              decoration: _decoration(
+                hint: _getTranslatedEnglishNameHint(languageProvider),
+                languageProvider: languageProvider,
+              ),
             ),
             const SizedBox(height: 12),
-            _fieldLabel("Arabic Full Name"),
+            _fieldLabel(_getTranslatedArabicNameLabel(languageProvider)),
             TextFormField(
               controller: _arbNameCtrl,
-              decoration: _decoration(hint: "Enter Arabic Full Name"),
+              decoration: _decoration(
+                hint: _getTranslatedArabicNameHint(languageProvider),
+                languageProvider: languageProvider,
+              ),
             ),
             const SizedBox(height: 12),
             _dropdown<String>(
-              label: "Sex",
+              label: _getTranslatedSexLabel(languageProvider),
               value: sexValue as String?,
               items: _sexItems,
-              labelOf: _prettyLabel,
+              labelOf: (value) => _getTranslatedLabel(value, languageProvider),
               onChanged: (v) => setState(() => _sex = v),
+              languageProvider: languageProvider,
             ),
             const SizedBox(height: 12),
-            _fieldLabel("Email"),
+            _fieldLabel(_getTranslatedEmailLabel(languageProvider)),
             TextFormField(
               controller: _emailCtrl,
               keyboardType: TextInputType.emailAddress,
-              decoration: _decoration(hint: "Enter Email"),
+              decoration: _decoration(
+                hint: _getTranslatedEmailHint(languageProvider),
+                languageProvider: languageProvider,
+              ),
             ),
             const SizedBox(height: 12),
-            _fieldLabel("Phone Number"),
+            _fieldLabel(_getTranslatedPhoneLabel(languageProvider)),
             Row(
               children: [
                 SizedBox(
@@ -407,7 +545,10 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
                     onChanged: (v) => setState(() {
                       if (v != null) _countryCode = v;
                     }),
-                    decoration: _decoration(hint: "Code"),
+                    decoration: _decoration(
+                      hint: _getTranslatedCodeHint(languageProvider),
+                      languageProvider: languageProvider,
+                    ),
                     icon: const Icon(
                       Icons.keyboard_arrow_down_rounded,
                       color: _iconMuted,
@@ -420,7 +561,10 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
                   child: TextFormField(
                     controller: _phoneCtrl,
                     keyboardType: TextInputType.phone,
-                    decoration: _decoration(hint: "Enter Phone Number"),
+                    decoration: _decoration(
+                      hint: _getTranslatedPhoneHint(languageProvider),
+                      languageProvider: languageProvider,
+                    ),
                   ),
                 ),
               ],
@@ -432,13 +576,16 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _fieldLabel("Height (cm)"),
+                      _fieldLabel(_getTranslatedHeightLabel(languageProvider)),
                       TextFormField(
                         controller: _heightCtrl,
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
-                        decoration: _decoration(hint: "Enter Height"),
+                        decoration: _decoration(
+                          hint: _getTranslatedHeightHint(languageProvider),
+                          languageProvider: languageProvider,
+                        ),
                       ),
                     ],
                   ),
@@ -448,13 +595,16 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _fieldLabel("Weight (kg)"),
+                      _fieldLabel(_getTranslatedWeightLabel(languageProvider)),
                       TextFormField(
                         controller: _weightCtrl,
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
-                        decoration: _decoration(hint: "Enter Weight"),
+                        decoration: _decoration(
+                          hint: _getTranslatedWeightHint(languageProvider),
+                          languageProvider: languageProvider,
+                        ),
                       ),
                     ],
                   ),
@@ -463,61 +613,69 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
             ),
             const SizedBox(height: 12),
             _dropdown<String>(
-              label: "Marital Status",
+              label: _getTranslatedMaritalStatusLabel(languageProvider),
               value: maritalValue as String?,
               items: _maritalItems,
-              labelOf: _prettyLabel,
+              labelOf: (value) => _getTranslatedLabel(value, languageProvider),
               onChanged: (v) => setState(() => _maritalStatus = v),
+              languageProvider: languageProvider,
             ),
             const SizedBox(height: 12),
-            _fieldLabel("Number of Children"),
+            _fieldLabel(_getTranslatedChildrenLabel(languageProvider)),
             TextFormField(
               controller: _childrenCtrl,
               keyboardType:
                   const TextInputType.numberWithOptions(signed: false),
-              decoration: _decoration(hint: "Enter Number of Children"),
+              decoration: _decoration(
+                hint: _getTranslatedChildrenHint(languageProvider),
+                languageProvider: languageProvider,
+              ),
             ),
             const SizedBox(height: 12),
             _dropdown<String>(
-              label: "Skin Tone",
+              label: _getTranslatedSkinToneLabel(languageProvider),
               value: skinToneValue as String?,
               items: _skinToneItems,
-              labelOf: _prettyLabel,
+              labelOf: (value) => _getTranslatedLabel(value, languageProvider),
               onChanged: (v) => setState(() => _skinTone = v),
+              languageProvider: languageProvider,
             ),
             const SizedBox(height: 12),
             _dropdown<String>(
-              label: "Place of Birth",
+              label: _getTranslatedBirthPlaceLabel(languageProvider),
               value: birthPlaceValue as String?,
               items: _birthPlaceItems,
-              labelOf: (s) => s, // already pretty
+              labelOf: (value) => _getTranslatedLabel(value, languageProvider),
               onChanged: (v) => setState(() => _placeOfBirth = v),
+              languageProvider: languageProvider,
             ),
             const SizedBox(height: 12),
-            _fieldLabel("Date of Birth"),
+            _fieldLabel(_getTranslatedDobLabel(languageProvider)),
             TextFormField(
               controller: _dobCtrl,
               readOnly: true,
               decoration: _decoration(
-                hint: "yyyy-mm-dd",
+                hint: _getTranslatedDobHint(languageProvider),
                 suffixIcon: IconButton(
-                  onPressed: _pickDate,
+                  onPressed: () => _pickDate(languageProvider),
                   icon: const Icon(
                     Icons.calendar_today_outlined,
                     size: 18,
                     color: _iconMuted,
                   ),
                 ),
+                languageProvider: languageProvider,
               ),
-              onTap: _pickDate,
+              onTap: () => _pickDate(languageProvider),
             ),
             const SizedBox(height: 12),
             _dropdown<String>(
-              label: "Religion",
+              label: _getTranslatedReligionLabel(languageProvider),
               value: religionValue as String?,
               items: _religionItems,
-              labelOf: _prettyLabel,
+              labelOf: (value) => _getTranslatedLabel(value, languageProvider),
               onChanged: (v) => setState(() => _religion = v),
+              languageProvider: languageProvider,
             ),
             const SizedBox(height: 20),
             SizedBox(
@@ -541,7 +699,7 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
                     ? const CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation(Colors.white),
                       )
-                    : const Text("Submit"),
+                    : Text(_getTranslatedSubmitButton(languageProvider)),
               ),
             ),
             const SizedBox(height: 20),
@@ -549,5 +707,218 @@ class _PersonalInformationStepState extends State<PersonalInformationStep> {
         ),
       ),
     );
+  }
+
+  // Translation helper methods
+  String _getTranslatedStepTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الخطوة 3: المعلومات الشخصية";
+    if (lang == 'am') return "ደረጃ 3: የግል መረጃ";
+    return "Step 3: Personal Information";
+  }
+
+  String _getTranslatedSectionTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المعلومات الشخصية";
+    if (lang == 'am') return "የግል መረጃ";
+    return "Personal Information";
+  }
+
+  String _getTranslatedAmharicNameLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الاسم الكامل بالأمهرية";
+    if (lang == 'am') return "ሙሉ ስም በአማርኛ";
+    return "Amharic Full Name";
+  }
+
+  String _getTranslatedAmharicNameHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل الاسم الكامل بالأمهرية";
+    if (lang == 'am') return "ሙሉ ስም በአማርኛ ያስገቡ";
+    return "Enter Amharic Full Name";
+  }
+
+  String _getTranslatedEnglishNameLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الاسم الكامل بالإنجليزية";
+    if (lang == 'am') return "ሙሉ ስም በእንግሊዝኛ";
+    return "English Full Name";
+  }
+
+  String _getTranslatedEnglishNameHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل الاسم الكامل بالإنجليزية";
+    if (lang == 'am') return "ሙሉ ስም በእንግሊዝኛ ያስገቡ";
+    return "Enter English Full Name";
+  }
+
+  String _getTranslatedArabicNameLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الاسم الكامل بالعربية";
+    if (lang == 'am') return "ሙሉ ስም በዓረብኛ";
+    return "Arabic Full Name";
+  }
+
+  String _getTranslatedArabicNameHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل الاسم الكامل بالعربية";
+    if (lang == 'am') return "ሙሉ ስም በዓረብኛ ያስገቡ";
+    return "Enter Arabic Full Name";
+  }
+
+  String _getTranslatedSexLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الجنس";
+    if (lang == 'am') return "ጾታ";
+    return "Sex";
+  }
+
+  String _getTranslatedEmailLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "البريد الإلكتروني";
+    if (lang == 'am') return "ኢሜል";
+    return "Email";
+  }
+
+  String _getTranslatedEmailHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل البريد الإلكتروني";
+    if (lang == 'am') return "ኢሜል ያስገቡ";
+    return "Enter Email";
+  }
+
+  String _getTranslatedPhoneLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "رقم الهاتف";
+    if (lang == 'am') return "ስልክ ቁጥር";
+    return "Phone Number";
+  }
+
+  String _getTranslatedCodeHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الكود";
+    if (lang == 'am') return "ኮድ";
+    return "Code";
+  }
+
+  String _getTranslatedPhoneHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل رقم الهاتف";
+    if (lang == 'am') return "ስልክ ቁጥር ያስገቡ";
+    return "Enter Phone Number";
+  }
+
+  String _getTranslatedHeightLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الطول (سم)";
+    if (lang == 'am') return "ቁመት (ሴ.ሜ)";
+    return "Height (cm)";
+  }
+
+  String _getTranslatedHeightHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل الطول";
+    if (lang == 'am') return "ቁመት ያስገቡ";
+    return "Enter Height";
+  }
+
+  String _getTranslatedWeightLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الوزن (كجم)";
+    if (lang == 'am') return "ክብደት (ኪ.ግ)";
+    return "Weight (kg)";
+  }
+
+  String _getTranslatedWeightHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل الوزن";
+    if (lang == 'am') return "ክብደት ያስገቡ";
+    return "Enter Weight";
+  }
+
+  String _getTranslatedMaritalStatusLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الحالة الاجتماعية";
+    if (lang == 'am') return "የጋብቻ ሁኔታ";
+    return "Marital Status";
+  }
+
+  String _getTranslatedChildrenLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "عدد الأطفال";
+    if (lang == 'am') return "የልጆች ብዛት";
+    return "Number of Children";
+  }
+
+  String _getTranslatedChildrenHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل عدد الأطفال";
+    if (lang == 'am') return "የልጆች ብዛት ያስገቡ";
+    return "Enter Number of Children";
+  }
+
+  String _getTranslatedSkinToneLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "لون البشرة";
+    if (lang == 'am') return "የቆዳ ቀለም";
+    return "Skin Tone";
+  }
+
+  String _getTranslatedBirthPlaceLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "مكان الميلاد";
+    if (lang == 'am') return "የትውልድ ቦታ";
+    return "Place of Birth";
+  }
+
+  String _getTranslatedDobLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تاريخ الميلاد";
+    if (lang == 'am') return "የትውልድ ቀን";
+    return "Date of Birth";
+  }
+
+  String _getTranslatedDobHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "yyyy-mm-dd";
+    if (lang == 'am') return "ዓ-ሳ-ዓዓዓዓ";
+    return "yyyy-mm-dd";
+  }
+
+  String _getTranslatedReligionLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الدين";
+    if (lang == 'am') return "ሃይማኖት";
+    return "Religion";
+  }
+
+  String _getTranslatedSubmitButton(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إرسال";
+    if (lang == 'am') return "አስገባ";
+    return "Submit";
+  }
+
+  // Error and success message translations
+  String _getTranslatedNotLoggedIn(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المستخدم غير مسجل الدخول";
+    if (lang == 'am') return "ተጠቃሚው አልገባም";
+    return "User not logged in";
+  }
+
+  String _getTranslatedSuccessMessage(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تم إرسال المعلومات الشخصية بنجاح";
+    if (lang == 'am') return "የግል መረጃ በተሳካ ሁኔታ ቀርቧል";
+    return "Personal info submitted successfully";
+  }
+
+  String _getTranslatedErrorMessage(
+      String error, LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "خطأ: $error";
+    if (lang == 'am') return "ስህተት: $error";
+    return "Error: $error";
   }
 }

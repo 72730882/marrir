@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/employee_profile.dart';
 import 'package:marrir/services/user.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class EditProfilePage extends StatefulWidget {
   final Function(Widget) onChildSelected;
@@ -45,33 +47,30 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   // Phone number validation function
-  String? _validatePhoneNumber(String? value) {
+  String? _validatePhoneNumber(
+      String? value, LanguageProvider languageProvider) {
     if (value == null || value.isEmpty) {
       return null; // Phone number is optional
     }
 
-    // Check if phone number starts with country code (starts with +)
     if (!value.startsWith('+')) {
-      return 'Phone number must start with country code (e.g., +251...)';
+      return _getTranslatedPhoneCountryCodeError(languageProvider);
     }
 
-    // Remove non-digit characters except the leading +
     final digitsOnly = value.replaceAll(RegExp(r'[^0-9+]'), '');
 
-    // Validate minimum length (country code + at least 6 digits)
     if (digitsOnly.length < 8) {
-      return 'Phone number is too short';
+      return _getTranslatedPhoneTooShort(languageProvider);
     }
 
-    // Validate maximum length
     if (digitsOnly.length > 16) {
-      return 'Phone number is too long';
+      return _getTranslatedPhoneTooLong(languageProvider);
     }
 
     return null;
   }
 
-  Future<void> _updateProfile() async {
+  Future<void> _updateProfile(LanguageProvider languageProvider) async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -98,38 +97,37 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(response["message"] ?? "Profile updated"),
+          content: Text(response["message"] ??
+              _getTranslatedProfileUpdated(languageProvider)),
           backgroundColor: Colors.green,
         ),
       );
 
-      // Navigate back to ProfilePage
       widget.onChildSelected(
         ProfilePage(onChildSelected: widget.onChildSelected),
       );
     } catch (e) {
       if (!mounted) return;
 
-      String errorMessage = "Update failed";
+      String errorMessage = _getTranslatedUpdateFailed(languageProvider);
 
-      // Parse specific error messages
       if (e.toString().contains("phone_number")) {
         if (e.toString().contains("format") ||
             e.toString().contains("invalid")) {
-          errorMessage =
-              "Invalid phone number format. Please use country code format (e.g., +251911223344)";
+          errorMessage = _getTranslatedInvalidPhoneFormat(languageProvider);
         } else if (e.toString().contains("already exists")) {
-          errorMessage = "Phone number already registered with another account";
+          errorMessage = _getTranslatedPhoneAlreadyExists(languageProvider);
         }
       } else if (e.toString().contains("email")) {
         if (e.toString().contains("invalid") ||
             e.toString().contains("format")) {
-          errorMessage = "Invalid email format";
+          errorMessage = _getTranslatedInvalidEmailFormat(languageProvider);
         } else if (e.toString().contains("already exists")) {
-          errorMessage = "Email already registered with another account";
+          errorMessage = _getTranslatedEmailAlreadyExists(languageProvider);
         }
       } else {
-        errorMessage = "Update failed: ${e.toString()}";
+        errorMessage =
+            "${_getTranslatedUpdateFailed(languageProvider)}: ${e.toString()}";
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -144,6 +142,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Form(
       key: _formKey,
       child: Column(
@@ -170,9 +170,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           );
                         },
                       ),
-                      const Text(
-                        "Edit Profile",
-                        style: TextStyle(
+                      Text(
+                        _getTranslatedEditProfileTitle(languageProvider),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
@@ -208,7 +208,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ),
                       ),
                       Text(
-                        "ID: ${widget.userId}",
+                        "${_getTranslatedId(languageProvider)}: ${widget.userId}",
                         style:
                             const TextStyle(fontSize: 14, color: Colors.grey),
                       ),
@@ -224,34 +224,42 @@ class _EditProfilePageState extends State<EditProfilePage> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  _buildLabeledTextField("Full Name", fullNameController,
-                      validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your full name';
-                    }
-                    return null;
-                  }),
                   _buildLabeledTextField(
-                    "Phone Number",
-                    phoneController,
-                    validator: _validatePhoneNumber,
-                    hintText: "+251911223344",
-                    keyboardType: TextInputType.phone,
+                    _getTranslatedFullNameLabel(languageProvider),
+                    fullNameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return _getTranslatedFullNameRequired(languageProvider);
+                      }
+                      return null;
+                    },
+                    languageProvider: languageProvider,
                   ),
                   _buildLabeledTextField(
-                    "Email Address",
+                    _getTranslatedPhoneNumberLabel(languageProvider),
+                    phoneController,
+                    validator: (value) =>
+                        _validatePhoneNumber(value, languageProvider),
+                    hintText: _getTranslatedPhoneHint(languageProvider),
+                    keyboardType: TextInputType.phone,
+                    languageProvider: languageProvider,
+                  ),
+                  _buildLabeledTextField(
+                    _getTranslatedEmailLabel(languageProvider),
                     emailController,
                     validator: (value) {
                       if (value != null && value.isNotEmpty) {
                         final emailRegex = RegExp(
                             r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
                         if (!emailRegex.hasMatch(value)) {
-                          return 'Please enter a valid email address';
+                          return _getTranslatedValidEmailRequired(
+                              languageProvider);
                         }
                       }
                       return null;
                     },
                     keyboardType: TextInputType.emailAddress,
+                    languageProvider: languageProvider,
                   ),
                   const SizedBox(height: 20),
                   Padding(
@@ -259,9 +267,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Phone Number Format:",
-                          style: TextStyle(
+                        Text(
+                          _getTranslatedPhoneFormatTitle(languageProvider),
+                          style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,
                             fontWeight: FontWeight.bold,
@@ -269,7 +277,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "• Must start with country code (e.g., +251 for Ethiopia)",
+                          _getTranslatedPhoneFormatDescription(
+                              languageProvider),
                           style: TextStyle(
                             fontSize: 11,
                             color: Colors.grey[600],
@@ -280,7 +289,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: _updateProfile,
+                    onPressed: () => _updateProfile(languageProvider),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF65B2C9),
                       shape: RoundedRectangleBorder(
@@ -291,9 +300,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         vertical: 15,
                       ),
                     ),
-                    child: const Text(
-                      "Update Profile",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    child: Text(
+                      _getTranslatedUpdateProfileButton(languageProvider),
+                      style: const TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -340,6 +349,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     String? Function(String?)? validator,
     String? hintText,
     TextInputType? keyboardType,
+    required LanguageProvider languageProvider,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -373,6 +383,154 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ],
       ),
     );
+  }
+
+  // Translation helper methods
+  String _getTranslatedEditProfileTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تعديل الملف الشخصي";
+    if (lang == 'am') return "መገለጫ አስተካክል";
+    return "Edit Profile";
+  }
+
+  String _getTranslatedId(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الرقم";
+    if (lang == 'am') return "መለያ";
+    return "ID";
+  }
+
+  String _getTranslatedFullNameLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الاسم الكامل";
+    if (lang == 'am') return "ሙሉ ስም";
+    return "Full Name";
+  }
+
+  String _getTranslatedFullNameRequired(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "يرجى إدخال الاسم الكامل";
+    if (lang == 'am') return "እባክዎ ሙሉ ስምዎን ያስገቡ";
+    return "Please enter your full name";
+  }
+
+  String _getTranslatedPhoneNumberLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "رقم الهاتف";
+    if (lang == 'am') return "ስልክ ቁጥር";
+    return "Phone Number";
+  }
+
+  String _getTranslatedPhoneHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "+251911223344";
+    if (lang == 'am') return "+251911223344";
+    return "+251911223344";
+  }
+
+  String _getTranslatedEmailLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "البريد الإلكتروني";
+    if (lang == 'am') return "ኢሜል";
+    return "Email Address";
+  }
+
+  String _getTranslatedValidEmailRequired(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "يرجى إدخال بريد إلكتروني صحيح";
+    if (lang == 'am') return "እባክዎ ትክክለኛ ኢሜል ያስገቡ";
+    return "Please enter a valid email address";
+  }
+
+  String _getTranslatedPhoneFormatTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "صيغة رقم الهاتف:";
+    if (lang == 'am') return "የስልክ ቁጥር ቅርጸት:";
+    return "Phone Number Format:";
+  }
+
+  String _getTranslatedPhoneFormatDescription(
+      LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "• يجب أن يبدأ برمز الدولة (مثال: +251 لإثيوبيا)";
+    if (lang == 'am') return "• ከአገር ኮድ መጀመር አለበት (ለምሳሌ: +251 ለኢትዮጵያ)";
+    return "• Must start with country code (e.g., +251 for Ethiopia)";
+  }
+
+  String _getTranslatedUpdateProfileButton(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تحديث الملف الشخصي";
+    if (lang == 'am') return "መገለጫ አዘምን";
+    return "Update Profile";
+  }
+
+  // Validation error messages
+  String _getTranslatedPhoneCountryCodeError(
+      LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar')
+      return "رقم الهاتف يجب أن يبدأ برمز الدولة (مثال: +251...)";
+    if (lang == 'am') return "ስልክ ቁጥሩ ከአገር ኮድ መጀመር አለበት (ለምሳሌ: +251...)";
+    return "Phone number must start with country code (e.g., +251...)";
+  }
+
+  String _getTranslatedPhoneTooShort(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "رقم الهاتف قصير جداً";
+    if (lang == 'am') return "ስልክ ቁጥሩ በጣም አጭር ነው";
+    return "Phone number is too short";
+  }
+
+  String _getTranslatedPhoneTooLong(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "رقم الهاتف طويل جداً";
+    if (lang == 'am') return "ስልክ ቁጥሩ በጣም ረጅም ነው";
+    return "Phone number is too long";
+  }
+
+  // Success and error messages
+  String _getTranslatedProfileUpdated(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تم تحديث الملف الشخصي";
+    if (lang == 'am') return "መገለጫ ተዘምኗል";
+    return "Profile updated";
+  }
+
+  String _getTranslatedUpdateFailed(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "فشل التحديث";
+    if (lang == 'am') return "ማዘመን አልተሳካም";
+    return "Update failed";
+  }
+
+  String _getTranslatedInvalidPhoneFormat(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar')
+      return "صيغة رقم الهاتف غير صحيحة. يرجى استخدام صيغة رمز الدولة (مثال: +251911223344)";
+    if (lang == 'am')
+      return "የስልክ ቁጥር ቅርጸት ትክክል አይደለም። እባክዎ የአገር ኮድ ቅርጸት ይጠቀሙ (ለምሳሌ: +251911223344)";
+    return "Invalid phone number format. Please use country code format (e.g., +251911223344)";
+  }
+
+  String _getTranslatedPhoneAlreadyExists(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "رقم الهاتف مسجل مسبقاً مع حساب آخر";
+    if (lang == 'am') return "ስልክ ቁጥሩ በሌላ መለያ ተመዝግቧል";
+    return "Phone number already registered with another account";
+  }
+
+  String _getTranslatedInvalidEmailFormat(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "صيغة البريد الإلكتروني غير صحيحة";
+    if (lang == 'am') return "የኢሜል ቅርጸት ትክክል አይደለም";
+    return "Invalid email format";
+  }
+
+  String _getTranslatedEmailAlreadyExists(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "البريد الإلكتروني مسجل مسبقاً مع حساب آخر";
+    if (lang == 'am') return "ኢሜሉ በሌላ መለያ ተመዝግቧል";
+    return "Email already registered with another account";
   }
 }
 

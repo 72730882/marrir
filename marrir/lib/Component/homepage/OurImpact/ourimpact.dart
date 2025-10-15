@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:marrir/Component/auth/login_screen.dart';
-import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class OurImpact extends StatelessWidget {
   const OurImpact({super.key});
@@ -10,10 +10,13 @@ class OurImpact extends StatelessWidget {
   Widget build(BuildContext context) {
     final lang = Provider.of<LanguageProvider>(context);
 
+    // Check if current language is Arabic
+    bool isArabic = lang.currentLang == 'ar';
+
     return SingleChildScrollView(
       child: Column(
         children: [
-          // FULL-WIDTH BACGROUND (Who we are)
+          // FULL-WIDTH BACKGROUND (Who we are)
           Container(
             width: double.infinity,
             height: 410,
@@ -30,7 +33,9 @@ class OurImpact extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: isArabic
+                    ? CrossAxisAlignment.center
+                    : CrossAxisAlignment.start,
                 children: [
                   Text(
                     lang.t('welcome'),
@@ -39,6 +44,7 @@ class OurImpact extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
+                    textAlign: isArabic ? TextAlign.center : TextAlign.start,
                   ),
                   const SizedBox(height: 5),
                   Text(
@@ -47,32 +53,38 @@ class OurImpact extends StatelessWidget {
                       fontSize: 11,
                       color: Colors.white,
                     ),
-                    textAlign: TextAlign.start,
+                    textAlign: isArabic ? TextAlign.center : TextAlign.start,
                   ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginScreen(),
+                  const SizedBox(height: 20),
+
+                  // Button - centered for Arabic
+                  Align(
+                    alignment:
+                        isArabic ? Alignment.center : Alignment.centerLeft,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(13),
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(13),
                       ),
-                    ),
-                    child: Text(
-                      lang.t('get_started'),
-                      style: const TextStyle(
-                        color: Color(0xFF65b2c9),
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      child: Text(
+                        lang.t('get_started'),
+                        style: const TextStyle(
+                          color: Color(0xFF65b2c9),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),

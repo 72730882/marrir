@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
+import 'package:marrir/widgets/footer.dart';
 import 'package:provider/provider.dart';
 
 class ServicesScreen extends StatelessWidget {
@@ -67,11 +68,11 @@ class ServicesScreen extends StatelessWidget {
             ),
           ),
 
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              "Select the appropriate package to promote Profiles/CVs",
-              style: TextStyle(
+              lang.t('select_package_promote'),
+              style: const TextStyle(
                 fontSize: 14,
                 color: Colors.black,
               ),
@@ -81,63 +82,63 @@ class ServicesScreen extends StatelessWidget {
           const SizedBox(height: 15),
 
           // ===== Card Example =====
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    // Left side text
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            lang.t('agencies'),
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "${lang.t('duration')}: ${lang.t('6_month')}",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black54,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "${lang.t('profiles')}: 250",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 16),
+          //   child: Card(
+          //     elevation: 4,
+          //     shape: RoundedRectangleBorder(
+          //       borderRadius: BorderRadius.circular(12),
+          //     ),
+          //     child: Padding(
+          //       padding: const EdgeInsets.all(16),
+          //       child: Row(
+          //         children: [
+          //           // Left side text
+          //           Expanded(
+          //             child: Column(
+          //               crossAxisAlignment: CrossAxisAlignment.start,
+          //               children: [
+          //                 Text(
+          //                   lang.t('agencies'),
+          //                   style: const TextStyle(
+          //                     fontSize: 17,
+          //                     fontWeight: FontWeight.bold,
+          //                   ),
+          //                 ),
+          //                 const SizedBox(height: 8),
+          //                 Text(
+          //                   "${lang.t('duration')}: ${lang.t('6_month')}",
+          //                   style: const TextStyle(
+          //                     fontSize: 14,
+          //                     color: Colors.black54,
+          //                   ),
+          //                 ),
+          //                 const SizedBox(height: 4),
+          //                 Text(
+          //                   "${lang.t('profiles')}: 250",
+          //                   style: const TextStyle(
+          //                     fontSize: 14,
+          //                     color: Colors.blue,
+          //                   ),
+          //                 ),
+          //               ],
+          //             ),
+          //           ),
 
-                    // Right side price
-                    const Text(
-                      "AED 59", // updated price
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF65b2c9),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          //           // Right side price
+          //           const Text(
+          //             "AED 59", // updated price
+          //             style: TextStyle(
+          //               fontSize: 18,
+          //               fontWeight: FontWeight.bold,
+          //               color: Color(0xFF65b2c9),
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
 
           const SizedBox(height: 10),
           Padding(
@@ -198,64 +199,64 @@ class ServicesScreen extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    // Left side text
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            lang.t('recruitment_firms'),
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "${lang.t('duration')}: ${lang.t('6_month')}",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black54,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "${lang.t('profiles')}: 250",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+          // const SizedBox(height: 10),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 16),
+          //   child: Card(
+          //     elevation: 4,
+          //     shape: RoundedRectangleBorder(
+          //       borderRadius: BorderRadius.circular(12),
+          //     ),
+          //     child: Padding(
+          //       padding: const EdgeInsets.all(16),
+          //       child: Row(
+          //         children: [
+          //           // Left side text
+          //           Expanded(
+          //             child: Column(
+          //               crossAxisAlignment: CrossAxisAlignment.start,
+          //               children: [
+          //                 Text(
+          //                   lang.t('recruitment_firms'),
+          //                   style: const TextStyle(
+          //                     fontSize: 17,
+          //                     fontWeight: FontWeight.bold,
+          //                   ),
+          //                 ),
+          //                 const SizedBox(height: 8),
+          //                 Text(
+          //                   "${lang.t('duration')}: ${lang.t('6_month')}",
+          //                   style: const TextStyle(
+          //                     fontSize: 14,
+          //                     color: Colors.black54,
+          //                   ),
+          //                 ),
+          //                 const SizedBox(height: 4),
+          //                 Text(
+          //                   "${lang.t('profiles')}: 250",
+          //                   style: const TextStyle(
+          //                     fontSize: 14,
+          //                     color: Colors.blue,
+          //                   ),
+          //                 ),
+          //               ],
+          //             ),
+          //           ),
 
-                    // Right side price
-                    const Text(
-                      "AED 59", // updated price
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF65b2c9),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          //           // Right side price
+          //           const Text(
+          //             "AED 59", // updated price
+          //             style: TextStyle(
+          //               fontSize: 18,
+          //               fontWeight: FontWeight.bold,
+          //               color: Color(0xFF65b2c9),
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
 
           const SizedBox(height: 10),
 
@@ -299,11 +300,11 @@ class ServicesScreen extends StatelessWidget {
             ),
           ),
 
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              "Reserve the Profiles/CVs that match your needs.",
-              style: TextStyle(
+              lang.t('reserve_profiles_match'),
+              style: const TextStyle(
                 fontSize: 14,
                 color: Colors.black,
               ),
@@ -455,11 +456,11 @@ class ServicesScreen extends StatelessWidget {
             ),
           ),
 
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              "Move profiles",
-              style: TextStyle(
+              lang.t('move_profiles'),
+              style: const TextStyle(
                 fontSize: 14,
                 color: Colors.black,
               ),
@@ -599,29 +600,28 @@ class ServicesScreen extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          // ===== Post jobs =====
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 30, 16, 2),
+// ===== Post jobs =====
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 30, 16, 2),
             child: Text(
-              "Post Jobs",
-              style: TextStyle(
+              lang.t('Post_Jobs'),
+              style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF65b2c9)),
             ),
           ),
 
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              "Start Posting jobs fot to allow jop seekers and recruitment Firms to view your request",
-              style: TextStyle(
+              lang.t('start_posting_jobs'),
+              style: const TextStyle(
                 fontSize: 14,
                 color: Colors.black,
               ),
             ),
           ),
-
           const SizedBox(height: 15),
 
           // ===== Card Example =====
@@ -724,11 +724,11 @@ class ServicesScreen extends StatelessWidget {
             ),
           ),
 
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              "Start assigning a Recruitment firms to process importing yout selected candidates",
-              style: TextStyle(
+              lang.t('assigning_recruitment_firms'),
+              style: const TextStyle(
                 fontSize: 14,
                 color: Colors.black,
               ),
@@ -782,102 +782,7 @@ class ServicesScreen extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo
-              Image.asset(
-                'assets/images/splash_image/logo3.png', // your logo path
-                height: 100,
-              ),
-              const SizedBox(height: 1),
-
-              // Email
-              Text(
-                 lang.t('office_name'),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Color(0xFF65b2c9),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // Address
-               Text(
-                lang.t('office_address'),
-                style: TextStyle(
-                  fontSize: 13,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-
-              // Social Media Icons Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const FaIcon(FontAwesomeIcons.linkedin,
-                        color: Colors.blue),
-                    onPressed: () {
-                      // TODO: Add LinkedIn link
-                    },
-                  ),
-                  IconButton(
-                    icon: const FaIcon(FontAwesomeIcons.facebook,
-                        color: Colors.blueAccent),
-                    onPressed: () {
-                      // TODO: Add Facebook link
-                    },
-                  ),
-                  IconButton(
-                    icon: const FaIcon(FontAwesomeIcons.twitter,
-                        color: Colors.lightBlue),
-                    onPressed: () {
-                      // TODO: Add Twitter link
-                    },
-                  ),
-                  IconButton(
-                    icon: const FaIcon(FontAwesomeIcons.instagram,
-                        color: Colors.purple),
-                    onPressed: () {
-                      // TODO: Add Instagram link
-                    },
-                  ),
-                  IconButton(
-                    icon: const FaIcon(FontAwesomeIcons.whatsapp,
-                        color: Colors.green),
-                    onPressed: () {
-                      // TODO: Add WhatsApp link
-                    },
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 10),
-
-              // Divider line
-              const Divider(
-                color: Colors.black,
-                thickness: 1.5,
-                indent: 20,
-                endIndent: 20,
-              ),
-              const SizedBox(height: 10),
-              // Copyright
-              const Text(
-                "© 2025 Marrir.com. All rights reserved.",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Color.fromARGB(255, 2, 2, 2),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 10),
-            ],
-          )
+          const Footer(),
         ],
       ),
     );

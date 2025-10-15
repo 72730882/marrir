@@ -53,8 +53,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-
 dev_dependencies:
+  flutter_launcher_icons: "^0.13.1"
   flutter_test:
     sdk: flutter
 
@@ -64,6 +64,13 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
+
+# Flutter Launcher Icons Configuration
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/WhatsApp Image 2025-10-03 at 11.26.07_bb97716c.jpg"
+  min_sdk_android: 21 # Optional, default is 16
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -81,6 +88,7 @@ flutter:
     - assets/images/onboarding_images/
     - assets/images/OIP.jpeg
     - assets/images/OIP (1).jpeg
+    - assets/icon/WhatsApp Image 2025-10-03 at 11.26.07_bb97716c.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

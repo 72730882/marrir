@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/Page/Employee/employee_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:marrir/services/user.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class HelpCenterScreen extends StatefulWidget {
   const HelpCenterScreen({super.key});
@@ -36,6 +37,8 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -56,16 +59,18 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text("Token not found, please login again.")),
+                SnackBar(
+                    content:
+                        Text(_getTranslatedTokenNotFound(languageProvider))),
               );
             }
           },
         ),
         centerTitle: true,
-        title: const Text(
-          "Help Center",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+        title: Text(
+          _getTranslatedTitle(languageProvider),
+          style:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
         ),
       ),
       body: SingleChildScrollView(
@@ -74,17 +79,17 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Heading
-            const Text(
-              "Help Center",
-              style: TextStyle(
+            Text(
+              _getTranslatedTitle(languageProvider),
+              style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: Colors.black),
             ),
             const SizedBox(height: 4),
-            const Text(
-              "Find answers to your questions and get support",
-              style: TextStyle(fontSize: 13, color: Colors.black54),
+            Text(
+              _getTranslatedSubtitle(languageProvider),
+              style: const TextStyle(fontSize: 13, color: Colors.black54),
             ),
             const SizedBox(height: 16),
 
@@ -94,18 +99,30 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Expanded(
-                    child: _supportOption(Icons.help_outline, "FAQ",
-                        "Find answers to common questions", Colors.purple),
+                    child: _supportOption(
+                        Icons.help_outline,
+                        _getTranslatedFAQ(languageProvider),
+                        _getTranslatedFAQSubtitle(languageProvider),
+                        Colors.purple,
+                        languageProvider),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _supportOption(Icons.email_outlined, "Email",
-                        "Email Support", Colors.pink),
+                    child: _supportOption(
+                        Icons.email_outlined,
+                        _getTranslatedEmail(languageProvider),
+                        _getTranslatedEmailSubtitle(languageProvider),
+                        Colors.pink,
+                        languageProvider),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _supportOption(Icons.phone_outlined, "Phone",
-                        "Phone Support", Colors.deepPurple),
+                    child: _supportOption(
+                        Icons.phone_outlined,
+                        _getTranslatedPhone(languageProvider),
+                        _getTranslatedPhoneSubtitle(languageProvider),
+                        Colors.deepPurple,
+                        languageProvider),
                   ),
                 ],
               ),
@@ -113,14 +130,14 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             const SizedBox(height: 20),
 
             // Search box
-            const Text(
-              "Help Questions",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            Text(
+              _getTranslatedHelpQuestions(languageProvider),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 10),
             TextField(
               decoration: InputDecoration(
-                hintText: "Search help articles...",
+                hintText: _getTranslatedSearchHint(languageProvider),
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 contentPadding: const EdgeInsets.symmetric(vertical: 12),
                 border: OutlineInputBorder(
@@ -134,14 +151,14 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             const SizedBox(height: 20),
 
             // FAQ section
-            const Text(
-              "Frequently Asked Questions",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            Text(
+              _getTranslatedFAQs(languageProvider),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 10),
             ...List.generate(_faqs.length, (index) {
-              return _buildFAQItem(
-                  index, _faqs[index]["q"]!, _faqs[index]["a"]!);
+              return _buildFAQItem(index, _faqs[index]["q"]!,
+                  _faqs[index]["a"]!, languageProvider);
             }),
             const SizedBox(height: 20),
 
@@ -161,13 +178,13 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Still Need Help?",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                  Text(_getTranslatedStillNeedHelp(languageProvider),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600, fontSize: 15)),
                   const SizedBox(height: 6),
-                  const Text(
-                    "Can’t find what you’re looking for? Our support team is here to help.",
-                    style: TextStyle(fontSize: 13, color: Colors.black54),
+                  Text(
+                    _getTranslatedSupportDescription(languageProvider),
+                    style: const TextStyle(fontSize: 13, color: Colors.black54),
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton(
@@ -180,7 +197,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text("Contact Support"),
+                    child: Text(_getTranslatedContactSupport(languageProvider)),
                   ),
                 ],
               ),
@@ -193,21 +210,30 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Expanded(
-                    child: _infoCard(Icons.menu_book_outlined, "Documentation",
-                        "Detailed guides and API documentation", Colors.purple),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _infoCard(Icons.play_circle_outline, "Tutorials",
-                        "Step-by-step video tutorials and guides", Colors.pink),
+                    child: _infoCard(
+                        Icons.menu_book_outlined,
+                        _getTranslatedDocumentation(languageProvider),
+                        _getTranslatedDocumentationSubtitle(languageProvider),
+                        Colors.purple,
+                        languageProvider),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: _infoCard(
-                        Icons.people_outline,
-                        "Community",
-                        "Join our community forums for discussions and support",
-                        Colors.deepPurple),
+                        Icons.play_circle_outline,
+                        _getTranslatedTutorials(languageProvider),
+                        _getTranslatedTutorialsSubtitle(languageProvider),
+                        Colors.pink,
+                        languageProvider),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _infoCard(
+                        Icons.people_outlined,
+                        _getTranslatedCommunity(languageProvider),
+                        _getTranslatedCommunitySubtitle(languageProvider),
+                        Colors.deepPurple,
+                        languageProvider),
                   ),
                 ],
               ),
@@ -219,8 +245,8 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   }
 
   // --- Support Option Card ---
-  Widget _supportOption(
-      IconData icon, String title, String subtitle, Color color) {
+  Widget _supportOption(IconData icon, String title, String subtitle,
+      Color color, LanguageProvider languageProvider) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -251,7 +277,8 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   }
 
   // --- FAQ Item ---
-  Widget _buildFAQItem(int index, String question, String answer) {
+  Widget _buildFAQItem(int index, String question, String answer,
+      LanguageProvider languageProvider) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
@@ -260,7 +287,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           border: Border.all(color: Colors.grey.shade300)),
       child: ExpansionTile(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Text(question,
+        title: Text(_getTranslatedFAQQuestion(question, languageProvider),
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
         iconColor: Colors.black,
         collapsedIconColor: Colors.black,
@@ -268,7 +295,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
-            child: Text(answer,
+            child: Text(_getTranslatedFAQAnswer(answer, languageProvider),
                 style: const TextStyle(fontSize: 13, color: Colors.black54)),
           ),
         ],
@@ -277,7 +304,8 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   }
 
   // --- Info Card ---
-  Widget _infoCard(IconData icon, String title, String subtitle, Color color) {
+  Widget _infoCard(IconData icon, String title, String subtitle, Color color,
+      LanguageProvider languageProvider) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -304,5 +332,226 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         ],
       ),
     );
+  }
+
+  // Translation helper methods
+  String _getTranslatedTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "مركز المساعدة";
+    if (lang == 'am') return "የእገዛ ማዕከል";
+    return "Help Center";
+  }
+
+  String _getTranslatedSubtitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "ابحث عن إجابات لأسئلتك واحصل على الدعم";
+    if (lang == 'am') return "ለጥያቄዎችዎ መልስ ያግኙ እና ድጋፍ ያግኙ";
+    return "Find answers to your questions and get support";
+  }
+
+  String _getTranslatedFAQ(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الأسئلة الشائعة";
+    if (lang == 'am') return "ተደጋግሞ የሚጠየቁ ጥያቄዎች";
+    return "FAQ";
+  }
+
+  String _getTranslatedFAQSubtitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "ابحث عن إجابات للأسئلة الشائعة";
+    if (lang == 'am') return "ለተለመዱ ጥያቄዎች መልስ ያግኙ";
+    return "Find answers to common questions";
+  }
+
+  String _getTranslatedEmail(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "البريد الإلكتروني";
+    if (lang == 'am') return "ኢሜይል";
+    return "Email";
+  }
+
+  String _getTranslatedEmailSubtitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الدعم عبر البريد الإلكتروني";
+    if (lang == 'am') return "የኢሜይል ድጋፍ";
+    return "Email Support";
+  }
+
+  String _getTranslatedPhone(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الهاتف";
+    if (lang == 'am') return "ስልክ";
+    return "Phone";
+  }
+
+  String _getTranslatedPhoneSubtitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الدعم الهاتفي";
+    if (lang == 'am') return "የስልክ ድጋፍ";
+    return "Phone Support";
+  }
+
+  String _getTranslatedHelpQuestions(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أسئلة المساعدة";
+    if (lang == 'am') return "የእገዛ ጥያቄዎች";
+    return "Help Questions";
+  }
+
+  String _getTranslatedSearchHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "ابحث في مقالات المساعدة...";
+    if (lang == 'am') return "የእገዛ መጣጥፎችን ይፈልጉ...";
+    return "Search help articles...";
+  }
+
+  String _getTranslatedFAQs(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الأسئلة الشائعة";
+    if (lang == 'am') return "ተደጋግሞ የሚጠየቁ ጥያቄዎች";
+    return "Frequently Asked Questions";
+  }
+
+  String _getTranslatedStillNeedHelp(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "لا تزال بحاجة للمساعدة؟";
+    if (lang == 'am') return "አሁንም እገዛ ይፈልጋሉ?";
+    return "Still Need Help?";
+  }
+
+  String _getTranslatedSupportDescription(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar')
+      return "لا يمكنك العثور على ما تبحث عنه؟ فريق الدعم لدينا هنا لمساعدتك.";
+    if (lang == 'am') return "የሚፈልጉትን ማግኘት አልቻሉም? የእገዛ ቡድናችን እዚህ ያግኙዎታል።";
+    return "Can't find what you're looking for? Our support team is here to help.";
+  }
+
+  String _getTranslatedContactSupport(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "اتصل بالدعم";
+    if (lang == 'am') return "ድጋፍ ያግኙ";
+    return "Contact Support";
+  }
+
+  String _getTranslatedDocumentation(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الوثائق";
+    if (lang == 'am') return "ሰነዶች";
+    return "Documentation";
+  }
+
+  String _getTranslatedDocumentationSubtitle(
+      LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدلة تفصيلية ووثائق API";
+    if (lang == 'am') return "ዝርዝር መመሪያዎች እና API ሰነዶች";
+    return "Detailed guides and API documentation";
+  }
+
+  String _getTranslatedTutorials(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الدروس";
+    if (lang == 'am') return "መማሪያዎች";
+    return "Tutorials";
+  }
+
+  String _getTranslatedTutorialsSubtitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "دروس فيديو خطوة بخطوة وأدلة";
+    if (lang == 'am') return "ደረጃ በደረጃ የቪዲዮ መማሪያዎች እና መመሪያዎች";
+    return "Step-by-step video tutorials and guides";
+  }
+
+  String _getTranslatedCommunity(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المجتمع";
+    if (lang == 'am') return "ማህበረሰብ";
+    return "Community";
+  }
+
+  String _getTranslatedCommunitySubtitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "انضم إلى منتديات مجتمعنا للمناقشات والدعم";
+    if (lang == 'am') return "ለውይይት እና ድጋፍ ወደ ማህበረሰባችን መድረኮች ይቀላቀሉ";
+    return "Join our community forums for discussions and support";
+  }
+
+  String _getTranslatedTokenNotFound(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الرمز غير موجود، يرجى تسجيل الدخول مرة أخرى";
+    if (lang == 'am') return "ቶከን አልተገኘም፣ እባክዎ እንደገና ይግቡ";
+    return "Token not found, please login again";
+  }
+
+  String _getTranslatedFAQQuestion(
+      String question, LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+
+    switch (question) {
+      case "How do I add a new employee?":
+        if (lang == 'ar') return "كيف يمكنني إضافة موظف جديد؟";
+        if (lang == 'am') return "አዲስ ሰራተኛ እንዴት ማከል እችላለሁ?";
+        return question;
+
+      case "How can I promote an employee profile?":
+        if (lang == 'ar') return "كيف يمكنني ترقية ملف موظف؟";
+        if (lang == 'am') return "የሰራተኛ መገለጫ እንዴት ማሳደግ እችላለሁ?";
+        return question;
+
+      case "What is the difference between reserve and transfer?":
+        if (lang == 'ar') return "ما الفرق بين الحجز والنقل؟";
+        if (lang == 'am') return "በቦታ ማስያዝ እና ማስተላለፍ መካከል ያለው ልዩነት ምንድነው?";
+        return question;
+
+      case "How do I track payments?":
+        if (lang == 'ar') return "كيف يمكنني تتبع المدفوعات؟";
+        if (lang == 'am') return "ክፍያዎችን እንዴት እከታተላለሁ?";
+        return question;
+
+      case "Can I export employee data?":
+        if (lang == 'ar') return "هل يمكنني تصدير بيانات الموظفين؟";
+        if (lang == 'am') return "የሰራተኞችን ውሂብ ልላክ ይቻለኛል?";
+        return question;
+
+      default:
+        return question;
+    }
+  }
+
+  String _getTranslatedFAQAnswer(
+      String answer, LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+
+    switch (answer) {
+      case "Go to Dashboard > Add Employee.":
+        if (lang == 'ar') return "اذهب إلى لوحة التحكم > إضافة موظف.";
+        if (lang == 'am') return "ወደ ዳሽቦርድ > ሰራተኛ ጨምር ይሂዱ.";
+        return answer;
+
+      case "Navigate to Employee Profile > Promotion.":
+        if (lang == 'ar') return "انتقل إلى ملف الموظف > الترقية.";
+        if (lang == 'am') return "ወደ ሰራተኛ መገለጫ > ማስተዋወቅ ይሂዱ.";
+        return answer;
+
+      case "Reserve keeps the slot, transfer reassigns it.":
+        if (lang == 'ar') return "الحجز يحتفظ بالفتحة، النقل يعيد تعيينها.";
+        if (lang == 'am') return "ቦታ ማስያዝ ቦታውን ይጠብቃል፣ ማስተላለፍ ደግሞ ዳግም ያመድጣል።";
+        return answer;
+
+      case "Go to Payment section for full history.":
+        if (lang == 'ar')
+          return "اذهب إلى قسم المدفوعات للحصول على السجل الكامل.";
+        if (lang == 'am') return "ሙሉ ታሪክ ለማግኘት ወደ ክፍያ ክፍል ይሂዱ.";
+        return answer;
+
+      case "Yes, from Settings > Export Data.":
+        if (lang == 'ar') return "نعم، من الإعدادات > تصدير البيانات.";
+        if (lang == 'am') return "አዎ፣ ከቅንብሮች > ውሂብ ላክ ይችላሉ።";
+        return answer;
+
+      default:
+        return answer;
+    }
   }
 }

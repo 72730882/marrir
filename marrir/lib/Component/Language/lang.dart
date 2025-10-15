@@ -62,6 +62,17 @@ class AppStrings {
       'profile_promotion': 'Profile Promotion',
       'profile_promotion_desc':
           'Facilitating the effective promotion of individual professional profiles, enhancing visibility and potential.',
+      'select_package_promote':
+          'Select the appropriate package to promote Profiles/CVs',
+      'reserve_profiles_match':
+          'Reserve the Profiles/CVs that match your needs.',
+      'move_profiles': 'Move profiles',
+      'start_posting_jobs':
+          'Start Posting jobs to allow job seekers and recruitment Firms to view your request',
+      'assigning_recruitment_firms':
+          'Start assigning a Recruitment firms to process importing your selected candidates',
+      'Post_Jobs': 'Post Jobs',
+      'move-profiles': 'Move profiles',
       // About us page
       'about_us': 'About Us',
       'who_we_are': 'Who We Are',
@@ -447,6 +458,18 @@ class AppStrings {
       'profile_promotion': 'ترويج الملف الشخصي',
       'profile_promotion_desc':
           'تسهيل الترويج الفعال للملفات الشخصية المهنية الفردية، وتعزيز الظهور والإمكانات.',
+      // Add these new translations:
+      'select_package_promote':
+          'اختر الباقة المناسبة للترويج للملفات الشخصية / السير الذاتية',
+      'reserve_profiles_match':
+          'احجز الملفات الشخصية / السير الذاتية التي تتناسب مع احتياجاتك.',
+      'move_profiles': 'نقل الملفات الشخصية',
+      'start_posting_jobs':
+          'ابدأ بنشر الوظائف للسماح للباحثين عن العمل وشركات التوظيف بعرض طلبك',
+      'assigning_recruitment_firms':
+          'ابدأ في تعيين شركات التوظيف لمعالجة استيراد المرشحين المختارين',
+      'Post_Jobs': 'نشر الوظائف',
+      'move-profiles': 'نقل الملفات الشخصية',
       // About us page
       'about_us': 'معلومات عنا',
       'who_we_are': 'من نحن',
@@ -531,7 +554,7 @@ class AppStrings {
       'office_address':
           'الإمارات العربية المتحدة، إمارة دبي، مكتب رقم 748-382، برج كونكورد، الطابق التاسع، الصفوح، مدينة دبي للإعلام',
       //login screen
-      'login_title': 'مرحبًا بعودتك!\nيرجى تسجيل الدخول للمتابعة على Marrir.',
+      'login_title': 'مرحبًا بعودتك!\nيرجى تسجيل الدخول للمتابعة على مررر.',
       'select_role': "اختر نوع الحساب",
       'password': 'كلمة المرور',
       'login_with_fb': 'تسجيل الدخول عبر فيسبوك',
@@ -822,6 +845,15 @@ class AppStrings {
       'profile_promotion': 'መግለጫ ማስተዋወቅ',
       'profile_promotion_desc':
           'የግለሰብ ሙያዊ መግለጫዎችን በተግባር ማስተዋወቅን ማመቻቸት፣ ታይነት እና አቅም ማሳደግ።',
+      'select_package_promote': 'ፕሮፋይሎች / CV ለማስተዋወቅ ተገቢውን ፓኬጅ ይምረጡ',
+      'reserve_profiles_match': 'ከእርስዎ ፍላጎቶች ጋር የሚጣጣሙ ፕሮፋይሎች / CV ያስይዙ።',
+      'move_profiles': 'ፕሮፋይሎችን ያንቀሳቅሱ',
+      'start_posting_jobs':
+          'የስራ ፈላጊዎች እና የቅጥር ኩባንያዎች ጥያቄዎን እንዲያዩ ስራዎችን ለመለጠፍ ይጀምሩ',
+      'assigning_recruitment_firms':
+          'የተመረጡትን ተመራጮች ለማስገባት ለማስኮደት የቅጥር ኩባንያዎችን ለመመድብ ይጀምሩ',
+      'Post_Jobs': 'የስራ ማስታወቂያ መለጠፍ',
+      'move-profiles': 'መገለጫዎችን አንቀሳቅስ',
       // About us page
       'profiles': 'ፕሮፋይሎች',
       //about us page

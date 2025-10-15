@@ -140,25 +140,24 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context);
 
-            final lang = Provider.of<LanguageProvider>(context);
+    const List<Widget> pages = [
+      DashboardPage(),
+      CompanyInfoPage(),
+      REmployeePage(),
+      REmployeeRatingPage(),
+      RecruitmentPromotionPage(),
+      RTransferProfilePage(),
+      ReserveProfilePage(),
+      RTransferHistoryPage(),
+      PaymentPage(),
+      ReserveHistoryPage(),
+      HelpPage(),
+    ];
 
-            final List<Widget> _pages = const [
-    DashboardPage(),
-    CompanyInfoPage(),
-    REmployeePage(),
-    REmployeeRatingPage(),
-    RecruitmentPromotionPage(),
-    RTransferProfilePage(),
-    ReserveProfilePage(),
-    RTransferHistoryPage(),
-    PaymentPage(),
-    ReserveHistoryPage(),
-    HelpPage(),
-  ];
-
-  final List<String> _menuTitles = [
-     lang.t('dashboard'),
+    final List<String> menuTitles = [
+      lang.t('dashboard'),
       lang.t('company_info'),
       lang.t('recruiter_employee'),
       lang.t('employee_rating'),
@@ -171,20 +170,19 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
       lang.t('help'),
     ];
 
-  final List<IconData> _menuIcons = [
-    Icons.dashboard,
-    Icons.business,
-    Icons.people,
-    Icons.star_rate,
-    Icons.campaign,
-    Icons.swap_horiz,
-    Icons.book_online,
-    Icons.person_search,
-    Icons.payment,
-    Icons.history,
-    Icons.help_outline,
-  ];
-
+    final List<IconData> menuIcons = [
+      Icons.dashboard,
+      Icons.business,
+      Icons.people,
+      Icons.star_rate,
+      Icons.campaign,
+      Icons.swap_horiz,
+      Icons.book_online,
+      Icons.person_search,
+      Icons.payment,
+      Icons.history,
+      Icons.help_outline,
+    ];
 
     return WillPopScope(
       onWillPop: () async {
@@ -218,24 +216,24 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
             ),
           ),
           actions: [
-    PopupMenuButton<String>(
-      tooltip: "Select Language",
-      icon: const Icon(Icons.translate, color: Colors.purple),
-      onSelected: (value) {
-        Provider.of<LanguageProvider>(context, listen: false)
-            .changeLanguage(value);
-      },
-      itemBuilder: (BuildContext context) => [
-        const PopupMenuItem(value: "en", child: Text("English")),
-        const PopupMenuItem(value: "ar", child: Text("العربية")),
-        const PopupMenuItem(value: "am", child: Text("አማርኛ")),
-      ],
-    ),
-    IconButton(
-      icon: const Icon(Icons.notifications_none),
-      onPressed: () {},
-    ),
-  ],
+            PopupMenuButton<String>(
+              tooltip: "Select Language",
+              icon: const Icon(Icons.translate, color: Colors.purple),
+              onSelected: (value) {
+                Provider.of<LanguageProvider>(context, listen: false)
+                    .changeLanguage(value);
+              },
+              itemBuilder: (BuildContext context) => [
+                const PopupMenuItem(value: "en", child: Text("English")),
+                const PopupMenuItem(value: "ar", child: Text("العربية")),
+                const PopupMenuItem(value: "am", child: Text("አማርኛ")),
+              ],
+            ),
+            IconButton(
+              icon: const Icon(Icons.notifications_none),
+              onPressed: () {},
+            ),
+          ],
         ),
         drawer: Drawer(
           backgroundColor: Colors.white,
@@ -248,18 +246,18 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
                 const SizedBox(height: 20),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: _menuTitles.length + 1,
+                    itemCount: menuTitles.length + 1,
                     itemBuilder: (context, index) {
-                      if (index < _menuTitles.length) {
+                      if (index < menuTitles.length) {
                         return ListTile(
                           leading: Icon(
-                            _menuIcons[index],
+                            menuIcons[index],
                             color: _selectedIndex == index
                                 ? const Color(0xFF65b2c9)
                                 : Colors.black54,
                           ),
                           title: Text(
-                            _menuTitles[index],
+                            menuTitles[index],
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: _selectedIndex == index
@@ -284,7 +282,7 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
                               const Icon(Icons.logout, color: Colors.black54),
                           title: Text(
                             lang.t('logout'),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.normal,
                               color: Colors.black87,
@@ -298,8 +296,8 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
                                   title: Text(
                                     lang.t('end_session'),
                                     textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                   content: Text(
                                     lang.t('logout_confirmation'),
@@ -345,7 +343,7 @@ class _RecruitmentPageState extends State<RecruitmentPage> {
         ),
         body: IndexedStack(
           index: _selectedIndex,
-          children: _pages,
+          children: pages,
         ),
       ),
     );

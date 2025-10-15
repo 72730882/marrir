@@ -8,6 +8,7 @@ class PaymentService {
     baseUrl: "https://api.marrir.com", // <-- add your domain only, no api/v1
 
     // baseUrl: "http://127.0.0.1:8000/",
+    // baseUrl: "http://10.0.2.2:8000",
     connectTimeout: const Duration(seconds: 30),
     receiveTimeout: const Duration(seconds: 30),
   ));

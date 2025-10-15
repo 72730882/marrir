@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/services/Employee/cv_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class StepID extends StatefulWidget {
   final VoidCallback onSuccess;
@@ -45,7 +47,8 @@ class _StepIDState extends State<StepID> {
   static const _submitTeal = Color(0xFF8EC6D6);
   static const _iconMuted = Color(0xFF667085);
 
-  InputDecoration _decor({String? hint, Widget? suffixIcon}) {
+  InputDecoration _decor(
+      {String? hint, Widget? suffixIcon, LanguageProvider? languageProvider}) {
     return InputDecoration(
       hintText: hint,
       hintStyle: const TextStyle(
@@ -82,7 +85,8 @@ class _StepIDState extends State<StepID> {
     );
   }
 
-  Future<void> _pickDate(TextEditingController controller) async {
+  Future<void> _pickDate(TextEditingController controller,
+      LanguageProvider languageProvider) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -90,20 +94,44 @@ class _StepIDState extends State<StepID> {
       lastDate: DateTime(2100),
     );
     if (pickedDate != null) {
-      controller.text =
-          "${pickedDate.month}/${pickedDate.day}/${pickedDate.year}";
+      controller.text = _formatDateForDisplay(pickedDate, languageProvider);
+    }
+  }
+
+  String _formatDateForDisplay(
+      DateTime date, LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar' || lang == 'am') {
+      return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+    } else {
+      return "${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}";
     }
   }
 
   // --------------------- Submit Form ---------------------
   Future<void> _submitForm() async {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context, listen: false);
+
     if (!_formKey.currentState!.validate()) return;
 
     // Show loading indicator
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(
+              _getTranslatedSubmitting(languageProvider),
+              style: const TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+      ),
     );
 
     try {
@@ -115,7 +143,7 @@ class _StepIDState extends State<StepID> {
       if (userId == null || token == null) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("User not logged in!")),
+          SnackBar(content: Text(_getTranslatedNotLoggedIn(languageProvider))),
         );
         return;
       }
@@ -129,43 +157,51 @@ class _StepIDState extends State<StepID> {
         dateExpiry: dateExpiryController.text.trim(),
         nationality: nationality!,
         token: token,
-        // Pass userId to ensure it's linked to the logged-in user
         userId: userId,
       );
 
       Navigator.pop(context);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(res['message'] ?? "CV submitted successfully!")),
+        SnackBar(
+            content: Text(res['message'] ??
+                _getTranslatedSubmissionSuccess(languageProvider))),
       );
+
+      widget.onSuccess();
+      widget.onNextStep();
     } catch (e) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Submission failed: ${e.toString()}")),
+        SnackBar(
+            content: Text(_getTranslatedSubmissionFailed(
+                e.toString(), languageProvider))),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Step 2: ID Information",
-              style: TextStyle(
+            Text(
+              _getTranslatedStepTitle(languageProvider),
+              style: const TextStyle(
                 fontSize: 16,
                 color: _titleColor,
                 fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 14),
-            const Text(
-              "ID Information",
-              style: TextStyle(
+            Text(
+              _getTranslatedSectionTitle(languageProvider),
+              style: const TextStyle(
                 fontSize: 13,
                 color: _sectionLabel,
                 fontWeight: FontWeight.w600,
@@ -174,104 +210,118 @@ class _StepIDState extends State<StepID> {
             const SizedBox(height: 12),
 
             // National ID
-            _fieldLabel("National ID"),
+            _fieldLabel(_getTranslatedNationalIDLabel(languageProvider)),
             TextFormField(
               controller: nationalIDController,
-              decoration: _decor(hint: "Enter National ID"),
-              validator: (value) =>
-                  value!.isEmpty ? "National ID is required" : null,
+              decoration: _decor(
+                hint: _getTranslatedNationalIDHint(languageProvider),
+                languageProvider: languageProvider,
+              ),
+              validator: (value) => value!.isEmpty
+                  ? _getTranslatedNationalIDError(languageProvider)
+                  : null,
             ),
             const SizedBox(height: 12),
 
             // Passport Number
-            _fieldLabel("Passport Number"),
+            _fieldLabel(_getTranslatedPassportLabel(languageProvider)),
             TextFormField(
               controller: passportController,
-              decoration: _decor(hint: "Enter Passport Number"),
-              validator: (value) =>
-                  value!.isEmpty ? "Passport Number is required" : null,
+              decoration: _decor(
+                hint: _getTranslatedPassportHint(languageProvider),
+                languageProvider: languageProvider,
+              ),
+              validator: (value) => value!.isEmpty
+                  ? _getTranslatedPassportError(languageProvider)
+                  : null,
             ),
             const SizedBox(height: 12),
 
             // Date Issued
-            _fieldLabel("Date Issued"),
+            _fieldLabel(_getTranslatedDateIssuedLabel(languageProvider)),
             TextFormField(
               controller: dateIssuedController,
               readOnly: true,
               decoration: _decor(
-                hint: "Select Date Issued",
+                hint: _getTranslatedDateIssuedHint(languageProvider),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.calendar_today,
                       color: _iconMuted, size: 20),
-                  onPressed: () => _pickDate(dateIssuedController),
+                  onPressed: () =>
+                      _pickDate(dateIssuedController, languageProvider),
                 ),
+                languageProvider: languageProvider,
               ),
-              validator: (value) =>
-                  value!.isEmpty ? "Date Issued is required" : null,
+              validator: (value) => value!.isEmpty
+                  ? _getTranslatedDateIssuedError(languageProvider)
+                  : null,
             ),
             const SizedBox(height: 12),
 
             // Place Issued
-            _fieldLabel("Place Issued"),
+            _fieldLabel(_getTranslatedPlaceIssuedLabel(languageProvider)),
             TextFormField(
               controller: placeIssuedController,
-              decoration: _decor(hint: "Enter Place Issued"),
-              validator: (value) =>
-                  value!.isEmpty ? "Place Issued is required" : null,
+              decoration: _decor(
+                hint: _getTranslatedPlaceIssuedHint(languageProvider),
+                languageProvider: languageProvider,
+              ),
+              validator: (value) => value!.isEmpty
+                  ? _getTranslatedPlaceIssuedError(languageProvider)
+                  : null,
             ),
             const SizedBox(height: 12),
 
             // Date of Expiry
-            _fieldLabel("Date of Expiry"),
+            _fieldLabel(_getTranslatedDateExpiryLabel(languageProvider)),
             TextFormField(
               controller: dateExpiryController,
               readOnly: true,
               decoration: _decor(
-                hint: "Select Expiry Date",
+                hint: _getTranslatedDateExpiryHint(languageProvider),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.calendar_today,
                       color: _iconMuted, size: 20),
-                  onPressed: () => _pickDate(dateExpiryController),
+                  onPressed: () =>
+                      _pickDate(dateExpiryController, languageProvider),
                 ),
+                languageProvider: languageProvider,
               ),
-              validator: (value) =>
-                  value!.isEmpty ? "Expiry Date is required" : null,
+              validator: (value) => value!.isEmpty
+                  ? _getTranslatedDateExpiryError(languageProvider)
+                  : null,
             ),
             const SizedBox(height: 12),
 
             // Nationality
-            _fieldLabel("Nationality"),
+            _fieldLabel(_getTranslatedNationalityLabel(languageProvider)),
             DropdownButtonFormField<String>(
               value: nationality,
-              items: const [
-                "Select Nationality",
-                "Ethiopian",
-                "American",
-                "British",
-                "Other",
-              ]
+              items: _getNationalityOptions(languageProvider)
                   .map((c) => DropdownMenuItem(
                         value: c,
                         child: Text(c,
-                            style:
-                                const TextStyle(fontSize: 13, color: _sectionLabel)),
+                            style: const TextStyle(
+                                fontSize: 13, color: _sectionLabel)),
                       ))
                   .toList(),
               onChanged: (v) => setState(() => nationality = v),
               decoration: _decor(
-                hint: "Select Nationality",
+                hint: _getTranslatedNationalityHint(languageProvider),
                 suffixIcon: const Padding(
                   padding: EdgeInsets.only(right: 6),
                   child: Icon(Icons.keyboard_arrow_down_rounded,
                       color: _iconMuted, size: 22),
                 ),
+                languageProvider: languageProvider,
               ),
               icon: const SizedBox.shrink(),
               borderRadius: BorderRadius.circular(10),
-              validator: (value) =>
-                  (value == null || value == "Select Nationality")
-                      ? "Please select nationality"
-                      : null,
+              validator: (value) => (value == null ||
+                      value ==
+                          _getTranslatedSelectNationality(languageProvider))
+                  ? _getTranslatedNationalityError(languageProvider)
+                  : null,
               style: const TextStyle(fontSize: 13, color: _sectionLabel),
             ),
             const SizedBox(height: 20),
@@ -288,9 +338,9 @@ class _StepIDState extends State<StepID> {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 onPressed: _submitForm,
-                child: const Text(
-                  "Submit",
-                  style: TextStyle(
+                child: Text(
+                  _getTranslatedSubmitButton(languageProvider),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -302,5 +352,208 @@ class _StepIDState extends State<StepID> {
         ),
       ),
     );
+  }
+
+  // Translation helper methods
+  String _getTranslatedStepTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الخطوة 2: معلومات الهوية";
+    if (lang == 'am') return "ደረጃ 2: የመለያ መረጃ";
+    return "Step 2: ID Information";
+  }
+
+  String _getTranslatedSectionTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "معلومات الهوية";
+    if (lang == 'am') return "የመለያ መረጃ";
+    return "ID Information";
+  }
+
+  String _getTranslatedNationalIDLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الرقم القومي";
+    if (lang == 'am') return "ብሔራዊ መለያ";
+    return "National ID";
+  }
+
+  String _getTranslatedNationalIDHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل الرقم القومي";
+    if (lang == 'am') return "ብሔራዊ መለያ ያስገቡ";
+    return "Enter National ID";
+  }
+
+  String _getTranslatedNationalIDError(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الرقم القومي مطلوب";
+    if (lang == 'am') return "ብሔራዊ መለያ ያስፈልጋል";
+    return "National ID is required";
+  }
+
+  String _getTranslatedPassportLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "رقم جواز السفر";
+    if (lang == 'am') return "የፓስፖርት ቁጥር";
+    return "Passport Number";
+  }
+
+  String _getTranslatedPassportHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل رقم جواز السفر";
+    if (lang == 'am') return "የፓስፖርት ቁጥር ያስገቡ";
+    return "Enter Passport Number";
+  }
+
+  String _getTranslatedPassportError(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "رقم جواز السفر مطلوب";
+    if (lang == 'am') return "የፓስፖርት ቁጥር ያስፈልጋል";
+    return "Passport Number is required";
+  }
+
+  String _getTranslatedDateIssuedLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تاريخ الإصدار";
+    if (lang == 'am') return "የተሰጠበት ቀን";
+    return "Date Issued";
+  }
+
+  String _getTranslatedDateIssuedHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "اختر تاريخ الإصدار";
+    if (lang == 'am') return "የተሰጠበት ቀን ይምረጡ";
+    return "Select Date Issued";
+  }
+
+  String _getTranslatedDateIssuedError(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تاريخ الإصدار مطلوب";
+    if (lang == 'am') return "የተሰጠበት ቀን ያስፈልጋል";
+    return "Date Issued is required";
+  }
+
+  String _getTranslatedPlaceIssuedLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "مكان الإصدار";
+    if (lang == 'am') return "የተሰጠበት ቦታ";
+    return "Place Issued";
+  }
+
+  String _getTranslatedPlaceIssuedHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل مكان الإصدار";
+    if (lang == 'am') return "የተሰጠበት ቦታ ያስገቡ";
+    return "Enter Place Issued";
+  }
+
+  String _getTranslatedPlaceIssuedError(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "مكان الإصدار مطلوب";
+    if (lang == 'am') return "የተሰጠበት ቦታ ያስፈልጋል";
+    return "Place Issued is required";
+  }
+
+  String _getTranslatedDateExpiryLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تاريخ الانتهاء";
+    if (lang == 'am') return "የሚያልቅበት ቀን";
+    return "Date of Expiry";
+  }
+
+  String _getTranslatedDateExpiryHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "اختر تاريخ الانتهاء";
+    if (lang == 'am') return "የሚያልቅበት ቀን ይምረጡ";
+    return "Select Expiry Date";
+  }
+
+  String _getTranslatedDateExpiryError(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تاريخ الانتهاء مطلوب";
+    if (lang == 'am') return "የሚያልቅበት ቀን ያስፈልጋል";
+    return "Expiry Date is required";
+  }
+
+  String _getTranslatedNationalityLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الجنسية";
+    if (lang == 'am') return "ዜግነት";
+    return "Nationality";
+  }
+
+  String _getTranslatedNationalityHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "اختر الجنسية";
+    if (lang == 'am') return "ዜግነት ይምረጡ";
+    return "Select Nationality";
+  }
+
+  String _getTranslatedSelectNationality(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "اختر الجنسية";
+    if (lang == 'am') return "ዜግነት ይምረጡ";
+    return "Select Nationality";
+  }
+
+  String _getTranslatedNationalityError(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "يرجى اختيار الجنسية";
+    if (lang == 'am') return "እባክዎ ዜግነት ይምረጡ";
+    return "Please select nationality";
+  }
+
+  String _getTranslatedSubmitButton(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إرسال";
+    if (lang == 'am') return "አስገባ";
+    return "Submit";
+  }
+
+  List<String> _getNationalityOptions(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+
+    if (lang == 'ar') {
+      return ["اختر الجنسية", "إثيوبي", "أمريكي", "بريطاني", "أخرى"];
+    } else if (lang == 'am') {
+      return ["ዜግነት ይምረጡ", "ኢትዮጵያዊ", "አሜሪካዊ", "ብሪታንያዊ", "ሌላ"];
+    } else {
+      return [
+        "Select Nationality",
+        "Ethiopian",
+        "American",
+        "British",
+        "Other"
+      ];
+    }
+  }
+
+  // Error and status message translations
+  String _getTranslatedSubmitting(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "جاري الإرسال...";
+    if (lang == 'am') return "እየቀረበ ነው...";
+    return "Submitting...";
+  }
+
+  String _getTranslatedNotLoggedIn(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المستخدم غير مسجل الدخول!";
+    if (lang == 'am') return "ተጠቃሚው አልገባም!";
+    return "User not logged in!";
+  }
+
+  String _getTranslatedSubmissionSuccess(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تم إرسال السيرة الذاتية بنجاح!";
+    if (lang == 'am') return "የህይወት ታሪክ በተሳካ ሁኔታ ቀርቧል!";
+    return "CV submitted successfully!";
+  }
+
+  String _getTranslatedSubmissionFailed(
+      String error, LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "فشل الإرسال: $error";
+    if (lang == 'am') return "ማስገባት አልተሳካም: $error";
+    return "Submission failed: $error";
   }
 }

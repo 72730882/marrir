@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
+import 'package:marrir/widgets/footer.dart';
 import 'package:provider/provider.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -181,92 +182,7 @@ class AboutScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // ===== CONTACT US FOOTER =====
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo
-              Image.asset(
-                'assets/images/splash_image/logo3.png', // your logo path
-                height: 100,
-              ),
-              const SizedBox(height: 1),
-
-              // Email
-              Text(
-                lang.t('office_name'),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Color(0xFF65b2c9),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // Address
-              Text(
-                lang.t('office_address'),
-                style: const TextStyle(
-                  fontSize: 13,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-
-              // Social Media Icons Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const FaIcon(FontAwesomeIcons.linkedin,
-                        color: Colors.blue),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: const FaIcon(FontAwesomeIcons.facebook,
-                        color: Colors.blueAccent),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: const FaIcon(FontAwesomeIcons.twitter,
-                        color: Colors.lightBlue),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: const FaIcon(FontAwesomeIcons.instagram,
-                        color: Colors.purple),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: const FaIcon(FontAwesomeIcons.whatsapp,
-                        color: Colors.green),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 10),
-
-              // Divider line
-              const Divider(
-                color: Colors.black,
-                thickness: 1.5,
-                indent: 20,
-                endIndent: 20,
-              ),
-              const SizedBox(height: 10),
-              // Copyright
-              const Text(
-                "© 2025 Marrir.com. All rights reserved.",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Color.fromARGB(255, 2, 2, 2),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 10),
-            ],
-          )
+          const Footer(),
         ],
       ),
     );

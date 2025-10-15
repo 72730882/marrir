@@ -10,18 +10,16 @@ class HelpPage extends StatefulWidget {
 }
 
 class _HelpPageState extends State<HelpPage> {
-  
-
   @override
   Widget build(BuildContext context) {
     final lang = Provider.of<LanguageProvider>(context);
-    final List<Map<String, String>> _faqs = [
-    {"q": lang.t('faq_q1'), "a": lang.t('faq_a1')},
+    final List<Map<String, String>> faqs = [
+      {"q": lang.t('faq_q1'), "a": lang.t('faq_a1')},
       {"q": lang.t('faq_q2'), "a": lang.t('faq_a2')},
       {"q": lang.t('faq_q3'), "a": lang.t('faq_a3')},
       {"q": lang.t('faq_q4'), "a": lang.t('faq_a4')},
       {"q": lang.t('faq_q5'), "a": lang.t('faq_a5')},
-  ];
+    ];
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -162,11 +160,11 @@ class _HelpPageState extends State<HelpPage> {
                           width: double.infinity,
                         ),
                         const SizedBox(height: 12),
-                        ...List.generate(_faqs.length, (index) {
+                        ...List.generate(faqs.length, (index) {
                           return _buildFAQItem(
                             index,
-                            lang.t(_faqs[index]["q"]!),
-                            lang.t(_faqs[index]["a"]!),
+                            lang.t(faqs[index]["q"]!),
+                            lang.t(faqs[index]["a"]!),
                           );
                         }),
                       ],
@@ -199,8 +197,8 @@ class _HelpPageState extends State<HelpPage> {
                         const SizedBox(height: 15),
                         Text(
                           lang.t('contact_support_hint'),
-                          style:
-                              const TextStyle(fontSize: 13, color: Colors.black54),
+                          style: const TextStyle(
+                              fontSize: 13, color: Colors.black54),
                         ),
                         const SizedBox(height: 12),
                         ElevatedButton(
@@ -308,8 +306,7 @@ class _HelpPageState extends State<HelpPage> {
       child: ExpansionTile(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(question,
-            style:
-                const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
         iconColor: Colors.black,
         collapsedIconColor: Colors.black,
         onExpansionChanged: (expanded) {

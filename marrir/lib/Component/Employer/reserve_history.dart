@@ -150,8 +150,8 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
                         for (final detail in _selectedBatchDetails)
                           ListTile(
                             title: Text(detail.employeeName),
-                            subtitle:
-                                Text('${lang.t('occupation')}: ${detail.occupation}'),
+                            subtitle: Text(
+                                '${lang.t('occupation')}: ${detail.occupation}'),
                             trailing: Text(detail.status.toUpperCase()),
                           ),
                       ],
@@ -351,7 +351,7 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: "${title} - ",
+                  text: "$title - ",
                   style: const TextStyle(
                     fontSize: 14,
                     color: Colors.black,
@@ -402,8 +402,7 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
           color: Colors.white,
           elevation: 4,
           shadowColor: Colors.black54,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: Column(
             children: [
               Container(
@@ -518,8 +517,7 @@ class _ReserveHistoryPageState extends State<ReserveHistoryPage> {
           color: Colors.white,
           elevation: 4,
           shadowColor: Colors.black54,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: Column(
             children: [
               Container(

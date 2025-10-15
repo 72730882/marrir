@@ -4,6 +4,7 @@ import '../../services/api_service.dart';
 import '../auth/login_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
+
 class EmployeeRatingPage extends StatefulWidget {
   const EmployeeRatingPage({super.key});
 
@@ -52,7 +53,8 @@ class _EmployeeRatingPageState extends State<EmployeeRatingPage> {
             .map((e) => {
                   "id": e['id'],
                   "name": "${e['first_name']} ${e['last_name']}",
-                  "rating": (e['rating'] ?? 0).toDouble(), // 👈 assume backend sends rating
+                  "rating": (e['rating'] ?? 0)
+                      .toDouble(), // 👈 assume backend sends rating
                 })
             .toList();
         isLoading = false;
@@ -76,10 +78,10 @@ class _EmployeeRatingPageState extends State<EmployeeRatingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ===== Page Title =====
-               Center(
+              Center(
                 child: Text(
-                lang.t("employee_ratings"),
-                  style: TextStyle(
+                  lang.t("employee_ratings"),
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -118,7 +120,7 @@ class _EmployeeRatingPageState extends State<EmployeeRatingPage> {
                           Expanded(
                             child: Text(
                               lang.t("reserve_name"),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -126,8 +128,8 @@ class _EmployeeRatingPageState extends State<EmployeeRatingPage> {
                           ),
                           Expanded(
                             child: Text(
-                             lang.t("cv_rating"),
-                              style: TextStyle(
+                              lang.t("cv_rating"),
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),

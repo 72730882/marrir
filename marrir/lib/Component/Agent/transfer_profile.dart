@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:marrir/services/Employer/transfer_service.dart';
 import 'package:provider/provider.dart';
 import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
+
 class TransferProfilePage extends StatefulWidget {
   const TransferProfilePage({super.key});
 
@@ -183,7 +184,6 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
   }
 
   Widget _buildTransferCard({
-    
     required String title,
     required String subtitle,
     required List<dynamic> users,
@@ -191,7 +191,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
     required VoidCallback onTransfer,
   }) {
     final filteredUsers = _getFilteredUsers(users, searchController);
-         final lang = Provider.of<LanguageProvider>(context); 
+    final lang = Provider.of<LanguageProvider>(context);
 
     return Container(
       decoration: BoxDecoration(
@@ -243,9 +243,9 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-               Text(lang.t('matching_results'),
-                    style:
-                        TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                Text(lang.t('matching_results'),
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 ...filteredUsers.take(3).map((user) {
                   return ListTile(
@@ -261,7 +261,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                 }),
                 if (filteredUsers.isEmpty)
                   Text(lang.t('no_results'),
-                      style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      style: const TextStyle(color: Colors.grey, fontSize: 12)),
               ],
             ),
 
@@ -285,7 +285,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-             final lang = Provider.of<LanguageProvider>(context); 
+    final lang = Provider.of<LanguageProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -295,12 +295,13 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               Text(lang.t('transfer'),
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              Text(lang.t('transfer'),
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
-             Text(
+              Text(
                 lang.t('transfer_hint'),
-                style: TextStyle(fontSize: 14, color: Colors.black),
+                style: const TextStyle(fontSize: 14, color: Colors.black),
               ),
               const SizedBox(height: 20),
               if (_isLoading)
@@ -353,7 +354,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
 
                 // Non-agreement
                 _buildTransferCard(
-                 title: lang.t('non_approved_title'),
+                  title: lang.t('non_approved_title'),
                   subtitle: lang.t('non_approved_subtitle'),
                   users: _unrelatedUsers,
                   searchController: _nonApprovedSearchController,
@@ -394,14 +395,14 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                   padding: const EdgeInsets.all(12),
                   child: Column(
                     children: [
-                       Row(
+                      Row(
                         children: [
                           Text(
                             lang.t('search_employees'),
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
-                          Spacer(),
+                          const Spacer(),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -446,7 +447,7 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                                   borderRadius: BorderRadius.circular(6)),
                             ),
                             child: Text(
-                             lang.t('remove_all'),
+                              lang.t('remove_all'),
                               style: TextStyle(
                                 color: _selectedEmployees.isNotEmpty
                                     ? Colors.black87
@@ -471,12 +472,12 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                       const SizedBox(height: 12),
                       if (_filteredEmployees.isEmpty &&
                           _employeeSearchController.text.isNotEmpty)
-                         Padding(
-                          padding: EdgeInsets.all(16.0),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
                           child: Text(
-                           lang.t('no_employees_found'),
+                            lang.t('no_employees_found'),
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey),
+                            style: const TextStyle(color: Colors.grey),
                           ),
                         )
                       else
@@ -519,7 +520,8 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                                         const SizedBox(height: 4),
                                         Text(employee['job_title'] ?? ''),
                                         const SizedBox(height: 4),
-                                        Text("${lang.t('agreement')}: ${hasAgreement ? lang.t('approved') : lang.t('non_agreement')}",
+                                        Text(
+                                          "${lang.t('agreement')}: ${hasAgreement ? lang.t('approved') : lang.t('non_agreement')}",
                                           style: const TextStyle(
                                               color: Colors.black54),
                                         ),
@@ -537,8 +539,8 @@ class _TransferProfilePageState extends State<TransferProfilePage> {
                                               BorderRadius.circular(6),
                                         ),
                                         child: Text(
-                                         lang.t('available'),
-                                          style: TextStyle(
+                                          lang.t('available'),
+                                          style: const TextStyle(
                                             color: Color.fromARGB(
                                                 255, 40, 118, 42),
                                             fontSize: 12,

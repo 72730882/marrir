@@ -357,9 +357,9 @@ class _AgentPromotionPageState extends State<AgentPromotionPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 24),
-               Text(
+              Text(
                 lang.t("promotions"),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
                 ),
@@ -367,8 +367,8 @@ class _AgentPromotionPageState extends State<AgentPromotionPage> {
               ),
               const SizedBox(height: 1),
               Text(
-                 lang.t("choose_plan"),
-                style: TextStyle(
+                lang.t("choose_plan"),
+                style: const TextStyle(
                   fontSize: 15,
                   color: Color.fromARGB(255, 94, 91, 91),
                 ),

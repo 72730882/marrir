@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/user_info_provider.dart';
 import '../../services/api_service.dart';
 import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
-import 'package:provider/provider.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -150,7 +149,7 @@ class _DashboardPageState extends State<DashboardPage> {
             children: [
               Text(
                 lang.t('dashboard_overview'),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 19,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
@@ -213,7 +212,7 @@ class _DashboardPageState extends State<DashboardPage> {
           // ==== COMPANY REGISTRATION ====
           Text(
             lang.t("company_registration"),
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
@@ -222,7 +221,7 @@ class _DashboardPageState extends State<DashboardPage> {
           const SizedBox(height: 4),
           Text(
             lang.t("document_required"),
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 15,
               color: Colors.black,
             ),
@@ -262,7 +261,6 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   static Widget _buildStatCard(String title, String value, String subtitle) {
-    
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -303,10 +301,8 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-   Widget _buildProgressCard(
-   
-      String section, String title, double progress) {
-          final lang = Provider.of<LanguageProvider>(context, listen: false);
+  Widget _buildProgressCard(String section, String title, double progress) {
+    final lang = Provider.of<LanguageProvider>(context, listen: false);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -358,7 +354,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     borderRadius: BorderRadius.circular(6)),
               ),
               child: Text(lang.t("continue"),
-                  style: TextStyle(color: Colors.white, fontSize: 15)),
+                  style: const TextStyle(color: Colors.white, fontSize: 15)),
             ),
           ),
         ],

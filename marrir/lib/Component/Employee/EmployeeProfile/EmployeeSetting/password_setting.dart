@@ -3,6 +3,8 @@ import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSetting/settin
 import 'package:marrir/Component/Employee/wave_background.dart';
 import 'package:marrir/services/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class PassWordPinPage extends StatefulWidget {
   final Function(Widget)? onChildSelected;
@@ -23,7 +25,8 @@ class _PassWordPinPageState extends State<PassWordPinPage> {
   final TextEditingController _confirmController = TextEditingController();
 
   // Show dialog
-  void _showDialog(String message, {bool success = false}) {
+  void _showDialog(String message,
+      {bool success = false, required LanguageProvider languageProvider}) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -61,9 +64,9 @@ class _PassWordPinPageState extends State<PassWordPinPage> {
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: const Text(
-                    'OK',
-                    style: TextStyle(
+                  child: Text(
+                    _getTranslatedOk(languageProvider),
+                    style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white),
@@ -78,29 +81,30 @@ class _PassWordPinPageState extends State<PassWordPinPage> {
   }
 
   // Handle password change
-  Future<void> _handleChangePassword() async {
+  Future<void> _handleChangePassword(LanguageProvider languageProvider) async {
     final current = _currentController.text.trim();
     final newPass = _newController.text.trim();
     final confirm = _confirmController.text.trim();
 
     if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
-      _showDialog("Please fill all fields.");
+      _showDialog(_getTranslatedFillAllFields(languageProvider),
+          languageProvider: languageProvider);
       return;
     }
 
     if (newPass != confirm) {
-      _showDialog("New password and confirmation do not match.");
+      _showDialog(_getTranslatedPasswordMismatch(languageProvider),
+          languageProvider: languageProvider);
       return;
     }
 
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      final String? userId =
-          prefs.getString('user_id'); // same as work experience
+      final String? userId = prefs.getString('user_id');
       final String? token = prefs.getString('access_token');
       if (userId == null || token == null) {
-        throw Exception("User not logged in or token missing.");
+        throw Exception(_getTranslatedNotLoggedIn(languageProvider));
       }
 
       // Call API
@@ -112,16 +116,20 @@ class _PassWordPinPageState extends State<PassWordPinPage> {
         password: newPass,
       );
 
-      _showDialog("Password changed successfully!", success: true);
+      _showDialog(_getTranslatedPasswordChanged(languageProvider),
+          success: true, languageProvider: languageProvider);
     } catch (e) {
-      _showDialog("Error: $e");
+      _showDialog("${_getTranslatedError(languageProvider)}: $e",
+          languageProvider: languageProvider);
     }
   }
 
-  InputDecoration _pinInputDecoration(bool obscure, VoidCallback toggle) {
+  InputDecoration _pinInputDecoration(
+      bool obscure, VoidCallback toggle, String hintText) {
     return InputDecoration(
       filled: true,
       fillColor: const Color.fromRGBO(142, 198, 214, 0.3),
+      hintText: hintText,
       suffixIcon: IconButton(
         icon: Icon(
             obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -138,15 +146,16 @@ class _PassWordPinPageState extends State<PassWordPinPage> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
-      resizeToAvoidBottomInset:
-          true, // ✅ allows body to resize when keyboard appears
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Column(
           children: [
             WaveBackground(
-              title: "Password Settings",
+              title: _getTranslatedTitle(languageProvider),
               onBack: () {
                 if (widget.onChildSelected != null) {
                   widget.onChildSelected!(
@@ -165,43 +174,47 @@ class _PassWordPinPageState extends State<PassWordPinPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Current Password',
-                        style: TextStyle(fontSize: 16, color: Colors.black54)),
+                    Text(_getTranslatedCurrentPassword(languageProvider),
+                        style: const TextStyle(
+                            fontSize: 16, color: Colors.black54)),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _currentController,
                       obscureText: _obscureCurrent,
                       decoration: _pinInputDecoration(_obscureCurrent, () {
                         setState(() => _obscureCurrent = !_obscureCurrent);
-                      }),
+                      }, _getTranslatedCurrentPasswordHint(languageProvider)),
                     ),
                     const SizedBox(height: 20),
-                    const Text('New Password',
-                        style: TextStyle(fontSize: 16, color: Colors.black54)),
+                    Text(_getTranslatedNewPassword(languageProvider),
+                        style: const TextStyle(
+                            fontSize: 16, color: Colors.black54)),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _newController,
                       obscureText: _obscureNew,
                       decoration: _pinInputDecoration(_obscureNew, () {
                         setState(() => _obscureNew = !_obscureNew);
-                      }),
+                      }, _getTranslatedNewPasswordHint(languageProvider)),
                     ),
                     const SizedBox(height: 20),
-                    const Text('Confirm Password',
-                        style: TextStyle(fontSize: 16, color: Colors.black54)),
+                    Text(_getTranslatedConfirmPassword(languageProvider),
+                        style: const TextStyle(
+                            fontSize: 16, color: Colors.black54)),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _confirmController,
                       obscureText: _obscureConfirm,
                       decoration: _pinInputDecoration(_obscureConfirm, () {
                         setState(() => _obscureConfirm = !_obscureConfirm);
-                      }),
+                      }, _getTranslatedConfirmPasswordHint(languageProvider)),
                     ),
                     const SizedBox(height: 25),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _handleChangePassword,
+                        onPressed: () =>
+                            _handleChangePassword(languageProvider),
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
                               const Color.fromRGBO(142, 198, 214, 1),
@@ -210,9 +223,9 @@ class _PassWordPinPageState extends State<PassWordPinPage> {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: const Text(
-                          'Change Password',
-                          style: TextStyle(
+                        child: Text(
+                          _getTranslatedChangePasswordButton(languageProvider),
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -220,7 +233,7 @@ class _PassWordPinPageState extends State<PassWordPinPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 40), // 👌 extra space for keyboard
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
@@ -229,5 +242,104 @@ class _PassWordPinPageState extends State<PassWordPinPage> {
         ),
       ),
     );
+  }
+
+  // Translation helper methods
+  String _getTranslatedTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إعدادات كلمة المرور";
+    if (lang == 'am') return "የይለፍ ቃል ቅንብሮች";
+    return "Password Settings";
+  }
+
+  String _getTranslatedCurrentPassword(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "كلمة المرور الحالية";
+    if (lang == 'am') return "አሁን ያለው የይለፍ ቃል";
+    return "Current Password";
+  }
+
+  String _getTranslatedCurrentPasswordHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل كلمة المرور الحالية";
+    if (lang == 'am') return "አሁን ያለው የይለፍ ቃል ያስገቡ";
+    return "Enter current password";
+  }
+
+  String _getTranslatedNewPassword(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "كلمة المرور الجديدة";
+    if (lang == 'am') return "አዲስ የይለፍ ቃል";
+    return "New Password";
+  }
+
+  String _getTranslatedNewPasswordHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل كلمة المرور الجديدة";
+    if (lang == 'am') return "አዲስ የይለፍ ቃል ያስገቡ";
+    return "Enter new password";
+  }
+
+  String _getTranslatedConfirmPassword(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تأكيد كلمة المرور";
+    if (lang == 'am') return "የይለፍ ቃል አረጋግጥ";
+    return "Confirm Password";
+  }
+
+  String _getTranslatedConfirmPasswordHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أعد إدخال كلمة المرور الجديدة";
+    if (lang == 'am') return "አዲሱን የይለፍ ቃል እንደገና ያስገቡ";
+    return "Re-enter new password";
+  }
+
+  String _getTranslatedChangePasswordButton(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تغيير كلمة المرور";
+    if (lang == 'am') return "የይለፍ ቃል ቀይር";
+    return "Change Password";
+  }
+
+  String _getTranslatedOk(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "موافق";
+    if (lang == 'am') return "እሺ";
+    return "OK";
+  }
+
+  String _getTranslatedFillAllFields(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "يرجى ملء جميع الحقول";
+    if (lang == 'am') return "እባክዎ ሁሉንም ሕዋሶች ይሙሉ";
+    return "Please fill all fields";
+  }
+
+  String _getTranslatedPasswordMismatch(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "كلمة المرور الجديدة وتأكيدها غير متطابقين";
+    if (lang == 'am') return "አዲሱ የይለፍ ቃል እና ማረጋገጫው አይሚሳሰሉም";
+    return "New password and confirmation do not match";
+  }
+
+  String _getTranslatedNotLoggedIn(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المستخدم غير مسجل الدخول أو الرمز مفقود";
+    if (lang == 'am') return "ተጠቃሚው አልገባም ወይም ቶከኑ ጠፍቷል";
+    return "User not logged in or token missing";
+  }
+
+  String _getTranslatedPasswordChanged(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تم تغيير كلمة المرور بنجاح!";
+    if (lang == 'am') return "የይለፍ ቃሉ በተሳካ ሁኔታ ተቀይሯል!";
+    return "Password changed successfully!";
+  }
+
+  String _getTranslatedError(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "خطأ";
+    if (lang == 'am') return "ስህተት";
+    return "Error";
   }
 }

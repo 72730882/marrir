@@ -74,7 +74,7 @@ class _EmployeeRatingPageState extends State<REmployeeRatingPage> {
 
   @override
   Widget build(BuildContext context) {
-            final lang = Provider.of<LanguageProvider>(context);
+    final lang = Provider.of<LanguageProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -87,8 +87,8 @@ class _EmployeeRatingPageState extends State<REmployeeRatingPage> {
               // ===== Page Title =====
               Center(
                 child: Text(
-                   lang.t("employee_ratings"),
-                  style: TextStyle(
+                  lang.t("employee_ratings"),
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),

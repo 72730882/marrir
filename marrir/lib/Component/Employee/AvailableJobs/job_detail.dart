@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/services/Employer/job_service.dart';
 import 'package:marrir/services/Employer/get_comany_info.dart';
+import 'package:marrir/services/Employee/job_application.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:marrir/services/user.dart'; // Make sure to import your ApiService
 
 class JobDetailsPage extends StatefulWidget {
   const JobDetailsPage({super.key, required this.job});
@@ -13,13 +16,59 @@ class JobDetailsPage extends StatefulWidget {
 
 class _JobDetailsPageState extends State<JobDetailsPage> {
   final CompanyService _companyService = CompanyService();
+  final JobApplicationService _jobApplicationService = JobApplicationService();
+
   Map<String, dynamic> _companyInfo = {};
   bool _isLoadingCompanyInfo = true;
+  bool _isCheckingApplication = true;
+  bool _hasApplied = false;
+  String? _applicationStatus;
+  String? _currentUserId;
+  bool _isProcessing = false;
+  Map<String, dynamic>? _userData;
+  String? _authToken;
 
   @override
   void initState() {
     super.initState();
-    _fetchCompanyInfo();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    await _getCurrentUserAndToken();
+    await _fetchCompanyInfo();
+    await _checkApplicationStatus();
+  }
+
+  Future<void> _getCurrentUserAndToken() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      final email = prefs.getString("user_email");
+      _authToken = prefs.getString(
+          "access_token"); // Assuming you store token as "auth_token"
+
+      if (email == null || _authToken == null) {
+        print('No stored email or token found');
+        setState(() {
+          _isCheckingApplication = false;
+        });
+        return;
+      }
+
+      // Fetch user data using your existing ApiService
+      final userData =
+          await ApiService.getUserInfo(email: email, Token: _authToken!);
+
+      setState(() {
+        _userData = userData;
+        _currentUserId = userData['id']?.toString();
+      });
+    } catch (e) {
+      print('Error getting current user: $e');
+      setState(() {
+        _isCheckingApplication = false;
+      });
+    }
   }
 
   Future<void> _fetchCompanyInfo() async {
@@ -43,6 +92,213 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         _isLoadingCompanyInfo = false;
       });
     }
+  }
+
+  Future<void> _checkApplicationStatus() async {
+    if (_currentUserId == null) {
+      setState(() {
+        _isCheckingApplication = false;
+      });
+      return;
+    }
+
+    try {
+      final hasApplied = await _jobApplicationService.hasUserApplied(
+        jobId: widget.job['id'],
+        userId: _currentUserId!,
+      );
+
+      String? status;
+      if (hasApplied) {
+        status = await _jobApplicationService.getApplicationStatus(
+          jobId: widget.job['id'],
+          userId: _currentUserId!,
+        );
+      }
+
+      setState(() {
+        _hasApplied = hasApplied;
+        _applicationStatus = status;
+        _isCheckingApplication = false;
+      });
+    } catch (e) {
+      print('Error checking application status: $e');
+      setState(() {
+        _isCheckingApplication = false;
+      });
+    }
+  }
+
+  Future<void> _applyForJob() async {
+    if (_currentUserId == null) {
+      _showSnackBar('Please login to apply for jobs');
+      return;
+    }
+
+    if (_isProcessing) return;
+
+    setState(() {
+      _isProcessing = true;
+    });
+
+    try {
+      final result = await _jobApplicationService.applyForJob(
+        jobId: widget.job['id'],
+        userId: _currentUserId!,
+      );
+
+      if (result['success'] == true) {
+        _showSnackBar(
+            result['message'] ?? 'Application submitted successfully!',
+            isError: false);
+        setState(() {
+          _hasApplied = true;
+          _applicationStatus = 'pending';
+        });
+      } else {
+        _showSnackBar(result['message'] ?? 'Failed to apply for job',
+            isError: true);
+      }
+    } catch (e) {
+      _showSnackBar('Error applying for job: $e', isError: true);
+    } finally {
+      setState(() {
+        _isProcessing = false;
+      });
+    }
+  }
+
+  Future<void> _withdrawApplication() async {
+    if (_currentUserId == null) return;
+
+    if (_isProcessing) return;
+
+    setState(() {
+      _isProcessing = true;
+    });
+
+    try {
+      final result = await _jobApplicationService.removeApplication(
+        jobId: widget.job['id'],
+        userId: _currentUserId!,
+      );
+
+      if (result['success'] == true) {
+        _showSnackBar(
+            result['message'] ?? 'Application withdrawn successfully!',
+            isError: false);
+        setState(() {
+          _hasApplied = false;
+          _applicationStatus = null;
+        });
+      } else {
+        _showSnackBar(result['message'] ?? 'Failed to withdraw application',
+            isError: true);
+      }
+    } catch (e) {
+      _showSnackBar('Error withdrawing application: $e', isError: true);
+    } finally {
+      setState(() {
+        _isProcessing = false;
+      });
+    }
+  }
+
+  void _showSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  String _getStatusDisplayText() {
+    switch (_applicationStatus?.toLowerCase()) {
+      case 'pending':
+        return 'Application Pending';
+      case 'accepted':
+        return 'Application Accepted 🎉';
+      case 'declined':
+        return 'Application Declined';
+      default:
+        return 'Apply Now';
+    }
+  }
+
+  Color _getStatusColor() {
+    switch (_applicationStatus?.toLowerCase()) {
+      case 'pending':
+        return Colors.orange;
+      case 'accepted':
+        return Colors.green;
+      case 'declined':
+        return Colors.red;
+      default:
+        return const Color(0xFF65B2C9);
+    }
+  }
+
+  IconData _getStatusIcon() {
+    switch (_applicationStatus?.toLowerCase()) {
+      case 'pending':
+        return Icons.pending;
+      case 'accepted':
+        return Icons.check_circle;
+      case 'declined':
+        return Icons.cancel;
+      default:
+        return Icons.work_outline;
+    }
+  }
+
+  // Add user info display in the header (optional)
+  Widget _buildUserInfo() {
+    if (_userData == null) {
+      return Container();
+    }
+
+    final fullName = "${_userData!['first_name']} ${_userData!['last_name']}";
+    final role = _userData!['role'] ?? "";
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.blueGrey.shade50,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.person_outline, size: 24, color: Color(0xFF111111)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  fullName,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF111111),
+                  ),
+                ),
+                Text(
+                  role,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF8E8E93),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -79,12 +335,15 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: _isLoadingCompanyInfo
+      body: _isLoadingCompanyInfo || _isCheckingApplication
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
+                  // User Info (optional - you can remove this if not needed)
+                  // _buildUserInfo(),
+
                   // Job header
                   Column(
                     children: [
@@ -166,6 +425,44 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                     ],
                   ),
                   const SizedBox(height: 16),
+
+                  // Application Status Badge (if applied)
+                  if (_hasApplied && _applicationStatus != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor().withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _getStatusColor().withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _getStatusIcon(),
+                            color: _getStatusColor(),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _getStatusDisplayText(),
+                            style: TextStyle(
+                              color: _getStatusColor(),
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (_hasApplied && _applicationStatus != null)
+                    const SizedBox(height: 16),
 
                   // Info Row
                   Row(
@@ -284,26 +581,75 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Apply Now Button
+                  // Apply/Withdraw Button
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF65B2C9),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      onPressed: () {
-                        // Handle apply logic
-                      },
-                      child: const Text(
-                        "Apply Now",
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                    ),
+                    child: _isProcessing
+                        ? ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            onPressed: null,
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  "Processing...",
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          )
+                        : _hasApplied
+                            ? OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.red,
+                                  side: const BorderSide(color: Colors.red),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                onPressed: _withdrawApplication,
+                                child: const Text(
+                                  "Withdraw Application",
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              )
+                            : ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF65B2C9),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                onPressed: _applyForJob,
+                                child: const Text(
+                                  "Apply Now",
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.white),
+                                ),
+                              ),
                   ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

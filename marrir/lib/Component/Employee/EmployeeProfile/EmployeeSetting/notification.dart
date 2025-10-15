@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSetting/setting.dart';
 import 'package:marrir/Component/Employee/wave_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class NotificationSettingsPage extends StatefulWidget {
   final Function(Widget) onChildSelected;
@@ -47,28 +49,27 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         _isLoading = false;
       });
     } catch (e) {
-      // If loading fails, use default settings
       setState(() => _isLoading = false);
     }
   }
 
-  Future<void> _updateNotificationSetting(String key, bool value) async {
-    // Optimistic update for instant UI response
+  Future<void> _updateNotificationSetting(
+      String key, bool value, LanguageProvider languageProvider) async {
     setState(() => _notificationStates[key] = value);
 
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(key, value);
     } catch (e) {
-      // Revert on error with a snackbar notification
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save setting: $e')),
+        SnackBar(content: Text(_getTranslatedSaveFailed(languageProvider))),
       );
       setState(() => _notificationStates[key] = !value);
     }
   }
 
-  Widget _buildNotificationOption(String title, String key) {
+  Widget _buildNotificationOption(
+      String title, String key, LanguageProvider languageProvider) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
@@ -86,7 +87,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           const SizedBox(width: 16),
           Switch(
             value: _notificationStates[key] ?? true,
-            onChanged: (bool value) => _updateNotificationSetting(key, value),
+            onChanged: (bool value) =>
+                _updateNotificationSetting(key, value, languageProvider),
             activeColor: const Color(0xFF65B2C9),
           ),
         ],
@@ -96,6 +98,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -103,7 +107,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               padding: const EdgeInsets.all(0),
               children: [
                 WaveBackground(
-                  title: "Notification Settings",
+                  title: _getTranslatedTitle(languageProvider),
                   onBack: () {
                     widget.onChildSelected(
                       SettingPage(onChildSelected: widget.onChildSelected),
@@ -118,23 +122,113 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildNotificationOption(
-                          "General Notification", "general_notification"),
-                      _buildNotificationOption("Sound", "sound"),
-                      _buildNotificationOption("Sound Call", "sound_call"),
-                      _buildNotificationOption("Vibrate", "vibrate"),
+                          _getTranslatedGeneralNotification(languageProvider),
+                          "general_notification",
+                          languageProvider),
                       _buildNotificationOption(
-                          "Transaction Updates", "transaction_update"),
+                          _getTranslatedSound(languageProvider),
+                          "sound",
+                          languageProvider),
                       _buildNotificationOption(
-                          "Expense Reminders", "expense_reminder"),
+                          _getTranslatedSoundCall(languageProvider),
+                          "sound_call",
+                          languageProvider),
                       _buildNotificationOption(
-                          "Budget Notifications", "budget_notifications"),
+                          _getTranslatedVibrate(languageProvider),
+                          "vibrate",
+                          languageProvider),
                       _buildNotificationOption(
-                          "Low Balance Alerts", "low_balance_alerts"),
+                          _getTranslatedTransactionUpdates(languageProvider),
+                          "transaction_update",
+                          languageProvider),
+                      _buildNotificationOption(
+                          _getTranslatedExpenseReminders(languageProvider),
+                          "expense_reminder",
+                          languageProvider),
+                      _buildNotificationOption(
+                          _getTranslatedBudgetNotifications(languageProvider),
+                          "budget_notifications",
+                          languageProvider),
+                      _buildNotificationOption(
+                          _getTranslatedLowBalanceAlerts(languageProvider),
+                          "low_balance_alerts",
+                          languageProvider),
                     ],
                   ),
                 ),
               ],
             ),
     );
+  }
+
+  // Translation helper methods
+  String _getTranslatedTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إعدادات الإشعارات";
+    if (lang == 'am') return "የማሳወቂያ ቅንብሮች";
+    return "Notification Settings";
+  }
+
+  String _getTranslatedGeneralNotification(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الإشعارات العامة";
+    if (lang == 'am') return "አጠቃላይ ማሳወቂያ";
+    return "General Notification";
+  }
+
+  String _getTranslatedSound(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الصوت";
+    if (lang == 'am') return "ድምፅ";
+    return "Sound";
+  }
+
+  String _getTranslatedSoundCall(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "صوت المكالمة";
+    if (lang == 'am') return "የደወል ድምፅ";
+    return "Sound Call";
+  }
+
+  String _getTranslatedVibrate(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الاهتزاز";
+    if (lang == 'am') return "እንቅጥቅጥ";
+    return "Vibrate";
+  }
+
+  String _getTranslatedTransactionUpdates(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تحديثات المعاملات";
+    if (lang == 'am') return "የግብይት ዝመናዎች";
+    return "Transaction Updates";
+  }
+
+  String _getTranslatedExpenseReminders(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تذكير بالمصروفات";
+    if (lang == 'am') return "የወጪ አስታዋሽ";
+    return "Expense Reminders";
+  }
+
+  String _getTranslatedBudgetNotifications(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إشعارات الميزانية";
+    if (lang == 'am') return "የበጀት ማሳወቂያዎች";
+    return "Budget Notifications";
+  }
+
+  String _getTranslatedLowBalanceAlerts(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تنبيهات الرصيد المنخفض";
+    if (lang == 'am') return "የዝቅተኛ ሚዛን ማንቂያዎች";
+    return "Low Balance Alerts";
+  }
+
+  String _getTranslatedSaveFailed(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "فشل حفظ الإعداد";
+    if (lang == 'am') return "ቅንብሩን ማስቀመጥ አልተሳካም";
+    return "Failed to save setting";
   }
 }

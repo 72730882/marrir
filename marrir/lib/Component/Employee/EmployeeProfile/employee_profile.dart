@@ -7,6 +7,8 @@ import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSecurity/secur
 import 'package:marrir/Component/Employee/EmployeeProfile/EmployeeSetting/setting.dart';
 import 'package:marrir/Component/Employee/wave_background.dart';
 import 'package:marrir/Component/onboarding/SplashScreen/splash_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class ProfilePage extends StatefulWidget {
   final Function(Widget) onChildSelected;
@@ -22,7 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String userId = "";
   String userImage = "";
   bool isLoading = true;
-  String token = ""; // Store token locally
+  String token = "";
 
   @override
   void initState() {
@@ -39,7 +41,6 @@ class _ProfilePageState extends State<ProfilePage> {
       try {
         final user = await ApiService.getUserInfo(email: email, Token: token);
 
-        // Decide which image to use
         String imageUrl = "";
         if (user["cv"] != null && user["cv"]["head_photo"] != null) {
           imageUrl = user["cv"]["head_photo"];
@@ -81,17 +82,19 @@ class _ProfilePageState extends State<ProfilePage> {
         userName: userName,
         userId: userId,
         userImage: userImage,
-        token: token, // ✅ Pass the real token here
+        token: token,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Column(
       children: [
         WaveBackground(
-          title: "Profile",
+          title: _getTranslatedProfileTitle(languageProvider),
           onBack: () {},
           onNotification: () {},
           bottomContent: Column(
@@ -108,7 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(height: 10),
               Text(
-                isLoading ? "Loading..." : userName,
+                isLoading ? _getTranslatedLoading(languageProvider) : userName,
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -116,7 +119,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               Text(
-                isLoading ? "" : "ID: $userId",
+                isLoading
+                    ? ""
+                    : "${_getTranslatedId(languageProvider)}: $userId",
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 20),
@@ -129,35 +134,40 @@ class _ProfilePageState extends State<ProfilePage> {
             children: [
               _buildProfileOption(
                 context,
-                "Edit Profile",
+                _getTranslatedEditProfile(languageProvider),
                 Icons.person_2,
-                null, // We handle navigation separately
+                null,
                 onTap: _navigateToEditProfile,
+                languageProvider: languageProvider,
               ),
               _buildProfileOption(
                 context,
-                "Security",
+                _getTranslatedSecurity(languageProvider),
                 Icons.security_sharp,
                 SecurityPage(onChildSelected: widget.onChildSelected),
+                languageProvider: languageProvider,
               ),
               _buildProfileOption(
                 context,
-                "Setting",
+                _getTranslatedSetting(languageProvider),
                 Icons.settings,
                 SettingPage(onChildSelected: widget.onChildSelected),
+                languageProvider: languageProvider,
               ),
               // _buildProfileOption(
               //   context,
-              //   "Help",
+              //   _getTranslatedHelp(languageProvider),
               //   Icons.help,
               //   HelpFAQPage(onChildSelected: widget.onChildSelected),
+              //   languageProvider: languageProvider,
               // ),
               _buildProfileOption(
                 context,
-                "Logout",
+                _getTranslatedLogout(languageProvider),
                 Icons.logout,
                 const SizedBox(),
-                onTap: () => _showLogoutDialog(context),
+                onTap: () => _showLogoutDialog(context, languageProvider),
+                languageProvider: languageProvider,
               ),
             ],
           ),
@@ -167,8 +177,13 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildProfileOption(
-      BuildContext context, String title, IconData icon, Widget? page,
-      {VoidCallback? onTap}) {
+    BuildContext context,
+    String title,
+    IconData icon,
+    Widget? page, {
+    VoidCallback? onTap,
+    required LanguageProvider languageProvider,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: InkWell(
@@ -205,22 +220,23 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  void _showLogoutDialog(
+      BuildContext context, LanguageProvider languageProvider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
-            "End Session",
-            style: TextStyle(
+          title: Text(
+            _getTranslatedEndSession(languageProvider),
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
             textAlign: TextAlign.center,
           ),
-          content: const Text(
-            "Are you sure you want to log out?",
-            style: TextStyle(fontSize: 15, color: Colors.black54),
+          content: Text(
+            _getTranslatedLogoutConfirmation(languageProvider),
+            style: const TextStyle(fontSize: 15, color: Colors.black54),
             textAlign: TextAlign.center,
           ),
           actionsPadding: const EdgeInsets.only(bottom: 8, right: 8, left: 8),
@@ -245,9 +261,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
-                    "Yes, End Session",
-                    style: TextStyle(
+                  child: Text(
+                    _getTranslatedYesEndSession(languageProvider),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -265,9 +281,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                   onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    "Cancel",
-                    style: TextStyle(
+                  child: Text(
+                    _getTranslatedCancel(languageProvider),
+                    style: const TextStyle(
                       color: Color(0xFF333333),
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
@@ -281,5 +297,90 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       },
     );
+  }
+
+  // Translation helper methods
+  String _getTranslatedProfileTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الملف الشخصي";
+    if (lang == 'am') return "መገለጫ";
+    return "Profile";
+  }
+
+  String _getTranslatedLoading(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "جاري التحميل...";
+    if (lang == 'am') return "በማቅረብ ላይ...";
+    return "Loading...";
+  }
+
+  String _getTranslatedId(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الرقم";
+    if (lang == 'am') return "መለያ";
+    return "ID";
+  }
+
+  String _getTranslatedEditProfile(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تعديل الملف الشخصي";
+    if (lang == 'am') return "መገለጫ አስተካክል";
+    return "Edit Profile";
+  }
+
+  String _getTranslatedSecurity(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الأمان";
+    if (lang == 'am') return "ደህንነት";
+    return "Security";
+  }
+
+  String _getTranslatedSetting(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الإعدادات";
+    if (lang == 'am') return "ቅንብሮች";
+    return "Setting";
+  }
+
+  String _getTranslatedHelp(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المساعدة";
+    if (lang == 'am') return "እርዳታ";
+    return "Help";
+  }
+
+  String _getTranslatedLogout(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تسجيل الخروج";
+    if (lang == 'am') return "ውጣ";
+    return "Logout";
+  }
+
+  String _getTranslatedEndSession(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إنهاء الجلسة";
+    if (lang == 'am') return "ክፍለ ጊዜ አቁም";
+    return "End Session";
+  }
+
+  String _getTranslatedLogoutConfirmation(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "هل أنت متأكد أنك تريد تسجيل الخروج؟";
+    if (lang == 'am') return "እርግጠኛ ነህ መውጣት ትፈልጋለህ?";
+    return "Are you sure you want to log out?";
+  }
+
+  String _getTranslatedYesEndSession(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "نعم، إنهاء الجلسة";
+    if (lang == 'am') return "አዎን፣ ክፍለ ጊዜ አቁም";
+    return "Yes, End Session";
+  }
+
+  String _getTranslatedCancel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إلغاء";
+    if (lang == 'am') return "ተወ";
+    return "Cancel";
   }
 }

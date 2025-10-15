@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/Component/Employee/layout/employee_header.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class CvHeader extends StatelessWidget {
   final int currentStep; // 1-based
@@ -17,6 +19,8 @@ class CvHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     const Color titleColor = Color(0xFF1D2433);
     const Color subtitleColor = Color(0xFF8A94A6);
     const Color cardBg = Colors.white;
@@ -28,18 +32,8 @@ class CvHeader extends StatelessWidget {
     const Color upcomingText = Color(0xFF98A2B3);
     const Color completedText = Color(0xFF667085);
 
-    final List<String> stepTitles = [
-      "Passport",
-      "ID Info",
-      "Personal",
-      "Address",
-      "Summary",
-      "Education",
-      "Photo",
-      "Experience",
-      "References",
-      "Additional",
-    ];
+    // Translated step titles
+    final List<String> stepTitles = _getTranslatedStepTitles(languageProvider);
 
     final int clampedTotal = totalSteps.clamp(1, stepTitles.length);
     final int clampedCurrent = currentStep.clamp(1, clampedTotal);
@@ -53,7 +47,8 @@ class CvHeader extends StatelessWidget {
 
     final double percent =
         completionPercent ?? (clampedCurrent / clampedTotal).clamp(0.0, 1.0);
-    final String percentLabel = "${(percent * 100).round()}% Complete";
+    final String percentLabel =
+        _getTranslatedPercentLabel(percent, languageProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +62,7 @@ class CvHeader extends StatelessWidget {
               Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: onMenuTap, // this now works via Builder
+                  onTap: onMenuTap,
                   borderRadius: BorderRadius.circular(8),
                   child: const Padding(
                     padding: EdgeInsets.all(8.0),
@@ -109,11 +104,11 @@ class CvHeader extends StatelessWidget {
         ),
 
         // --- CV title and subtitle ---
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            "Curriculum Vitae",
-            style: TextStyle(
+            _getTranslatedTitle(languageProvider),
+            style: const TextStyle(
               fontSize: 28,
               height: 1.2,
               fontWeight: FontWeight.w700,
@@ -123,11 +118,11 @@ class CvHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            "Educational Background & Experience",
-            style: TextStyle(
+            _getTranslatedSubtitle(languageProvider),
+            style: const TextStyle(
               fontSize: 14,
               height: 1.4,
               color: subtitleColor,
@@ -241,10 +236,9 @@ class CvHeader extends StatelessWidget {
                         ),
                       ),
                       // Foreground line (completed + active)
-                      // Foreground line (completed + active)
                       FractionallySizedBox(
                         alignment: Alignment.centerLeft,
-                        widthFactor: percent, // ✅ use clamped percent
+                        widthFactor: percent,
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           height: 4,
@@ -276,5 +270,89 @@ class CvHeader extends StatelessWidget {
         const SizedBox(height: 8),
       ],
     );
+  }
+
+  // Translation helper methods
+  List<String> _getTranslatedStepTitles(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+
+    if (lang == 'ar') {
+      return [
+        "جواز السفر",
+        "معلومات الهوية",
+        "معلومات شخصية",
+        "العنوان",
+        "ملخص",
+        "التعليم",
+        "الصورة",
+        "الخبرة",
+        "المراجع",
+        "إضافي",
+      ];
+    } else if (lang == 'am') {
+      return [
+        "ፓስፖርት",
+        "የመለያ መረጃ",
+        "የግል መረጃ",
+        "አድራሻ",
+        "ማጠቃለያ",
+        "ትምህርት",
+        "ፎቶ",
+        "ልምድ",
+        "ማጣቀሻዎች",
+        "ተጨማሪ",
+      ];
+    } else {
+      return [
+        "Passport",
+        "ID Info",
+        "Personal",
+        "Address",
+        "Summary",
+        "Education",
+        "Photo",
+        "Experience",
+        "References",
+        "Additional",
+      ];
+    }
+  }
+
+  String _getTranslatedTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+
+    if (lang == 'ar') {
+      return "السيرة الذاتية";
+    } else if (lang == 'am') {
+      return "የህይወት ታሪክ";
+    } else {
+      return "Curriculum Vitae";
+    }
+  }
+
+  String _getTranslatedSubtitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+
+    if (lang == 'ar') {
+      return "الخلفية التعليمية والخبرة";
+    } else if (lang == 'am') {
+      return "የትምህርት ዳራ እና ልምድ";
+    } else {
+      return "Educational Background & Experience";
+    }
+  }
+
+  String _getTranslatedPercentLabel(
+      double percent, LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    final percentValue = (percent * 100).round();
+
+    if (lang == 'ar') {
+      return "$percentValue% مكتمل";
+    } else if (lang == 'am') {
+      return "$percentValue% ተጠናቋል";
+    } else {
+      return "$percentValue% Complete";
+    }
   }
 }

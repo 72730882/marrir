@@ -118,7 +118,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
   @override
   Widget build(BuildContext context) {
-    final lang = Provider.of<LanguageProvider>(context); 
+    final lang = Provider.of<LanguageProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -150,8 +150,9 @@ class _PaymentPageState extends State<PaymentPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                       lang.t('total_payments'),
-                        style: TextStyle(fontSize: 14, color: Colors.black),
+                        lang.t('total_payments'),
+                        style:
+                            const TextStyle(fontSize: 14, color: Colors.black),
                       ),
                       const SizedBox(height: 8),
                       Text(

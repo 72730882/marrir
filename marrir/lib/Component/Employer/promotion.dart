@@ -4,6 +4,7 @@ import 'package:marrir/services/Employer/payment_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
+
 class PromotionPage extends StatefulWidget {
   const PromotionPage({super.key});
 
@@ -362,7 +363,7 @@ class _PromotionPageState extends State<PromotionPage> {
 
   @override
   Widget build(BuildContext context) {
-        final lang = Provider.of<LanguageProvider>(context);
+    final lang = Provider.of<LanguageProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -373,18 +374,18 @@ class _PromotionPageState extends State<PromotionPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 24),
-               Text(
+              Text(
                 lang.t("promotions"),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 1),
-               Text(
+              Text(
                 lang.t("choose_plan"),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 15,
                   color: Color.fromARGB(255, 94, 91, 91),
                 ),

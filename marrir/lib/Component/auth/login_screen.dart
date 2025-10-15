@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final lang = Provider.of<LanguageProvider>(context);
-    final Map<String, String> _accountTypes = {
+    final Map<String, String> accountTypes = {
       "agent": lang.t('agency'), // e.g., 'Foreign Employment Agency'
       "recruitment": lang.t('rec_firm'), // e.g., 'Recruitment Firm'
       "sponsor": lang.t('employer'), // e.g., 'Employer'
@@ -76,11 +76,11 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 25),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
                   lang.t('login_title'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -96,38 +96,63 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Text(
                       lang.t('select_role'),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 5),
-                    DropdownButtonFormField<String>(
-                      value: _selectedAccountType,
-                      items: _accountTypes.entries.map((entry) {
-                        return DropdownMenuItem<String>(
-                          value: entry.key,
-                          child: Text(entry.value),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedAccountType = value;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 12),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+
+                    // ===== Boxed Pick List for Account Type (single-select) =====
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      // decoration: BoxDecoration(
+                      //   borderRadius: BorderRadius.circular(10),
+                      //   border: Border.all(color: const Color(0xFF48C2E9)),
+                      // ),
+                      child: Column(
+                        children: accountTypes.entries.map((entry) {
+                          final isSelected = _selectedAccountType == entry.key;
+                          return InkWell(
+                            onTap: () {
+                              setState(() {
+                                _selectedAccountType = entry.key;
+                              });
+                            },
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 4.0),
+                              child: Row(
+                                children: [
+                                  Checkbox(
+                                    value: isSelected,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        _selectedAccountType = entry.key;
+                                      });
+                                    },
+                                    activeColor: const Color(0xFF7B4BBA),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      entry.value,
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
+
                     const SizedBox(height: 15),
                     Text(
                       lang.t('email'),
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
                     _buildTextField(
@@ -138,8 +163,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 15),
                     Text(
                       lang.t('password'),
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
                     _buildTextField(
@@ -162,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         child: Text(
                           lang.t('forgot_password'),
-                          style: TextStyle(color: Color(0xFF65b2c9)),
+                          style: const TextStyle(color: Color(0xFF65b2c9)),
                         ),
                       ),
                     ),
@@ -202,7 +227,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           label: Text(
                             lang.t('login_with_google'),
-                            style: TextStyle(fontSize: 14, color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.black),
                           ),
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -225,7 +251,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           label: Text(
                             lang.t('login_with_fb'),
-                            style: TextStyle(fontSize: 14, color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.black),
                           ),
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -345,38 +372,40 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
 
         // Navigate to dashboard based on role, passing token
-        Widget page;
-        switch (userData["role"].toLowerCase()) {
-          case "employee":
-            page =
-                EmployeePage(token: userData["access_token"]); // ✅ pass token
-            break;
-          case "agent":
-            page = const AgentPage(); // If needed
-            break;
-          case "employer":
-            page = const EmployerPage(); // If needed
-            break;
-          case "recruitment":
-            page = const RecruitmentPage(); // If needed
-            break;
-          default:
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Unknown role: ${userData["role"]}")),
-            );
-            return;
-        }
+        // NOTE: The code below is unreachable due to the return above in your original logic.
+        // Keeping it as-is to avoid changing behavior.
+        // Widget page;
+        // switch (userData["role"].toLowerCase()) {
+        //   case "employee":
+        //     page =
+        //         EmployeePage(token: userData["access_token"]); // ✅ pass token
+        //     break;
+        //   case "agent":
+        //     page = const AgentPage(); // If needed
+        //     break;
+        //   case "employer":
+        //     page = const EmployerPage(); // If needed
+        //     break;
+        //   case "recruitment":
+        //     page = const RecruitmentPage(); // If needed
+        //     break;
+        //   default:
+        //     ScaffoldMessenger.of(context).showSnackBar(
+        //       SnackBar(content: Text("Unknown role: ${userData["role"]}")),
+        //     );
+        //     return;
+        // }
 
-        if (apiRole != selectedRole || apiEmail != email.toLowerCase()) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                "Invalid login. Make sure you're using the correct email and role you registered with.",
-              ),
-            ),
-          );
-          return;
-        }
+        // if (apiRole != selectedRole || apiEmail != email.toLowerCase()) {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     const SnackBar(
+        //       content: Text(
+        //         "Invalid login. Make sure you're using the correct email and role you registered with.",
+        //       ),
+        //     ),
+        //   );
+        //   return;
+        // }
       }
 
       await _saveAndRedirect(userData);

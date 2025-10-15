@@ -3,6 +3,8 @@ import 'package:marrir/Page/Employee/employee_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:marrir/services/user.dart';
 import 'package:marrir/services/Employee/dashboard_service.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -44,6 +46,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       // Show error messages if any
       if (errors.isNotEmpty) {
+        final languageProvider =
+            Provider.of<LanguageProvider>(context, listen: false);
         errors.forEach((key, error) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(error.toString())),
@@ -57,8 +61,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         hasPartialData = false;
       });
 
+      final languageProvider =
+          Provider.of<LanguageProvider>(context, listen: false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load dashboard: $e')),
+        SnackBar(
+            content:
+                Text('${_getTranslatedFailedToLoad(languageProvider)}: $e')),
       );
     }
   }
@@ -197,9 +205,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(_getTranslatedLoading(languageProvider)),
+            ],
+          ),
+        ),
       );
     }
 
@@ -209,11 +228,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Error: $errorMessage'),
+              Text('${_getTranslatedError(languageProvider)}: $errorMessage'),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _loadDashboardData,
-                child: const Text('Retry'),
+                child: Text(_getTranslatedRetry(languageProvider)),
               ),
             ],
           ),
@@ -246,15 +265,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text("Token not found, please login again.")),
+                SnackBar(
+                    content:
+                        Text(_getTranslatedTokenNotFound(languageProvider))),
               );
             }
           },
         ),
-        title: const Text(
-          "Dashboard",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+        title: Text(
+          _getTranslatedDashboard(languageProvider),
+          style:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
       ),
@@ -301,9 +322,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        "Created: March 15, 2024",
-                        style: TextStyle(fontSize: 13, color: Colors.white70),
+                      Text(
+                        _getTranslatedCreatedDate(languageProvider),
+                        style: const TextStyle(
+                            fontSize: 13, color: Colors.white70),
                       ),
                     ],
                   ),
@@ -331,24 +353,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Expanded(
                   child: _buildProgressCard(
                     icon: Icons.description_outlined,
-                    title: "CV",
+                    title: _getTranslatedCV(languageProvider),
                     subtitle: cvProgress.isNotEmpty
-                        ? "$cvCompleted/8 sections completed"
-                        : "Data not available",
+                        ? "$cvCompleted/8 ${_getTranslatedSectionsCompleted(languageProvider)}"
+                        : _getTranslatedDataNotAvailable(languageProvider),
                     progress: cvOverallProgress,
                     enabled: cvProgress.isNotEmpty,
+                    languageProvider: languageProvider,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _buildProgressCard(
                     icon: Icons.settings_outlined,
-                    title: "Process",
+                    title: _getTranslatedProcess(languageProvider),
                     subtitle: processProgress.isNotEmpty
-                        ? "$processCompleted/16 sections completed"
-                        : "Data not available",
+                        ? "$processCompleted/16 ${_getTranslatedSectionsCompleted(languageProvider)}"
+                        : _getTranslatedDataNotAvailable(languageProvider),
                     progress: processOverallProgress,
                     enabled: processProgress.isNotEmpty,
+                    languageProvider: languageProvider,
                   ),
                 ),
               ],
@@ -357,33 +381,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 20),
 
             // Profile Statistics
-            const Text(
-              "Profile Statistics",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                _getTranslatedProfileStatistics(languageProvider),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
               ),
             ),
             const SizedBox(height: 12),
 
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 1.4,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              children: const [
-                _StatCard(title: "Profile Views", value: "0", percent: "+0%"),
-                _StatCard(
-                  title: "Job Application Count",
-                  value: "0",
-                  percent: "+0%",
-                ),
-                _StatCard(title: "Transfer Count", value: "0", percent: "+0%"),
-                _StatCard(title: "Saved Jobs", value: "0", percent: "+0%"),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                childAspectRatio: 1.4,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                children: [
+                  _StatCard(
+                    title: _getTranslatedProfileViews(languageProvider),
+                    value: "0",
+                    percent: "+0%",
+                  ),
+                  _StatCard(
+                    title: _getTranslatedJobApplicationCount(languageProvider),
+                    value: "0",
+                    percent: "+0%",
+                  ),
+                  _StatCard(
+                    title: _getTranslatedTransferCount(languageProvider),
+                    value: "0",
+                    percent: "+0%",
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -398,6 +435,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required String subtitle,
     required double progress,
     required bool enabled,
+    required LanguageProvider languageProvider,
   }) {
     return Container(
       padding: const EdgeInsets.all(14),
@@ -447,8 +485,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 4),
           Text(
             enabled
-                ? "${(progress * 100).toStringAsFixed(0)}% Complete"
-                : "N/A",
+                ? "${(progress * 100).toStringAsFixed(0)}% ${_getTranslatedComplete(languageProvider)}"
+                : _getTranslatedNotAvailable(languageProvider),
             style: TextStyle(
                 fontSize: 12,
                 color: enabled ? Colors.grey : Colors.grey.shade400),
@@ -456,6 +494,126 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
     );
+  }
+
+  // Translation helper methods
+  String _getTranslatedLoading(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "جاري التحميل...";
+    if (lang == 'am') return "በመጫን ላይ...";
+    return "Loading...";
+  }
+
+  String _getTranslatedFailedToLoad(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "فشل تحميل لوحة التحكم";
+    if (lang == 'am') return "ዳሽቦርድ መጫን አልተሳካም";
+    return "Failed to load dashboard";
+  }
+
+  String _getTranslatedError(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "خطأ";
+    if (lang == 'am') return "ስህተት";
+    return "Error";
+  }
+
+  String _getTranslatedRetry(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إعادة المحاولة";
+    if (lang == 'am') return "እንደገና ሞክር";
+    return "Retry";
+  }
+
+  String _getTranslatedTokenNotFound(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الرمز غير موجود، يرجى تسجيل الدخول مرة أخرى";
+    if (lang == 'am') return "ቶከን አልተገኘም፣ እባክዎ እንደገና ይግቡ";
+    return "Token not found, please login again";
+  }
+
+  String _getTranslatedDashboard(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "لوحة التحكم";
+    if (lang == 'am') return "ዳሽቦርድ";
+    return "Dashboard";
+  }
+
+  String _getTranslatedCreatedDate(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تم الإنشاء: ١٥ مارس ٢٠٢٤";
+    if (lang == 'am') return "የተፈጠረው: ማርች 15, 2024";
+    return "Created: March 15, 2024";
+  }
+
+  String _getTranslatedCV(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "السيرة الذاتية";
+    if (lang == 'am') return "ሲቪ";
+    return "CV";
+  }
+
+  String _getTranslatedProcess(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "العملية";
+    if (lang == 'am') return "ሂደት";
+    return "Process";
+  }
+
+  String _getTranslatedSectionsCompleted(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الأقسام المكتملة";
+    if (lang == 'am') return "የተጠናቀቁ ክፍሎች";
+    return "sections completed";
+  }
+
+  String _getTranslatedDataNotAvailable(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "البيانات غير متاحة";
+    if (lang == 'am') return "ውሂብ አይገኝም";
+    return "Data not available";
+  }
+
+  String _getTranslatedComplete(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "مكتمل";
+    if (lang == 'am') return "ተጠናቋል";
+    return "Complete";
+  }
+
+  String _getTranslatedNotAvailable(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "غير متاح";
+    if (lang == 'am') return "አይገኝም";
+    return "N/A";
+  }
+
+  String _getTranslatedProfileStatistics(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إحصائيات الملف الشخصي";
+    if (lang == 'am') return "የመገለጫ ስታቲስቲክስ";
+    return "Profile Statistics";
+  }
+
+  String _getTranslatedProfileViews(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "مشاهدات الملف الشخصي";
+    if (lang == 'am') return "የመገለጫ እይታዎች";
+    return "Profile Views";
+  }
+
+  String _getTranslatedJobApplicationCount(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "عدد طلبات العمل";
+    if (lang == 'am') return "የስራ ማመልከቻ ብዛት";
+    return "Job Application Count";
+  }
+
+  String _getTranslatedTransferCount(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "عدد التحويلات";
+    if (lang == 'am') return "የሽያጭ ብዛት";
+    return "Transfer Count";
   }
 }
 

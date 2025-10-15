@@ -5,6 +5,8 @@ import 'package:marrir/services/Employee/dashboard_service.dart';
 import 'package:marrir/services/Employer/payment_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart'; // For web URL launching
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class PromotionScreen extends StatefulWidget {
   const PromotionScreen({super.key});
@@ -118,11 +120,10 @@ class _PromotionScreenState extends State<PromotionScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-                'Redirected to payment gateway. Complete the payment and return to the app.'),
+          SnackBar(
+            content: Text(_getTranslatedPaymentRedirectMessage()),
             backgroundColor: Colors.blue,
-            duration: Duration(seconds: 5),
+            duration: const Duration(seconds: 5),
           ),
         );
       } else {
@@ -135,7 +136,7 @@ class _PromotionScreenState extends State<PromotionScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Payment failed: ${e.toString()}'),
+          content: Text('${_getTranslatedPaymentFailed()}: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -152,15 +153,15 @@ class _PromotionScreenState extends State<PromotionScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Package purchased successfully!'),
+        SnackBar(
+          content: Text(_getTranslatedPurchaseSuccess()),
           backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to complete purchase: ${e.toString()}'),
+          content: Text('${_getTranslatedPurchaseFailed()}: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -169,39 +170,44 @@ class _PromotionScreenState extends State<PromotionScreen> {
 
   Future<bool> _showPaymentConfirmation(
       {required String packageName, required double amount}) async {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context, listen: false);
+
     return await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Confirm Payment'),
+            title: Text(_getTranslatedConfirmPayment(languageProvider)),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Package: $packageName'),
-                Text('Amount: \$${amount.toStringAsFixed(2)}'),
+                Text(
+                    '${_getTranslatedPackage(languageProvider)}: $packageName'),
+                Text(
+                    '${_getTranslatedAmount(languageProvider)}: \$${amount.toStringAsFixed(2)}'),
                 const SizedBox(height: 16),
-                const Text(
-                  'You will be redirected to Telr payment gateway to complete the payment securely.',
-                  style: TextStyle(fontSize: 14),
+                Text(
+                  _getTranslatedPaymentRedirectDescription(languageProvider),
+                  style: const TextStyle(fontSize: 14),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'After payment, return to this app to see your updated status.',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                Text(
+                  _getTranslatedPaymentReturnMessage(languageProvider),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
+                child: Text(_getTranslatedCancel(languageProvider)),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromRGBO(142, 198, 214, 1),
                 ),
-                child: const Text('Proceed to Payment'),
+                child: Text(_getTranslatedProceedToPayment(languageProvider)),
               ),
             ],
           ),
@@ -228,15 +234,18 @@ class _PromotionScreenState extends State<PromotionScreen> {
   }
 
   void _showUrlFallback(String url) {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context, listen: false);
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Payment URL'),
+        title: Text(_getTranslatedPaymentURL(languageProvider)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Please copy this URL and open it in your browser:'),
+            Text(_getTranslatedCopyURLMessage(languageProvider)),
             const SizedBox(height: 16),
             SelectableText(
               url,
@@ -246,23 +255,23 @@ class _PromotionScreenState extends State<PromotionScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'After completing payment, return to this app.',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+            Text(
+              _getTranslatedPaymentReturnMessage(languageProvider),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            child: Text(_getTranslatedOK(languageProvider)),
           ),
           TextButton(
             onPressed: () {
               // Copy to clipboard functionality would go here
               Navigator.pop(context);
             },
-            child: const Text('Copy URL'),
+            child: Text(_getTranslatedCopyURL(languageProvider)),
           ),
         ],
       ),
@@ -272,7 +281,7 @@ class _PromotionScreenState extends State<PromotionScreen> {
   void _navigateToEmployeeSelection() {
     if (!_hasActiveSubscription) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please purchase a package first')),
+        SnackBar(content: Text(_getTranslatedPurchasePackageFirst())),
       );
       return;
     }
@@ -287,6 +296,8 @@ class _PromotionScreenState extends State<PromotionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -307,16 +318,18 @@ class _PromotionScreenState extends State<PromotionScreen> {
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text("Token not found, please login again.")),
+                SnackBar(
+                    content:
+                        Text(_getTranslatedTokenNotFound(languageProvider))),
               );
             }
           },
         ),
         centerTitle: true,
-        title: const Text(
-          "Promotion",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+        title: Text(
+          _getTranslatedTitle(languageProvider),
+          style:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
         ),
       ),
       body: Padding(
@@ -324,19 +337,20 @@ class _PromotionScreenState extends State<PromotionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 40),
+            Padding(
+              padding: const EdgeInsets.only(left: 40),
               child: Text(
-                "Promotions",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                _getTranslatedPromotions(languageProvider),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
             ),
             const SizedBox(height: 4),
-            const Padding(
-              padding: EdgeInsets.only(left: 40),
+            Padding(
+              padding: const EdgeInsets.only(left: 40),
               child: Text(
-                "Choose the plan that's right for you",
-                style: TextStyle(fontSize: 13, color: Colors.black54),
+                _getTranslatedChoosePlan(languageProvider),
+                style: const TextStyle(fontSize: 13, color: Colors.black54),
               ),
             ),
             const SizedBox(height: 30),
@@ -352,13 +366,15 @@ class _PromotionScreenState extends State<PromotionScreen> {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.green),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 20),
-                      SizedBox(width: 8),
+                      const Icon(Icons.check_circle,
+                          color: Colors.green, size: 20),
+                      const SizedBox(width: 8),
                       Text(
-                        'You have an active subscription',
-                        style: TextStyle(color: Colors.green, fontSize: 14),
+                        _getTranslatedActiveSubscription(languageProvider),
+                        style:
+                            const TextStyle(color: Colors.green, fontSize: 14),
                       ),
                     ],
                   ),
@@ -375,21 +391,23 @@ class _PromotionScreenState extends State<PromotionScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Error: $_error',
+                                '${_getTranslatedError(languageProvider)}: $_error',
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(color: Colors.red),
                               ),
                               const SizedBox(height: 16),
                               ElevatedButton(
                                 onPressed: _loadPackages,
-                                child: const Text('Retry'),
+                                child:
+                                    Text(_getTranslatedRetry(languageProvider)),
                               ),
                             ],
                           ),
                         )
                       : _packages.isEmpty
-                          ? const Center(
-                              child: Text('No packages available'),
+                          ? Center(
+                              child: Text(
+                                  _getTranslatedNoPackages(languageProvider)),
                             )
                           : ListView.builder(
                               itemCount: _packages.length,
@@ -403,10 +421,11 @@ class _PromotionScreenState extends State<PromotionScreen> {
                                   padding: const EdgeInsets.only(bottom: 16),
                                   child: _planCard(
                                     "\$${package['price']}",
-                                    "Duration: ${package['duration']}",
-                                    "${package['profile_count']} Profile Count",
+                                    "${_getTranslatedDuration(languageProvider)}: ${package['duration']}",
+                                    "${package['profile_count']} ${_getTranslatedProfileCount(languageProvider)}",
                                     isLoading: isLoading,
                                     onTap: () => _buyPackage(packageId),
+                                    languageProvider: languageProvider,
                                   ),
                                 );
                               },
@@ -426,7 +445,8 @@ class _PromotionScreenState extends State<PromotionScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text("Continue to Employee Selection"),
+                child:
+                    Text(_getTranslatedContinueToSelection(languageProvider)),
               ),
             ),
           ],
@@ -441,6 +461,7 @@ class _PromotionScreenState extends State<PromotionScreen> {
     String profileCount, {
     bool isLoading = false,
     VoidCallback? onTap,
+    required LanguageProvider languageProvider,
   }) {
     return GestureDetector(
       onTap: isLoading ? null : onTap,
@@ -508,13 +529,198 @@ class _PromotionScreenState extends State<PromotionScreen> {
                   backgroundColor: const Color.fromRGBO(142, 198, 214, 1),
                   foregroundColor: Colors.white,
                 ),
-                child: const Text('Buy Now'),
+                child: Text(_getTranslatedBuyNow(languageProvider)),
               ),
             if (isLoading) const CircularProgressIndicator(),
           ],
         ),
       ),
     );
+  }
+
+  // Translation helper methods
+  String _getTranslatedTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الترقية";
+    if (lang == 'am') return "ማስተዋወቅ";
+    return "Promotion";
+  }
+
+  String _getTranslatedPromotions(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الترقيات";
+    if (lang == 'am') return "ማስተዋወቅ";
+    return "Promotions";
+  }
+
+  String _getTranslatedChoosePlan(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "اختر الخطة المناسبة لك";
+    if (lang == 'am') return "ለእርስዎ ተስማሚ የሆነውን እቅድ ይምረጡ";
+    return "Choose the plan that's right for you";
+  }
+
+  String _getTranslatedActiveSubscription(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "لديك اشتراك نشط";
+    if (lang == 'am') return "ንቁ የሆነ ምዝገባ አለዎት";
+    return "You have an active subscription";
+  }
+
+  String _getTranslatedError(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "خطأ";
+    if (lang == 'am') return "ስህተት";
+    return "Error";
+  }
+
+  String _getTranslatedRetry(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إعادة المحاولة";
+    if (lang == 'am') return "እንደገና ሞክር";
+    return "Retry";
+  }
+
+  String _getTranslatedNoPackages(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "لا توجد باقات متاحة";
+    if (lang == 'am') return "ምንም ጥቅሎች የሉም";
+    return "No packages available";
+  }
+
+  String _getTranslatedDuration(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المدة";
+    if (lang == 'am') return "ቆይታ";
+    return "Duration";
+  }
+
+  String _getTranslatedProfileCount(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "عدد الملفات الشخصية";
+    if (lang == 'am') return "የመገለጫ ብዛት";
+    return "Profile Count";
+  }
+
+  String _getTranslatedContinueToSelection(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المتابعة إلى اختيار الموظف";
+    if (lang == 'am') return "ወደ ሰራተኛ ምርጫ ቀጥል";
+    return "Continue to Employee Selection";
+  }
+
+  String _getTranslatedBuyNow(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "اشتر الآن";
+    if (lang == 'am') return "አሁን ይግዙ";
+    return "Buy Now";
+  }
+
+  String _getTranslatedConfirmPayment(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تأكيد الدفع";
+    if (lang == 'am') return "ክፍያ አረጋግጥ";
+    return "Confirm Payment";
+  }
+
+  String _getTranslatedPackage(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الباقة";
+    if (lang == 'am') return "ጥቅል";
+    return "Package";
+  }
+
+  String _getTranslatedAmount(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المبلغ";
+    if (lang == 'am') return "መጠን";
+    return "Amount";
+  }
+
+  String _getTranslatedPaymentRedirectDescription(
+      LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar')
+      return "سيتم توجيهك إلى بوابة الدفع Telr لإكمال الدفع بأمان.";
+    if (lang == 'am') return "ወደ Telr የክፍያ መግቢያ በደህንነት ክፍያውን ለማጠናቀቅ ይመራሉ።";
+    return "You will be redirected to Telr payment gateway to complete the payment securely.";
+  }
+
+  String _getTranslatedPaymentReturnMessage(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar')
+      return "بعد الدفع، ارجع إلى هذا التطبيق لرؤية حالة التحديث.";
+    if (lang == 'am') return "ከክፍያ በኋላ፣ ወደዚህ መተግበሪያ ተመለስ የተዘመነውን ሁኔታ ለማየት።";
+    return "After payment, return to this app to see your updated status.";
+  }
+
+  String _getTranslatedCancel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إلغاء";
+    if (lang == 'am') return "ሰርዝ";
+    return "Cancel";
+  }
+
+  String _getTranslatedProceedToPayment(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المتابعة إلى الدفع";
+    if (lang == 'am') return "ወደ ክፍያ ቀጥል";
+    return "Proceed to Payment";
+  }
+
+  String _getTranslatedPaymentURL(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "رابط الدفع";
+    if (lang == 'am') return "የክፍያ አድራሻ";
+    return "Payment URL";
+  }
+
+  String _getTranslatedCopyURLMessage(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "يرجى نسخ هذا الرابط وفتحه في متصفحك:";
+    if (lang == 'am') return "እባክዎ ይህን አድራሻ ይቅዱ እና በአሳሽዎ ውስጥ ይክፈቱት:";
+    return "Please copy this URL and open it in your browser:";
+  }
+
+  String _getTranslatedOK(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "موافق";
+    if (lang == 'am') return "እሺ";
+    return "OK";
+  }
+
+  String _getTranslatedCopyURL(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "نسخ الرابط";
+    if (lang == 'am') return "አድራሻ ቅዱ";
+    return "Copy URL";
+  }
+
+  String _getTranslatedPurchasePackageFirst() {
+    return "Please purchase a package first";
+  }
+
+  String _getTranslatedPaymentRedirectMessage() {
+    return "Redirected to payment gateway. Complete the payment and return to the app.";
+  }
+
+  String _getTranslatedPaymentFailed() {
+    return "Payment failed";
+  }
+
+  String _getTranslatedPurchaseSuccess() {
+    return "Package purchased successfully!";
+  }
+
+  String _getTranslatedPurchaseFailed() {
+    return "Failed to complete purchase";
+  }
+
+  String _getTranslatedTokenNotFound(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الرمز غير موجود، يرجى تسجيل الدخول مرة أخرى";
+    if (lang == 'am') return "ቶከን አልተገኘም፣ እባክዎ እንደገና ይግቡ";
+    return "Token not found, please login again";
   }
 }
 

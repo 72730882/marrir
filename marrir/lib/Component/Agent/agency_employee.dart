@@ -94,7 +94,7 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
                 children: [
                   Text(
                     lang.t('employee'),
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87),
@@ -130,7 +130,8 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(lang.t("total_employees"),
-                          style: TextStyle(fontSize: 14, color: Colors.black)),
+                          style: const TextStyle(
+                              fontSize: 14, color: Colors.black)),
                       const SizedBox(height: 8),
                       Text("${employees.length}",
                           style: const TextStyle(
@@ -147,8 +148,8 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(lang.t("employees"),
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
                   ElevatedButton(
                     onPressed: showAddEmployeeDialog,
                     style: ElevatedButton.styleFrom(
@@ -207,7 +208,7 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
               ),
               const SizedBox(height: 12),
 
-         // ===== Employee Table Rows =====
+              // ===== Employee Table Rows =====
               Flexible(
                 child: isLoading
                     ? const Center(child: CircularProgressIndicator())
@@ -239,42 +240,42 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
                                             SizedBox(
                                                 width: 150,
                                                 child: Text(lang.t("name"),
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors.white))),
                                             SizedBox(
                                                 width: 150,
                                                 child: Text(lang.t("email"),
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors.white))),
                                             SizedBox(
                                                 width: 120,
                                                 child: Text(lang.t("phone"),
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors.white))),
                                             SizedBox(
                                                 width: 120,
                                                 child: Text(lang.t("country"),
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors.white))),
                                             SizedBox(
                                                 width: 120,
                                                 child: Text(lang.t("status"),
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors.white))),
                                             SizedBox(
                                                 width: 150,
                                                 child: Text(lang.t("actions"),
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors.white))),
@@ -322,20 +323,20 @@ class _AgencyEmployeePageState extends State<AgencyEmployeePage> {
                                                         ),
                                                       );
                                                     },
-                                                    child: Text(lang.t("edit_cv"),
-                                                        style: TextStyle(
+                                                    child: Text(
+                                                        lang.t("edit_cv"),
+                                                        style: const TextStyle(
                                                             fontSize: 12)),
                                                   ),
                                                   const SizedBox(width: 5),
                                                   PopupMenuButton<String>(
                                                     onSelected: (value) {},
-                                                    itemBuilder: (context) =>
-                                                         [
-                                                      PopupMenuItem(
+                                                    itemBuilder: (context) => [
+                                                      const PopupMenuItem(
                                                           value: 'view',
                                                           child: Text(
                                                               'View Details')),
-                                                      PopupMenuItem(
+                                                      const PopupMenuItem(
                                                           value: 'update',
                                                           child: Text(
                                                               'Update Status')),

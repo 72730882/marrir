@@ -373,8 +373,9 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
             )
           else
             Column(
-              children:
-                  _employees.map((employee) => _buildEmployeeCard(employee)).toList(),
+              children: _employees
+                  .map((employee) => _buildEmployeeCard(employee))
+                  .toList(),
             ),
         ],
       ),
@@ -423,8 +424,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
           Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: isAvailable
                       ? Colors.green.shade100
@@ -433,7 +433,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
                 ),
                 child: Text(
                   isAvailable ? lang.t('available') : lang.t('reserved'),
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: isAvailable ? Colors.green : Colors.black54,
                     fontSize: 12,
                   ),

@@ -193,21 +193,22 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
               ),
               child: Row(
                 children: [
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         lang.t('company_information'),
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         lang.t('add_company_info_desc'),
-                        style: TextStyle(fontSize: 15, color: Colors.black54),
+                        style: const TextStyle(
+                            fontSize: 15, color: Colors.black54),
                       ),
                     ],
                   ),
@@ -311,7 +312,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                         horizontal: 24, vertical: 12),
                   ),
                   child: Text(lang.t('submit'),
-                      style: TextStyle(color: Colors.white)),
+                      style: const TextStyle(color: Colors.white)),
                 ),
               ),
             ),
@@ -329,7 +330,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
               children: [
                 Text(
                   lang.t('agreement_table'),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                     color: Colors.black,
@@ -345,7 +346,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                   ),
                   child: Text(
                     lang.t('add_agreement'),
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
               ],
@@ -449,7 +450,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                     ),
                   ),
                   child: Text(lang.t('upload'),
-                      style: TextStyle(color: Colors.black)),
+                      style: const TextStyle(color: Colors.black)),
                 ),
               ],
             ),
@@ -489,7 +490,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                   child: Center(
                     child: Text(
                       lang.t('reserve_name'),
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
@@ -501,7 +502,7 @@ class _CompanyInfoPageState extends State<CompanyInfoPage> {
                   child: Center(
                     child: Text(
                       lang.t('status'),
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,

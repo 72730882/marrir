@@ -303,7 +303,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-     final lang = Provider.of<LanguageProvider>(context); 
+    final lang = Provider.of<LanguageProvider>(context);
     final requestedCount = _transferStats['requested']?.toString() ?? '0';
     final receivedCount = _transferStats['received']?.toString() ?? '0';
 
@@ -349,19 +349,21 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                     ],
                   ),
                 if (!_isLoading && _errorMessage.isEmpty) ...[
-                   Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                       lang.t("transfers"),
-                        style: TextStyle(
+                        lang.t("transfers"),
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
                       ),
                       Chip(
-                        label: Text(lang.t("this_month"),),
+                        label: Text(
+                          lang.t("this_month"),
+                        ),
                         backgroundColor: Colors.white,
                       ),
                     ],
@@ -387,9 +389,9 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                     ],
                   ),
                   const SizedBox(height: 40),
-                   Text(
+                  Text(
                     lang.t("incoming_transfer_requests"),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF7561E5),
@@ -401,8 +403,9 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                   if (_incomingTransfers.isEmpty)
                     Center(
                       child: Text(
-                         lang.t("no_incoming_transfer_requests"),
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                        lang.t("no_incoming_transfer_requests"),
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 16),
                       ),
                     )
                   else
@@ -425,19 +428,19 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                             ),
                             padding: const EdgeInsets.symmetric(
                                 vertical: 15, horizontal: 16),
-                            child:  Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                 lang.t("from"),
-                                  style: TextStyle(
+                                  lang.t("from"),
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 Text(
                                   lang.t("created_at"),
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -449,17 +452,19 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                               .take(_rowsToShow)
                               .map((transfer) {
                             final requesterName = _getRequesterName(transfer);
-                            final createdAt =
-                                _formatDate(_getField(transfer, lang.t("created_at"),));
+                            final createdAt = _formatDate(_getField(
+                              transfer,
+                              lang.t("created_at"),
+                            ));
                             return _buildTableRow(requesterName, createdAt);
                           }),
                         ],
                       ),
                     ),
                   const SizedBox(height: 40),
-                   Text(
+                  Text(
                     lang.t("process_transfer_request"),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF7561E5),
@@ -471,8 +476,9 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                   if (_processTransfers.isEmpty)
                     Center(
                       child: Text(
-                         lang.t("no_process_transfer_requests"),
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                        lang.t("no_process_transfer_requests"),
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 16),
                       ),
                     )
                   else
@@ -495,13 +501,13 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                             ),
                             padding: const EdgeInsets.symmetric(
                                 vertical: 15, horizontal: 16),
-                            child:  Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
                                   child: Text(
                                     lang.t("batch_no"),
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -510,7 +516,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                                 Expanded(
                                   child: Text(
                                     lang.t("transfer_to"),
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -519,7 +525,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                                 Expanded(
                                   child: Text(
                                     lang.t("created_at"),
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                     ),

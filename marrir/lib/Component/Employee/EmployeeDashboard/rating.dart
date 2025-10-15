@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:marrir/Page/Employee/employee_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:marrir/services/Employee/dashboard_service.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class RatingScreen extends StatefulWidget {
   const RatingScreen({super.key});
@@ -30,10 +32,14 @@ class _RatingScreenState extends State<RatingScreen> {
   ];
 
   Future<void> _submitRatings() async {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context, listen: false);
+
     // Check if all questions are answered
     if (_ratings.length != _questions.length) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please answer all questions")),
+        SnackBar(
+            content: Text(_getTranslatedAnswerAllQuestions(languageProvider))),
       );
       return;
     }
@@ -58,8 +64,8 @@ class _RatingScreenState extends State<RatingScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text(response['message'] ?? "Ratings submitted successfully!")),
+            content: Text(response['message'] ??
+                _getTranslatedRatingsSubmitted(languageProvider))),
       );
 
       // REMOVED Navigator.pop(context) - Stay on this screen
@@ -68,7 +74,9 @@ class _RatingScreenState extends State<RatingScreen> {
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to submit ratings: $e")),
+        SnackBar(
+            content:
+                Text("${_getTranslatedFailedToSubmit(languageProvider)}: $e")),
       );
     } finally {
       setState(() {
@@ -86,6 +94,8 @@ class _RatingScreenState extends State<RatingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -106,16 +116,18 @@ class _RatingScreenState extends State<RatingScreen> {
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text("Token not found, please login again.")),
+                SnackBar(
+                    content:
+                        Text(_getTranslatedTokenNotFound(languageProvider))),
               );
             }
           },
         ),
         centerTitle: true,
-        title: const Text(
-          "Rating",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+        title: Text(
+          _getTranslatedTitle(languageProvider),
+          style:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
         ),
       ),
       body: Column(
@@ -136,28 +148,29 @@ class _RatingScreenState extends State<RatingScreen> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.green),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.check_circle, color: Colors.green),
-                          SizedBox(width: 8),
+                          const Icon(Icons.check_circle, color: Colors.green),
+                          const SizedBox(width: 8),
                           Text(
-                            "Rating submitted successfully!",
-                            style: TextStyle(color: Colors.green),
+                            _getTranslatedSuccessMessage(languageProvider),
+                            style: const TextStyle(color: Colors.green),
                           ),
                         ],
                       ),
                     ),
 
-                  const Text(
-                    "Please answer the questions asked below to get your rating",
-                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                  Text(
+                    _getTranslatedDescription(languageProvider),
+                    style: const TextStyle(fontSize: 14, color: Colors.black87),
                   ),
                   const SizedBox(height: 16),
 
                   // Render each question with stars
                   ...List.generate(
                     _questions.length,
-                    (index) => _buildRatingQuestion(index, _questions[index]),
+                    (index) => _buildRatingQuestion(
+                        index, _questions[index], languageProvider),
                   ),
                 ],
               ),
@@ -179,10 +192,10 @@ class _RatingScreenState extends State<RatingScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text(
-                      "Submit New Rating",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    child: Text(
+                      _getTranslatedSubmitNewRating(languageProvider),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                   )
                 : ElevatedButton(
@@ -197,9 +210,9 @@ class _RatingScreenState extends State<RatingScreen> {
                     ),
                     child: _isSubmitting
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            "Submit",
-                            style: TextStyle(
+                        : Text(
+                            _getTranslatedSubmit(languageProvider),
+                            style: const TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                   ),
@@ -210,7 +223,8 @@ class _RatingScreenState extends State<RatingScreen> {
   }
 
   // Widget for a single rating question
-  Widget _buildRatingQuestion(int index, String question) {
+  Widget _buildRatingQuestion(
+      int index, String question, LanguageProvider languageProvider) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(14),
@@ -230,7 +244,7 @@ class _RatingScreenState extends State<RatingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            question,
+            _getTranslatedQuestion(question, languageProvider),
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -259,11 +273,144 @@ class _RatingScreenState extends State<RatingScreen> {
           ),
           if (_ratings[index] != null)
             Text(
-              "Selected: ${_ratings[index]} stars",
+              "${_getTranslatedSelected(languageProvider)}: ${_ratings[index]} ${_getTranslatedStars(languageProvider)}",
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
         ],
       ),
     );
+  }
+
+  // Translation helper methods
+  String _getTranslatedTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "التقييم";
+    if (lang == 'am') return "ደረጃ";
+    return "Rating";
+  }
+
+  String _getTranslatedDescription(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "يرجى الإجابة على الأسئلة أدناه للحصول على تقييمك";
+    if (lang == 'am') return "ደረጃዎን ለማግኘት ከዚህ በታች ያሉትን ጥያቄዎች ይመልሱ";
+    return "Please answer the questions asked below to get your rating";
+  }
+
+  String _getTranslatedSuccessMessage(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تم تقديم التقييم بنجاح!";
+    if (lang == 'am') return "ደረጃ በተሳካ ሁኔታ ቀርቧል!";
+    return "Rating submitted successfully!";
+  }
+
+  String _getTranslatedSubmitNewRating(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تقديم تقييم جديد";
+    if (lang == 'am') return "አዲስ ደረጃ አስገባ";
+    return "Submit New Rating";
+  }
+
+  String _getTranslatedSubmit(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تقديم";
+    if (lang == 'am') return "አስገባ";
+    return "Submit";
+  }
+
+  String _getTranslatedSelected(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المحدد";
+    if (lang == 'am') return "የተመረጠ";
+    return "Selected";
+  }
+
+  String _getTranslatedStars(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "نجوم";
+    if (lang == 'am') return "ኮከቦች";
+    return "stars";
+  }
+
+  String _getTranslatedAnswerAllQuestions(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "يرجى الإجابة على جميع الأسئلة";
+    if (lang == 'am') return "እባክዎ ሁሉንም ጥያቄዎች ይመልሱ";
+    return "Please answer all questions";
+  }
+
+  String _getTranslatedRatingsSubmitted(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تم تقديم التقييمات بنجاح!";
+    if (lang == 'am') return "ደረጃዎች በተሳካ ሁኔታ ቀርበዋል!";
+    return "Ratings submitted successfully!";
+  }
+
+  String _getTranslatedFailedToSubmit(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "فشل في تقديم التقييمات";
+    if (lang == 'am') return "ደረጃዎች ማስገባት አልተሳካም";
+    return "Failed to submit ratings";
+  }
+
+  String _getTranslatedTokenNotFound(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الرمز غير موجود، يرجى تسجيل الدخول مرة أخرى";
+    if (lang == 'am') return "ቶከን አልተገኘም፣ እባክዎ እንደገና ይግቡ";
+    return "Token not found, please login again";
+  }
+
+  String _getTranslatedQuestion(
+      String question, LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+
+    switch (question) {
+      case "Rate your ability to work under pressure":
+        if (lang == 'ar') return "قيم قدرتك على العمل تحت الضغط";
+        if (lang == 'am') return "በግፊት ስር የማሰር ችሎታዎን ይገምግሙ";
+        return question;
+
+      case "Rate your time management skills":
+        if (lang == 'ar') return "قيم مهاراتك في إدارة الوقت";
+        if (lang == 'am') return "የጊዜ አስተዳደር ክህሎቶችዎን ይገምግሙ";
+        return question;
+
+      case "Rate your communication skills":
+        if (lang == 'ar') return "قيم مهاراتك في التواصل";
+        if (lang == 'am') return "የመገናኛ ክህሎቶችዎን ይገምግሙ";
+        return question;
+
+      case "Rate your teamwork and collaboration ability":
+        if (lang == 'ar') return "قيم قدرتك على العمل الجماعي والتعاون";
+        if (lang == 'am') return "የቡድን ሥራ እና የትብብር ችሎታዎን ይገምግሙ";
+        return question;
+
+      case "Rate your flexibility and adaptability to change":
+        if (lang == 'ar') return "قيم مرونتك وقدرتك على التكيف مع التغيير";
+        if (lang == 'am') return "ለውጥ ተስማሚነትዎን እና ተለዋዋጭነትዎን ይገምግሙ";
+        return question;
+
+      case "Rate your problem-solving skills":
+        if (lang == 'ar') return "قيم مهاراتك في حل المشكلات";
+        if (lang == 'am') return "የችግር መፍትሄ ክህሎቶችዎን ይገምግሙ";
+        return question;
+
+      case "Rate your willingness to learn new skills and technologies":
+        if (lang == 'ar') return "قيم استعدادك لتعلم مهارات وتقنيات جديدة";
+        if (lang == 'am') return "አዳዲስ ክህሎቶች እና ቴክኖሎጂዎች ለመማር ፈቃደኝነትዎን ይገምግሙ";
+        return question;
+
+      case "Rate your attention to detail":
+        if (lang == 'ar') return "قيم اهتمامك بالتفاصيل";
+        if (lang == 'am') return "ለዝርዝሮች ያለዎትን ትኩረት ይገምግሙ";
+        return question;
+
+      case "Rate your ability to follow instructions":
+        if (lang == 'ar') return "قيم قدرتك على اتباع التعليمات";
+        if (lang == 'am') return "መመሪያዎችን የመከተል ችሎታዎን ይገምግሙ";
+        return question;
+
+      default:
+        return question;
+    }
   }
 }

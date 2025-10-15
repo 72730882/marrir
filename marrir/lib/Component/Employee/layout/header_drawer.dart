@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:marrir/services/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class EmployeeHeaderDrawer extends StatefulWidget {
   final VoidCallback closeDrawer;
@@ -107,9 +109,10 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
     final fullName = userData != null
         ? "${userData!['first_name']} ${userData!['last_name']}"
-        : "Loading...";
+        : _getTranslatedLoading(languageProvider);
     final role = userData?['role'] ?? "";
 
     return Material(
@@ -167,6 +170,7 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
                             menuItems[index]["icon"],
                             menuItems[index]["title"],
                             index,
+                            languageProvider,
                           ),
                         ),
                       );
@@ -181,7 +185,8 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title, int index) {
+  Widget _buildMenuItem(IconData icon, String title, int index,
+      LanguageProvider languageProvider) {
     final isSelected = widget.selectedIndex == index;
     bool isHovered = false;
 
@@ -211,7 +216,7 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
                   ),
                   const SizedBox(width: 16),
                   Text(
-                    title,
+                    _getTranslatedMenuItem(title, languageProvider),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -226,4 +231,71 @@ class _EmployeeHeaderDrawerState extends State<EmployeeHeaderDrawer>
       },
     );
   }
+
+  // Translation helper methods
+  String _getTranslatedLoading(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "جاري التحميل...";
+    if (lang == 'am') return "በመጫን ላይ...";
+    return "Loading...";
+  }
+
+  String _getTranslatedMenuItem(
+      String title, LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+
+    switch (title) {
+      case "Dashboard":
+        if (lang == 'ar') return "لوحة التحكم";
+        if (lang == 'am') return "ዳሽቦርድ";
+        return "Dashboard";
+
+      case "Status":
+        if (lang == 'ar') return "الحالة";
+        if (lang == 'am') return "ሁኔታ";
+        return "Status";
+
+      case "Rating":
+        if (lang == 'ar') return "التقييم";
+        if (lang == 'am') return "ደረጃ";
+        return "Rating";
+
+      case "Reserves":
+        if (lang == 'ar') return "الحجوزات";
+        if (lang == 'am') return "ቦታ ያለው";
+        return "Reserves";
+
+      case "Promotion":
+        if (lang == 'ar') return "الترقية";
+        if (lang == 'am') return "ማስተዋወቅ";
+        return "Promotion";
+
+      case "Payments":
+        if (lang == 'ar') return "المدفوعات";
+        if (lang == 'am') return "ክፍያዎች";
+        return "Payments";
+
+      case "Help Center":
+        if (lang == 'ar') return "مركز المساعدة";
+        if (lang == 'am') return "የእገዛ ማዕከል";
+        return "Help Center";
+
+      default:
+        return title;
+    }
+  }
+
+  // String _getTranslatedNoEmailError(LanguageProvider languageProvider) {
+  //   final lang = languageProvider.currentLang;
+  //   if (lang == 'ar') return "لم يتم العثور على بريد إلكتروني مخزن";
+  //   if (lang == 'am') return "የተቀመጠ ኢሜይል አልተገኘም";
+  //   return "No stored email found";
+  // }
+
+  // String _getTranslatedLoadUserError(LanguageProvider languageProvider) {
+  //   final lang = languageProvider.currentLang;
+  //   if (lang == 'ar') return "فشل تحميل معلومات المستخدم";
+  //   if (lang == 'am') return "የተጠቃሚ መረጃ መጫን አልተሳካም";
+  //   return "Failed to load user info";
+  // }
 }

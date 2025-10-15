@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:marrir/services/Employer/job_service.dart';
 import 'package:dio/dio.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 // import 'package:intl/intl.dart';
 
 class RecentlyPostedJobs extends StatefulWidget {
@@ -19,6 +21,12 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
   bool isLoading = true;
   String? errorMessage;
   List<dynamic> recentJobs = [];
+  List<dynamic> filteredJobs = [];
+  TextEditingController searchController = TextEditingController();
+
+  static const _hint = Color(0xFF9BA0A6);
+  static const _searchBg = Color(0xFFF2F2F7);
+  static const _ink = Color(0xFF111111);
 
   // Top horizontal slider data
   final List<Map<String, dynamic>> topCards = const [
@@ -41,6 +49,40 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
     super.initState();
     _startAutoSlide();
     fetchRecentJobs();
+    searchController.addListener(_filterJobs);
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _scrollController.dispose();
+    searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterJobs() {
+    final query = searchController.text.toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        filteredJobs = List.from(recentJobs);
+      } else {
+        filteredJobs = recentJobs.where((job) {
+          final name = _getJobField(job, 'name').toLowerCase();
+          final company = _getJobField(job, 'company').toLowerCase();
+          final location = _getJobField(job, 'location').toLowerCase();
+          final occupation = _getJobField(job, 'occupation').toLowerCase();
+          final description = _getJobField(job, 'description').toLowerCase();
+          final jobType = _getJobField(job, 'type').toLowerCase();
+
+          return name.contains(query) ||
+              company.contains(query) ||
+              location.contains(query) ||
+              occupation.contains(query) ||
+              description.contains(query) ||
+              jobType.contains(query);
+        }).toList();
+      }
+    });
   }
 
   Future<void> fetchRecentJobs() async {
@@ -64,7 +106,7 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
           final createdAt = _parseJobDate(job);
           return createdAt != null && createdAt.isAfter(twentyFourHoursAgo);
         }).toList();
-
+        filteredJobs = List.from(recentJobs);
         isLoading = false;
       });
     } on DioException catch (e) {
@@ -73,12 +115,14 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
         isLoading = false;
         errorMessage = errorMsg;
         recentJobs = [];
+        filteredJobs = [];
       });
     } catch (e) {
       setState(() {
         isLoading = false;
         errorMessage = 'Unexpected error: $e';
         recentJobs = [];
+        filteredJobs = [];
       });
     }
   }
@@ -104,16 +148,80 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
     }
   }
 
-  String _getTimeAgo(DateTime date) {
+  String _getTimeAgo(DateTime date, BuildContext context) {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context, listen: false);
     final now = DateTime.now();
     final difference = now.difference(date);
 
-    if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}m ago';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}h ago';
+    if (languageProvider.currentLang == 'ar') {
+      // Arabic translation
+      if (difference.inMinutes < 60) {
+        return 'قبل ${difference.inMinutes} دقيقة';
+      } else if (difference.inHours < 24) {
+        return 'قبل ${difference.inHours} ساعة';
+      } else {
+        return 'قبل ${difference.inDays} يوم';
+      }
+    } else if (languageProvider.currentLang == 'am') {
+      // Amharic translation
+      if (difference.inMinutes < 60) {
+        return 'ከ${difference.inMinutes} ደቂቃ በፊት';
+      } else if (difference.inHours < 24) {
+        return 'ከ${difference.inHours} ሰዓት በፊት';
+      } else {
+        return 'ከ${difference.inDays} ቀን በፊት';
+      }
     } else {
-      return '${difference.inDays}d ago';
+      // English (default)
+      if (difference.inMinutes < 60) {
+        return '${difference.inMinutes}m ago';
+      } else if (difference.inHours < 24) {
+        return '${difference.inHours}h ago';
+      } else {
+        return '${difference.inDays}d ago';
+      }
+    }
+  }
+
+  String _getTranslatedWorkplace(String location, BuildContext context) {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context, listen: false);
+    final isRemote = location.toLowerCase().contains('remote');
+
+    if (languageProvider.currentLang == 'ar') {
+      return isRemote ? 'عن بُعد' : 'في الموقع';
+    } else if (languageProvider.currentLang == 'am') {
+      return isRemote ? 'ርቀት' : 'በቦታ';
+    } else {
+      return isRemote ? 'Remote' : 'On-Site';
+    }
+  }
+
+  String _getTranslatedSalary(String amount, BuildContext context) {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context, listen: false);
+    final salaryText = amount != 'N/A' ? '\$$amount' : '';
+
+    if (languageProvider.currentLang == 'ar') {
+      return amount != 'N/A' ? '\$$amount' : 'الراتب غير محدد';
+    } else if (languageProvider.currentLang == 'am') {
+      return amount != 'N/A' ? '\$$amount' : 'ደሞዝ አልተገለጸም';
+    } else {
+      return amount != 'N/A' ? '\$$amount' : 'Salary not specified';
+    }
+  }
+
+  String _getTranslatedCompany(String company, BuildContext context) {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context, listen: false);
+
+    if (languageProvider.currentLang == 'ar') {
+      return company != 'N/A' ? company : 'شركة غير معروفة';
+    } else if (languageProvider.currentLang == 'am') {
+      return company != 'N/A' ? company : 'ያልታወቀ ኩባንያ';
+    } else {
+      return company != 'N/A' ? company : 'Unknown Company';
     }
   }
 
@@ -134,19 +242,60 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
   }
 
   @override
-  void dispose() {
-    _timer?.cancel();
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final displayJobs = filteredJobs;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // 🔹 Search Bar
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: _searchBg,
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  alignment: Alignment.center,
+                  child: TextField(
+                    controller: searchController,
+                    cursorColor: _ink,
+                    style: const TextStyle(fontSize: 15, color: _ink),
+                    decoration: InputDecoration(
+                      isCollapsed: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 12),
+                      prefixIcon:
+                          const Icon(Icons.search, color: _hint, size: 20),
+                      hintText: languageProvider.t('search_jobs'),
+                      hintStyle: const TextStyle(
+                        color: _hint,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      border: InputBorder.none,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              const TwoLineFilterIcon(
+                color: _ink,
+                width: 26,
+                lineThickness: 2.0,
+                gap: 8,
+                knobRadius: 3.0,
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
           // Horizontal scrollable top cards
           SizedBox(
             height: 190,
@@ -162,6 +311,7 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
                     card['title'] as String,
                     card['description'] as String,
                     const Color(0xFF65b2c9),
+                    context,
                   ),
                 );
               },
@@ -171,9 +321,13 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
           const SizedBox(height: 20),
 
           // Section title
-          const Text(
-            "Recently Posted Jobs (Last 24h)",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          Text(
+            languageProvider.currentLang == 'ar'
+                ? "الوظائف المنشورة حديثاً (آخر 24 ساعة)"
+                : languageProvider.currentLang == 'am'
+                    ? "በቅርብ ጊዜ የቀረቡ ስራዎች (ባለፈው 24 ሰዓት)"
+                    : "Recently Posted Jobs (Last 24h)",
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
 
@@ -188,19 +342,39 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
                 textAlign: TextAlign.center,
               ),
             )
-          else if (recentJobs.isEmpty)
-            const Center(
+          else if (displayJobs.isEmpty)
+            Center(
               child: Column(
                 children: [
-                  Icon(Icons.work_outline, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
+                  const Icon(Icons.work_outline, size: 64, color: Colors.grey),
+                  const SizedBox(height: 16),
                   Text(
-                    "No recent jobs found",
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    searchController.text.isEmpty
+                        ? (languageProvider.currentLang == 'ar'
+                            ? "لا توجد وظائف حديثة"
+                            : languageProvider.currentLang == 'am'
+                                ? "ቅርብ ጊዜ የቀረቡ ስራዎች አልተገኙም"
+                                : "No recent jobs found")
+                        : (languageProvider.currentLang == 'ar'
+                            ? "لا توجد وظائف مطابقة"
+                            : languageProvider.currentLang == 'am'
+                                ? "የሚጣጣሙ ስራዎች አልተገኙም"
+                                : "No matching jobs found"),
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                   Text(
-                    "Jobs posted in the last 24 hours will appear here",
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    searchController.text.isEmpty
+                        ? (languageProvider.currentLang == 'ar'
+                            ? "الوظائف المنشورة في آخر 24 ساعة ستظهر هنا"
+                            : languageProvider.currentLang == 'am'
+                                ? "ባለፈው 24 ሰዓት ውስጥ የቀረቡ ስራዎች እዚህ ይታያሉ"
+                                : "Jobs posted in the last 24 hours will appear here")
+                        : (languageProvider.currentLang == 'ar'
+                            ? "حاول تعديل مصطلحات البحث الخاصة بك"
+                            : languageProvider.currentLang == 'am'
+                                ? "የፍለጋ ቃላትዎን ይለውጡ"
+                                : "Try adjusting your search terms"),
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -208,8 +382,8 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
             )
           else
             // Job cards
-            ...recentJobs.map(
-              (job) => jobCard(job: job),
+            ...displayJobs.map(
+              (job) => jobCard(job: job, context: context),
             ),
         ],
       ),
@@ -217,7 +391,43 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
   }
 
   // Reusable top card widget
-  Widget buildTopCard(String title, String description, Color color) {
+  Widget buildTopCard(
+      String title, String description, Color color, BuildContext context) {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context, listen: false);
+
+    // Translate top card content based on current language
+    String translatedTitle = title;
+    String translatedDescription = description;
+
+    if (languageProvider.currentLang == 'ar') {
+      if (title == 'Build Your CV') translatedTitle = 'بناء سيرتك الذاتية';
+      if (title == 'Search Jobs') translatedTitle = 'البحث عن وظائف';
+      if (title == 'Upgrade Skills') translatedTitle = 'تطوير المهارات';
+
+      if (description == 'Generate a professional CV using your profile data.')
+        translatedDescription =
+            'قم بإنشاء سيرة ذاتية احترافية باستخدام بيانات ملفك الشخصي.';
+      if (description == 'Find jobs that match your skills and location.')
+        translatedDescription =
+            'ابحث عن الوظائف التي تتطابق مع مهاراتك وموقعك.';
+      if (description ==
+          'Learn and improve your skills for better opportunities.')
+        translatedDescription = 'تعلم وحسن مهاراتك للحصول على فرص أفضل.';
+    } else if (languageProvider.currentLang == 'am') {
+      if (title == 'Build Your CV') translatedTitle = 'CV ይገንቡ';
+      if (title == 'Search Jobs') translatedTitle = 'ስራዎችን ፈልግ';
+      if (title == 'Upgrade Skills') translatedTitle = 'ችሎታዎችን አሻሽል';
+
+      if (description == 'Generate a professional CV using your profile data.')
+        translatedDescription = 'የግል መረጃዎን በመጠቀም ብቃት ያለው CV ይፍጠሩ።';
+      if (description == 'Find jobs that match your skills and location.')
+        translatedDescription = 'ከችሎታዎችዎ እና ከአካባቢዎ ጋር የሚጣጣሙ ስራዎችን ያግኙ።';
+      if (description ==
+          'Learn and improve your skills for better opportunities.')
+        translatedDescription = 'ለተሻለ እድሎች ችሎታዎችዎን ይማሩ እና ያሻሽሉ።';
+    }
+
     return Container(
       width: 240,
       margin: const EdgeInsets.only(right: 12),
@@ -231,7 +441,7 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            title,
+            translatedTitle,
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -240,7 +450,7 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
           ),
           const SizedBox(height: 4),
           Text(
-            description,
+            translatedDescription,
             style: const TextStyle(
               fontSize: 14,
               color: Color.fromARGB(255, 240, 239, 239),
@@ -252,23 +462,27 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
   }
 
   // Reusable job card widget
-  Widget jobCard({required dynamic job}) {
+  Widget jobCard({required dynamic job, required BuildContext context}) {
     final title = _getJobField(job, 'name');
-    final company = _getJobField(job, 'company') != 'N/A'
-        ? _getJobField(job, 'company')
-        : 'Unknown Company';
+    final company =
+        _getTranslatedCompany(_getJobField(job, 'company'), context);
     final location = _getJobField(job, 'location');
     final jobType = _getJobField(job, 'type');
-    final salary = _getJobField(job, 'amount') != 'N/A'
-        ? '\$${_getJobField(job, 'amount')}'
-        : 'Salary not specified';
+    final salary = _getTranslatedSalary(_getJobField(job, 'amount'), context);
 
     final createdAt = _parseJobDate(job);
-    final postedTime = createdAt != null ? _getTimeAgo(createdAt) : 'Recently';
+    final postedTime = createdAt != null
+        ? _getTimeAgo(createdAt, context)
+        : (Provider.of<LanguageProvider>(context, listen: false).currentLang ==
+                'ar'
+            ? 'مؤخراً'
+            : Provider.of<LanguageProvider>(context, listen: false)
+                        .currentLang ==
+                    'am'
+                ? 'በቅርብ ጊዜ'
+                : 'Recently');
 
-    // Determine workplace type based on location or other criteria
-    final workplace =
-        location.toLowerCase().contains('remote') ? 'Remote' : 'On-Site';
+    final workplace = _getTranslatedWorkplace(location, context);
 
     return Card(
       elevation: 0,
@@ -306,7 +520,16 @@ class _RecentlyPostedJobsState extends State<RecentlyPostedJobs> {
                 tag(
                   jobType != 'N/A'
                       ? JobService.getOccupationDisplayName(jobType)
-                      : 'General',
+                      : (Provider.of<LanguageProvider>(context, listen: false)
+                                  .currentLang ==
+                              'ar'
+                          ? 'عام'
+                          : Provider.of<LanguageProvider>(context,
+                                          listen: false)
+                                      .currentLang ==
+                                  'am'
+                              ? 'አጠቃላይ'
+                              : 'General'),
                   const Color.fromARGB(255, 151, 196, 210),
                   const Color.fromARGB(255, 251, 252, 252),
                 ),
@@ -376,5 +599,82 @@ class ApiErrorHandler {
     } else {
       return 'Network error: ${e.message}';
     }
+  }
+}
+
+class TwoLineFilterIcon extends StatelessWidget {
+  final Color color;
+  final double width;
+  final double lineThickness;
+  final double gap;
+  final double knobRadius;
+
+  const TwoLineFilterIcon({
+    super.key,
+    required this.color,
+    this.width = 26,
+    this.lineThickness = 2.0,
+    this.gap = 8.0,
+    this.knobRadius = 3.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final height = lineThickness * 2 + gap;
+    return SizedBox(
+      width: width,
+      height: height,
+      child: CustomPaint(
+        painter: _TwoLineFilterPainter(
+          color: color,
+          t: lineThickness,
+          gap: gap,
+          knobR: knobRadius,
+        ),
+      ),
+    );
+  }
+}
+
+class _TwoLineFilterPainter extends CustomPainter {
+  final Color color;
+  final double t;
+  final double gap;
+  final double knobR;
+
+  _TwoLineFilterPainter({
+    required this.color,
+    required this.t,
+    required this.gap,
+    required this.knobR,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paintLine = Paint()
+      ..color = color
+      ..strokeWidth = t
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    final paintFill = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final yTop = t / 2;
+    final yBot = yTop + t + gap;
+
+    canvas.drawLine(Offset(0, yTop), Offset(size.width, yTop), paintLine);
+    canvas.drawLine(Offset(0, yBot), Offset(size.width, yBot), paintLine);
+
+    canvas.drawCircle(Offset(size.width - knobR - 1, yTop), knobR, paintFill);
+    canvas.drawCircle(Offset(knobR + 1, yBot), knobR, paintFill);
+  }
+
+  @override
+  bool shouldRepaint(covariant _TwoLineFilterPainter oldDelegate) {
+    return color != oldDelegate.color ||
+        t != oldDelegate.t ||
+        gap != oldDelegate.gap ||
+        knobR != oldDelegate.knobR;
   }
 }

@@ -137,7 +137,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-         final lang = Provider.of<LanguageProvider>(context); 
+    final lang = Provider.of<LanguageProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -149,7 +149,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
             // ===== TITLE =====
             Text(
               lang.t('reserve'),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -157,7 +157,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
             const SizedBox(height: 8),
             Text(
               lang.t('reserve_hint'),
-              style: TextStyle(fontSize: 14, color: Colors.black54),
+              style: const TextStyle(fontSize: 14, color: Colors.black54),
             ),
             const SizedBox(height: 20),
 
@@ -178,7 +178,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
   }
 
   Widget _buildSearchCard() {
-             final lang = Provider.of<LanguageProvider>(context); 
+    final lang = Provider.of<LanguageProvider>(context);
 
     return Container(
       decoration: BoxDecoration(
@@ -193,9 +193,9 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
-            child:  Text(
-               lang.t('search_employees'),
-              style: TextStyle(
+            child: Text(
+              lang.t('search_employees'),
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -290,7 +290,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
                         borderRadius: BorderRadius.circular(6)),
                   ),
                   child: Text(lang.t('clear'),
-                      style: TextStyle(color: Colors.black87)),
+                      style: const TextStyle(color: Colors.black87)),
                 ),
               ],
             ),
@@ -301,7 +301,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
   }
 
   Widget _buildLoadingIndicator() {
-                 final lang = Provider.of<LanguageProvider>(context); 
+    final lang = Provider.of<LanguageProvider>(context);
 
     return const Center(child: CircularProgressIndicator());
   }
@@ -333,7 +333,7 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
   }
 
   Widget _buildResultsCard() {
-                     final lang = Provider.of<LanguageProvider>(context); 
+    final lang = Provider.of<LanguageProvider>(context);
 
     return Container(
       decoration: BoxDecoration(
@@ -349,7 +349,8 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(lang.t('results'),
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
               Row(
                 children: [
                   OutlinedButton(
@@ -363,8 +364,8 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6)),
                     ),
-                    child:
-                        Text("${lang.t('reserve_selected')} (${_selectedEmployees.length})"),
+                    child: Text(
+                        "${lang.t('reserve_selected')} (${_selectedEmployees.length})"),
                   ),
                   const SizedBox(width: 8),
                   OutlinedButton(
@@ -390,8 +391,8 @@ class _ReserveProfilePageState extends State<ReserveProfilePage> {
 
           // Employee Cards
           if (_employees.isEmpty && !_isLoading)
-             Padding(
-              padding: EdgeInsets.all(20.0),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
               child: Text(lang.t('no_employees'), textAlign: TextAlign.center),
             )
           else

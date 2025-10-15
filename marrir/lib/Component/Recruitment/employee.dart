@@ -417,7 +417,7 @@ class _EmployeePageState extends State<REmployeePage> {
 
   @override
   Widget build(BuildContext context) {
-            final lang = Provider.of<LanguageProvider>(context);
+    final lang = Provider.of<LanguageProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -428,19 +428,21 @@ class _EmployeePageState extends State<REmployeePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ===== Employee Summary Card =====
-               Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     lang.t('employee'),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
                   ),
                   Chip(
-                    label: Text(lang.t('this_month'),),
+                    label: Text(
+                      lang.t('this_month'),
+                    ),
                     backgroundColor: Colors.white,
                   ),
                 ],
@@ -469,8 +471,9 @@ class _EmployeePageState extends State<REmployeePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                       lang.t("total_employees"),
-                        style: TextStyle(fontSize: 14, color: Colors.black),
+                        lang.t("total_employees"),
+                        style:
+                            const TextStyle(fontSize: 14, color: Colors.black),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -500,7 +503,8 @@ class _EmployeePageState extends State<REmployeePage> {
                 children: [
                   Text(
                     lang.t("employees"),
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   ElevatedButton(
                     onPressed: _showAddEmployeeDialog,
@@ -511,7 +515,7 @@ class _EmployeePageState extends State<REmployeePage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                     child: Text(lang.t("add_employee_button")),
+                    child: Text(lang.t("add_employee_button")),
                   ),
                 ],
               ),

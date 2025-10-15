@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:marrir/Page/Employee/employee_page.dart';
 import 'package:marrir/services/Employee/status_sevice.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class StatusUpdateScreen extends StatefulWidget {
   const StatusUpdateScreen({super.key});
@@ -39,6 +41,8 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
@@ -46,12 +50,13 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: _goBack,
+          onPressed: () => _goBack(languageProvider),
         ),
         centerTitle: true,
-        title: const Text(
-          "Status Update",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+        title: Text(
+          _getTranslatedTitle(languageProvider),
+          style:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
         ),
       ),
       body: SingleChildScrollView(
@@ -59,9 +64,9 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Provide an overview of your current employee status.",
-              style: TextStyle(fontSize: 14, color: Colors.black87),
+            Text(
+              _getTranslatedDescription(languageProvider),
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
             ),
             const SizedBox(height: 16),
 
@@ -71,7 +76,7 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
               child: ElevatedButton.icon(
                 onPressed: _generatePdf,
                 icon: const Icon(Icons.picture_as_pdf),
-                label: const Text("Generate Status PDF"),
+                label: Text(_getTranslatedGeneratePDF(languageProvider)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromRGBO(142, 198, 214, 1),
                   foregroundColor: Colors.white,
@@ -94,17 +99,18 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Status *",
-                        style: TextStyle(
+                    Text(_getTranslatedStatus(languageProvider),
+                        style: const TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w500)),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
                       value: _selectedStatus,
-                      hint: const Text("Select Status"),
+                      hint: Text(_getTranslatedSelectStatus(languageProvider)),
                       items: statusMap.keys
                           .map((e) => DropdownMenuItem(
                                 value: e,
-                                child: Text(e),
+                                child: Text(_getTranslatedStatusValue(
+                                    e, languageProvider)),
                               ))
                           .toList(),
                       onChanged: (val) {
@@ -120,16 +126,15 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text("Reason",
-                        style: TextStyle(
+                    Text(_getTranslatedReason(languageProvider),
+                        style: const TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w500)),
                     const SizedBox(height: 6),
                     TextField(
                       controller: _reasonController,
                       maxLines: 3,
                       decoration: InputDecoration(
-                        hintText:
-                            "Optional: provide a reason for the status update...",
+                        hintText: _getTranslatedReasonHint(languageProvider),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8)),
                         filled: true,
@@ -149,7 +154,8 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8)),
                             ),
-                            child: const Text("Add Update"),
+                            child:
+                                Text(_getTranslatedAddUpdate(languageProvider)),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -162,7 +168,8 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8)),
                             ),
-                            child: const Text("Results"),
+                            child:
+                                Text(_getTranslatedResults(languageProvider)),
                           ),
                         ),
                       ],
@@ -178,9 +185,9 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("Date Range",
-                    style:
-                        TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                Text(_getTranslatedDateRange(languageProvider),
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w600)),
                 GestureDetector(
                   onTap: () {
                     setState(() {
@@ -188,9 +195,9 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
                       _toDate = null;
                     });
                   },
-                  child: const Text("Reset",
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  child: Text(_getTranslatedReset(languageProvider),
+                      style: const TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w600)),
                 ),
               ],
             ),
@@ -198,7 +205,9 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
             Row(
               children: [
                 Expanded(
-                  child: _buildDateField("From", _fromDate, () async {
+                  child: _buildDateField(
+                      _getTranslatedFrom(languageProvider), _fromDate,
+                      () async {
                     DateTime? picked = await showDatePicker(
                       context: context,
                       initialDate: DateTime.now(),
@@ -210,11 +219,12 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
                         _fromDate = picked;
                       });
                     }
-                  }),
+                  }, languageProvider),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _buildDateField("To", _toDate, () async {
+                  child: _buildDateField(
+                      _getTranslatedTo(languageProvider), _toDate, () async {
                     DateTime? picked = await showDatePicker(
                       context: context,
                       initialDate: DateTime.now(),
@@ -226,7 +236,7 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
                         _toDate = picked;
                       });
                     }
-                  }),
+                  }, languageProvider),
                 ),
               ],
             ),
@@ -235,9 +245,12 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _quickButton("Today", _setTodayRange),
-                _quickButton("This Week", _setWeekRange),
-                _quickButton("This Month", _setMonthRange),
+                _quickButton(_getTranslatedToday(languageProvider),
+                    _setTodayRange, languageProvider),
+                _quickButton(_getTranslatedThisWeek(languageProvider),
+                    _setWeekRange, languageProvider),
+                _quickButton(_getTranslatedThisMonth(languageProvider),
+                    _setMonthRange, languageProvider),
               ],
             ),
 
@@ -248,9 +261,10 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Status Log",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  Text(
+                    _getTranslatedStatusLog(languageProvider),
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 12),
                   ListView.builder(
@@ -279,7 +293,8 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                statusLabel,
+                                _getTranslatedStatusValue(
+                                    statusLabel, languageProvider),
                                 style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -311,11 +326,11 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
                 ],
               )
             else
-              const Padding(
-                padding: EdgeInsets.only(top: 16),
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
                 child: Text(
-                  "No status updates found for the selected date range.",
-                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                  _getTranslatedNoStatusUpdates(languageProvider),
+                  style: const TextStyle(fontSize: 13, color: Colors.grey),
                 ),
               ),
           ],
@@ -324,29 +339,32 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
     );
   }
 
-  Future<void> _goBack() async {
+  Future<void> _goBack(LanguageProvider languageProvider) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString("access_token");
     if (token != null) {
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (_) => EmployeePage(token: token)));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Token not found, please login again.")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(_getTranslatedTokenNotFound(languageProvider))));
     }
   }
 
   Future<void> _addStatus() async {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context, listen: false);
+
     if (_selectedStatus == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Select a status")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(_getTranslatedSelectStatusError(languageProvider))));
       return;
     }
 
     final apiStatus = statusMap[_selectedStatus!];
     if (apiStatus == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Invalid status")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(_getTranslatedInvalidStatus(languageProvider))));
       return;
     }
 
@@ -382,16 +400,20 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
   }
 
   Future<void> _generatePdf() async {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context, listen: false);
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString("user_id");
     if (userId == null) return;
 
     await EmployeeStatusService.generatePdf(userId: userId);
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text("PDF generated!")));
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_getTranslatedPDFGenerated(languageProvider))));
   }
 
-  Widget _buildDateField(String label, DateTime? date, VoidCallback onTap) {
+  Widget _buildDateField(String label, DateTime? date, VoidCallback onTap,
+      LanguageProvider languageProvider) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -415,7 +437,8 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
     );
   }
 
-  Widget _quickButton(String text, VoidCallback onTap) {
+  Widget _quickButton(
+      String text, VoidCallback onTap, LanguageProvider languageProvider) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -464,5 +487,204 @@ class _StatusUpdateScreenState extends State<StatusUpdateScreen> {
       _toDate = endOfMonth;
     });
     _fetchResults();
+  }
+
+  // Translation helper methods
+  String _getTranslatedTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تحديث الحالة";
+    if (lang == 'am') return "ሁኔታ አዘምን";
+    return "Status Update";
+  }
+
+  String _getTranslatedDescription(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تقديم نظرة عامة عن حالة الموظف الحالية.";
+    if (lang == 'am') return "የአሁኑ የተጠቃሚ ሁኔታ አጠቃላይ እይታ ይስጡ።";
+    return "Provide an overview of your current employee status.";
+  }
+
+  String _getTranslatedGeneratePDF(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إنشاء ملف PDF للحالة";
+    if (lang == 'am') return "የሁኔታ PDF ፍጠር";
+    return "Generate Status PDF";
+  }
+
+  String _getTranslatedStatus(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الحالة *";
+    if (lang == 'am') return "ሁኔታ *";
+    return "Status *";
+  }
+
+  String _getTranslatedSelectStatus(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "اختر الحالة";
+    if (lang == 'am') return "ሁኔታ ይምረጡ";
+    return "Select Status";
+  }
+
+  String _getTranslatedStatusValue(
+      String status, LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+
+    switch (status) {
+      case "Active":
+        if (lang == 'ar') return "نشط";
+        if (lang == 'am') return "ንቁ";
+        return "Active";
+      case "Inactive":
+        if (lang == 'ar') return "غير نشط";
+        if (lang == 'am') return "ንቃት የለውም";
+        return "Inactive";
+      case "On Leave":
+        if (lang == 'ar') return "في إجازة";
+        if (lang == 'am') return "በእረፍት ላይ";
+        return "On Leave";
+      case "Terminated":
+        if (lang == 'ar') return "منتهي";
+        if (lang == 'am') return "ተቆርጧል";
+        return "Terminated";
+      case "Refuse Work":
+        if (lang == 'ar') return "رفض العمل";
+        if (lang == 'am') return "ሥራ ማቃለል";
+        return "Refuse Work";
+      case "Hold":
+        if (lang == 'ar') return "معلق";
+        if (lang == 'am') return "ያሮግ";
+        return "Hold";
+      case "Other":
+        if (lang == 'ar') return "أخرى";
+        if (lang == 'am') return "ሌላ";
+        return "Other";
+      case "Unknown":
+        if (lang == 'ar') return "غير معروف";
+        if (lang == 'am') return "የማይታወቅ";
+        return "Unknown";
+      default:
+        return status;
+    }
+  }
+
+  String _getTranslatedReason(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "السبب";
+    if (lang == 'am') return "ምክንያት";
+    return "Reason";
+  }
+
+  String _getTranslatedReasonHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "اختياري: تقديم سبب لتحديث الحالة...";
+    if (lang == 'am') return "አማራጭ: ለሁኔታ ማዘመኛ ምክንያት ይስጡ...";
+    return "Optional: provide a reason for the status update...";
+  }
+
+  String _getTranslatedAddUpdate(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إضافة تحديث";
+    if (lang == 'am') return "አዘምን ጨምር";
+    return "Add Update";
+  }
+
+  String _getTranslatedResults(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "النتائج";
+    if (lang == 'am') return "ውጤቶች";
+    return "Results";
+  }
+
+  String _getTranslatedDateRange(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "نطاق التاريخ";
+    if (lang == 'am') return "የቀን ክልል";
+    return "Date Range";
+  }
+
+  String _getTranslatedReset(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إعادة تعيين";
+    if (lang == 'am') return "እንደገና አቀናብር";
+    return "Reset";
+  }
+
+  String _getTranslatedFrom(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "من";
+    if (lang == 'am') return "ከ";
+    return "From";
+  }
+
+  String _getTranslatedTo(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إلى";
+    if (lang == 'am') return "እስከ";
+    return "To";
+  }
+
+  String _getTranslatedToday(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "اليوم";
+    if (lang == 'am') return "ዛሬ";
+    return "Today";
+  }
+
+  String _getTranslatedThisWeek(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "هذا الأسبوع";
+    if (lang == 'am') return "ይህ ሳምንት";
+    return "This Week";
+  }
+
+  String _getTranslatedThisMonth(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "هذا الشهر";
+    if (lang == 'am') return "ይህ ወር";
+    return "This Month";
+  }
+
+  String _getTranslatedStatusLog(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "سجل الحالة";
+    if (lang == 'am') return "የሁኔታ መዝገብ";
+    return "Status Log";
+  }
+
+  String _getTranslatedNoStatusUpdates(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') {
+      return "لم يتم العثور على تحديثات حالة لنطاق التاريخ المحدد.";
+    }
+    if (lang == 'am') return "ለተመረጠው የቀን ክልል ምንም የሁኔታ ማዘመኛዎች አልተገኙም።";
+    return "No status updates found for the selected date range.";
+  }
+
+  String _getTranslatedTokenNotFound(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الرمز غير موجود، يرجى تسجيل الدخول مرة أخرى";
+    if (lang == 'am') return "ቶከን አልተገኘም፣ እባክዎ እንደገና ይግቡ";
+    return "Token not found, please login again";
+  }
+
+  String _getTranslatedSelectStatusError(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "اختر حالة";
+    if (lang == 'am') return "ሁኔታ ይምረጡ";
+    return "Select a status";
+  }
+
+  String _getTranslatedInvalidStatus(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "حالة غير صالحة";
+    if (lang == 'am') return "ልክ ያልሆነ ሁኔታ";
+    return "Invalid status";
+  }
+
+  String _getTranslatedPDFGenerated(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تم إنشاء ملف PDF!";
+    if (lang == 'am') return "PDF ተፈጥሯል!";
+    return "PDF generated!";
   }
 }

@@ -61,6 +61,7 @@ flutter {
 
 dependencies {
     // Your dependencies go here if needed
+    
 }
 
 // 🔧 Force Gradle to use a bcprov version that works with Java 17

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:marrir/services/Employee/cv_service.dart'; // import your service
+import 'package:marrir/services/Employee/cv_service.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class PreviousExperienceForm extends StatefulWidget {
   const PreviousExperienceForm({super.key});
@@ -16,10 +18,19 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
   final TextEditingController _companyController = TextEditingController();
   final TextEditingController _summaryController = TextEditingController();
 
-  String? selectedCountry; // ✅ store selected country
+  String? selectedCountry;
   bool isSubmitting = false;
 
-  final List<String> countries = [
+  // Design tokens
+  static const _titleColor = Color(0xFF111111);
+  static const _labelColor = Color(0xFF111111);
+  static const _hintColor = Color(0xFF8E8E93);
+  static const _borderColor = Color(0xFFD1D1D6);
+  static const _fillColor = Colors.white;
+  static const _buttonColor = Color.fromRGBO(142, 198, 214, 1);
+
+  // Country options
+  static const List<String> _countryItems = [
     "Ethiopia",
     "USA",
     "UK",
@@ -39,15 +50,167 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
     super.dispose();
   }
 
+  // Get translated labels for display
+  String _getTranslatedLabel(String value, LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+
+    // Country translations
+    if (value == "Ethiopia") {
+      if (lang == 'ar') return "إثيوبيا";
+      if (lang == 'am') return "ኢትዮጵያ";
+      return "Ethiopia";
+    }
+    if (value == "USA") {
+      if (lang == 'ar') return "الولايات المتحدة";
+      if (lang == 'am') return "አሜሪካ";
+      return "USA";
+    }
+    if (value == "UK") {
+      if (lang == 'ar') return "المملكة المتحدة";
+      if (lang == 'am') return "እንግሊዝ";
+      return "UK";
+    }
+    if (value == "Canada") {
+      if (lang == 'ar') return "كندا";
+      if (lang == 'am') return "ካናዳ";
+      return "Canada";
+    }
+    if (value == "Germany") {
+      if (lang == 'ar') return "ألمانيا";
+      if (lang == 'am') return "ጀርመን";
+      return "Germany";
+    }
+    if (value == "UAE") {
+      if (lang == 'ar') return "الإمارات";
+      if (lang == 'am') return "የተባበሩት ዓረብ ኤምሬትስ";
+      return "UAE";
+    }
+    if (value == "Other") {
+      if (lang == 'ar') return "أخرى";
+      if (lang == 'am') return "ሌላ";
+      return "Other";
+    }
+
+    return value;
+  }
+
+  String _getTranslatedHint(String label, LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "اختر $label";
+    if (lang == 'am') return "$label ይምረጡ";
+    return "Select $label";
+  }
+
+  InputDecoration _decoration({
+    String? hint,
+    Widget? suffixIcon,
+    Widget? prefixIcon,
+    LanguageProvider? languageProvider,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(
+        color: _hintColor,
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+      ),
+      filled: true,
+      fillColor: _fillColor,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      prefixIcon: prefixIcon,
+      suffixIcon: suffixIcon,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: _borderColor, width: 1),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: _borderColor, width: 1),
+      ),
+    );
+  }
+
+  Widget _fieldLabel(String text) => Padding(
+        padding: const EdgeInsets.only(bottom: 4),
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontSize: 16,
+            color: _labelColor,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+
+  Widget _dropdown<T>({
+    required String label,
+    required T? value,
+    required List<T> items,
+    required String Function(T) labelOf,
+    required void Function(T?) onChanged,
+    required LanguageProvider languageProvider,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _fieldLabel(label),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<T>(
+          value: value,
+          items: items
+              .map(
+                (e) => DropdownMenuItem<T>(
+                  value: e,
+                  child: Text(
+                    labelOf(e),
+                    style: const TextStyle(fontSize: 13, color: _labelColor),
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: onChanged,
+          decoration: _decoration(
+            hint: _getTranslatedHint(label, languageProvider),
+            suffixIcon: const Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Icon(
+                Icons.keyboard_arrow_down_rounded,
+                color: _hintColor,
+                size: 22,
+              ),
+            ),
+            languageProvider: languageProvider,
+          ),
+          icon: const SizedBox.shrink(),
+          borderRadius: BorderRadius.circular(10),
+          style: const TextStyle(fontSize: 13, color: _labelColor),
+        ),
+      ],
+    );
+  }
+
   Future<void> _pickDate(
     BuildContext context,
     TextEditingController controller,
+    LanguageProvider languageProvider,
   ) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(1950),
       lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: _buttonColor,
+              onPrimary: Colors.white,
+              onSurface: _titleColor,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (pickedDate != null) {
@@ -56,14 +219,14 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
     }
   }
 
-  Future<void> _submitExperience() async {
+  Future<void> _submitExperience(LanguageProvider languageProvider) async {
     if (selectedCountry == null ||
         _cityController.text.isEmpty ||
         _companyController.text.isEmpty ||
         _fromDateController.text.isEmpty ||
         _toDateController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill all fields")),
+        SnackBar(content: Text(_getTranslatedFillAllFields(languageProvider))),
       );
       return;
     }
@@ -77,7 +240,7 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
 
       if (token == null || userId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Authentication required")),
+          SnackBar(content: Text(_getTranslatedAuthRequired(languageProvider))),
         );
         return;
       }
@@ -93,11 +256,13 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Experience submitted: ${res['id'] ?? 'OK'}")),
+        SnackBar(content: Text(_getTranslatedSuccessMessage(languageProvider))),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+        SnackBar(
+            content: Text(
+                _getTranslatedErrorMessage(e.toString(), languageProvider))),
       );
     } finally {
       setState(() => isSubmitting = false);
@@ -106,60 +271,114 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
 
   @override
   Widget build(BuildContext context) {
-    const Color textColor = Color(0xFF111111);
-    const Color buttonColor = Color.fromRGBO(142, 198, 214, 1);
+    final languageProvider = Provider.of<LanguageProvider>(context);
 
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          const Text(
-            'Step 8: Previous Experience and Documents',
-            style: TextStyle(
+          Text(
+            _getTranslatedStepTitle(languageProvider),
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: textColor,
+              color: _titleColor,
             ),
           ),
           const SizedBox(height: 30),
-          _buildLabel('Country'),
-          const SizedBox(height: 8),
-          _buildCountryDropdown(),
+          _dropdown<String>(
+            label: _getTranslatedCountryLabel(languageProvider),
+            value: selectedCountry,
+            items: _countryItems,
+            labelOf: (value) => _getTranslatedLabel(value, languageProvider),
+            onChanged: (v) => setState(() => selectedCountry = v),
+            languageProvider: languageProvider,
+          ),
           const SizedBox(height: 16),
-          _buildLabel('City'),
+          _fieldLabel(_getTranslatedCityLabel(languageProvider)),
           const SizedBox(height: 8),
-          _buildTextField('Enter City', controller: _cityController),
+          TextField(
+            controller: _cityController,
+            decoration: _decoration(
+              hint: _getTranslatedCityHint(languageProvider),
+              languageProvider: languageProvider,
+            ),
+          ),
           const SizedBox(height: 16),
-          _buildLabel('Company'),
+          _fieldLabel(_getTranslatedCompanyLabel(languageProvider)),
           const SizedBox(height: 8),
-          _buildTextField('Enter Company Name', controller: _companyController),
+          TextField(
+            controller: _companyController,
+            decoration: _decoration(
+              hint: _getTranslatedCompanyHint(languageProvider),
+              languageProvider: languageProvider,
+            ),
+          ),
           const SizedBox(height: 16),
-          _buildLabel('From'),
+          _fieldLabel(_getTranslatedFromLabel(languageProvider)),
           const SizedBox(height: 8),
-          _buildDateField(context, _fromDateController),
+          TextField(
+            controller: _fromDateController,
+            readOnly: true,
+            onTap: () =>
+                _pickDate(context, _fromDateController, languageProvider),
+            decoration: _decoration(
+              hint: _getTranslatedDateHint(languageProvider),
+              suffixIcon: IconButton(
+                onPressed: () =>
+                    _pickDate(context, _fromDateController, languageProvider),
+                icon: const Icon(
+                  Icons.calendar_today,
+                  color: _hintColor,
+                  size: 18,
+                ),
+              ),
+              languageProvider: languageProvider,
+            ),
+          ),
           const SizedBox(height: 16),
-          _buildLabel('To'),
+          _fieldLabel(_getTranslatedToLabel(languageProvider)),
           const SizedBox(height: 8),
-          _buildDateField(context, _toDateController),
+          TextField(
+            controller: _toDateController,
+            readOnly: true,
+            onTap: () =>
+                _pickDate(context, _toDateController, languageProvider),
+            decoration: _decoration(
+              hint: _getTranslatedDateHint(languageProvider),
+              suffixIcon: IconButton(
+                onPressed: () =>
+                    _pickDate(context, _toDateController, languageProvider),
+                icon: const Icon(
+                  Icons.calendar_today,
+                  color: _hintColor,
+                  size: 18,
+                ),
+              ),
+              languageProvider: languageProvider,
+            ),
+          ),
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
-              onPressed: isSubmitting ? null : _submitExperience,
+              onPressed: isSubmitting
+                  ? null
+                  : () => _submitExperience(languageProvider),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                backgroundColor: buttonColor,
-                side: const BorderSide(color: buttonColor),
+                backgroundColor: _buttonColor,
+                side: const BorderSide(color: _buttonColor),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
               child: isSubmitting
                   ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text(
-                      'Add Experience',
-                      style: TextStyle(
+                  : Text(
+                      _getTranslatedAddExperience(languageProvider),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -168,28 +387,33 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
             ),
           ),
           const SizedBox(height: 24),
-          _buildLabel('Previous Work'),
+          _fieldLabel(_getTranslatedPreviousWorkLabel(languageProvider)),
           const SizedBox(height: 8),
-          _buildTextField(
-            'Enter summary of the above input',
-            maxLines: 4,
+          TextField(
             controller: _summaryController,
+            maxLines: 4,
+            decoration: _decoration(
+              hint: _getTranslatedSummaryHint(languageProvider),
+              languageProvider: languageProvider,
+            ),
           ),
           const SizedBox(height: 30),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: isSubmitting ? null : _submitExperience,
+              onPressed: isSubmitting
+                  ? null
+                  : () => _submitExperience(languageProvider),
               style: ElevatedButton.styleFrom(
-                backgroundColor: buttonColor,
+                backgroundColor: _buttonColor,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text(
-                'Submit',
-                style: TextStyle(
+              child: Text(
+                _getTranslatedSubmitButton(languageProvider),
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -203,110 +427,125 @@ class _PreviousExperienceFormState extends State<PreviousExperienceForm> {
     );
   }
 
-  // 🔹 Reusable Widgets
-  Widget _buildLabel(String text) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: Color(0xFF111111),
-      ),
-    );
+  // Translation helper methods
+  String _getTranslatedStepTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الخطوة 8: الخبرة السابقة والمستندات";
+    if (lang == 'am') return "ደረጃ 8: ቀደምት ልምድ እና ሰነዶች";
+    return "Step 8: Previous Experience and Documents";
   }
 
-  Widget _buildTextField(
-    String placeholder, {
-    int maxLines = 1,
-    TextEditingController? controller,
-  }) {
-    return TextField(
-      controller: controller,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        hintText: placeholder,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 14,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFD1D1D6)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFD1D1D6)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFD1D1D6), width: 2),
-        ),
-      ),
-    );
+  String _getTranslatedCountryLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الدولة";
+    if (lang == 'am') return "አገር";
+    return "Country";
   }
 
-  Widget _buildDateField(
-    BuildContext context,
-    TextEditingController controller,
-  ) {
-    return TextField(
-      controller: controller,
-      readOnly: true,
-      onTap: () => _pickDate(context, controller),
-      decoration: InputDecoration(
-        hintText: 'Select Date',
-        suffixIcon: const Icon(
-          Icons.calendar_today,
-          color: Colors.grey,
-          size: 18,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 14,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFD1D1D6)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFD1D1D6)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFD1D1D6), width: 2),
-        ),
-      ),
-    );
+  String _getTranslatedCityLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المدينة";
+    if (lang == 'am') return "ከተማ";
+    return "City";
   }
 
-  Widget _buildCountryDropdown() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFD1D1D6)),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: DropdownButton<String>(
-        value: selectedCountry,
-        hint: const Text(
-          "Select Country",
-          style: TextStyle(color: Color(0xFF8E8E93)),
-        ),
-        isExpanded: true,
-        underline: const SizedBox(),
-        items: countries
-            .map((country) => DropdownMenuItem(
-                  value: country,
-                  child: Text(country),
-                ))
-            .toList(),
-        onChanged: (value) {
-          setState(() {
-            selectedCountry = value;
-          });
-        },
-      ),
-    );
+  String _getTranslatedCityHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل المدينة";
+    if (lang == 'am') return "ከተማ ያስገቡ";
+    return "Enter City";
+  }
+
+  String _getTranslatedCompanyLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الشركة";
+    if (lang == 'am') return "ኩባንያ";
+    return "Company";
+  }
+
+  String _getTranslatedCompanyHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل اسم الشركة";
+    if (lang == 'am') return "የኩባንያ ስም ያስገቡ";
+    return "Enter Company Name";
+  }
+
+  String _getTranslatedFromLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "من";
+    if (lang == 'am') return "ከ";
+    return "From";
+  }
+
+  String _getTranslatedToLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إلى";
+    if (lang == 'am') return "ወደ";
+    return "To";
+  }
+
+  String _getTranslatedDateHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "اختر التاريخ";
+    if (lang == 'am') return "ቀን ይምረጡ";
+    return "Select Date";
+  }
+
+  String _getTranslatedAddExperience(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إضافة خبرة";
+    if (lang == 'am') return "ልምድ ያክሉ";
+    return "Add Experience";
+  }
+
+  String _getTranslatedPreviousWorkLabel(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "العمل السابق";
+    if (lang == 'am') return "ቀደምት ሥራ";
+    return "Previous Work";
+  }
+
+  String _getTranslatedSummaryHint(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "أدخل ملخص للمدخلات أعلاه";
+    if (lang == 'am') return "ከላይ ለገቡት ማጠቃለያ ያስገቡ";
+    return "Enter summary of the above input";
+  }
+
+  String _getTranslatedSubmitButton(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إرسال";
+    if (lang == 'am') return "አስገባ";
+    return "Submit";
+  }
+
+  // Error and success message translations
+  String _getTranslatedFillAllFields(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "يرجى ملء جميع الحقول";
+    if (lang == 'am') return "እባክዎ ሁሉንም ሕዋሶች ይሙሉ";
+    return "Please fill all fields";
+  }
+
+  String _getTranslatedAuthRequired(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المصادقة مطلوبة";
+    if (lang == 'am') return "ማረጋገጫ ያስፈልጋል";
+    return "Authentication required";
+  }
+
+  String _getTranslatedSuccessMessage(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تم إرسال الخبرة بنجاح";
+    if (lang == 'am') return "ልምድ በተሳካ ሁኔታ ቀርቧል";
+    return "Experience submitted successfully";
+  }
+
+  String _getTranslatedErrorMessage(
+      String error, LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "خطأ: $error";
+    if (lang == 'am') return "ስህተት: $error";
+    return "Error: $error";
   }
 }

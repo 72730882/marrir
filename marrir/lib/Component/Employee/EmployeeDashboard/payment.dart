@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:marrir/Page/Employee/employee_page.dart';
 import 'package:marrir/services/Employee/payment_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:marrir/Component/Language/language_provider.dart';
 
 class PaymentsScreen extends StatefulWidget {
   const PaymentsScreen({super.key});
@@ -45,14 +47,14 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
     }
   }
 
-  String _formatStatus(String status) {
+  String _formatStatus(String status, LanguageProvider languageProvider) {
     switch (status.toLowerCase()) {
       case 'paid':
-        return 'Completed';
+        return _getTranslatedCompleted(languageProvider);
       case 'pending':
-        return 'Pending';
+        return _getTranslatedPending(languageProvider);
       case 'failed':
-        return 'Failed';
+        return _getTranslatedFailed(languageProvider);
       default:
         return status;
     }
@@ -73,6 +75,8 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -93,16 +97,18 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text("Token not found, please login again.")),
+                SnackBar(
+                    content:
+                        Text(_getTranslatedTokenNotFound(languageProvider))),
               );
             }
           },
         ),
         centerTitle: true,
-        title: const Text(
-          "Payments",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+        title: Text(
+          _getTranslatedTitle(languageProvider),
+          style:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
         ),
       ),
       body: _isLoading
@@ -113,14 +119,14 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Error: $_error',
+                        '${_getTranslatedError(languageProvider)}: $_error',
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: Colors.red),
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: _loadPayments,
-                        child: const Text('Retry'),
+                        child: Text(_getTranslatedRetry(languageProvider)),
                       ),
                     ],
                   ),
@@ -130,9 +136,9 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "The list of payments",
-                        style: TextStyle(
+                      Text(
+                        _getTranslatedListDescription(languageProvider),
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 14),
@@ -155,23 +161,37 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                                 width: 1,
                               ),
                             ),
-                            columns: const [
-                              DataColumn(label: Text("Bank")),
-                              DataColumn(label: Text("Transaction ID")),
-                              DataColumn(label: Text("Amount")),
-                              DataColumn(label: Text("Date")),
-                              DataColumn(label: Text("Type")),
-                              DataColumn(label: Text("Status")),
+                            columns: [
+                              DataColumn(
+                                  label: Text(
+                                      _getTranslatedBank(languageProvider))),
+                              DataColumn(
+                                  label: Text(_getTranslatedTransactionID(
+                                      languageProvider))),
+                              DataColumn(
+                                  label: Text(
+                                      _getTranslatedAmount(languageProvider))),
+                              DataColumn(
+                                  label: Text(
+                                      _getTranslatedDate(languageProvider))),
+                              DataColumn(
+                                  label: Text(
+                                      _getTranslatedType(languageProvider))),
+                              DataColumn(
+                                  label: Text(
+                                      _getTranslatedStatus(languageProvider))),
                             ],
                             rows: _payments.isEmpty
                                 ? [
-                                    const DataRow(cells: [
-                                      DataCell(Text("No payments found")),
-                                      DataCell(Text("")),
-                                      DataCell(Text("")),
-                                      DataCell(Text("")),
-                                      DataCell(Text("")),
-                                      DataCell(Text("")),
+                                    DataRow(cells: [
+                                      DataCell(Text(
+                                          _getTranslatedNoPaymentsFound(
+                                              languageProvider))),
+                                      const DataCell(Text("")),
+                                      const DataCell(Text("")),
+                                      const DataCell(Text("")),
+                                      const DataCell(Text("")),
+                                      const DataCell(Text("")),
                                     ])
                                   ]
                                 : _payments.map((payment) {
@@ -179,18 +199,21 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                                       cells: [
                                         DataCell(Text(
                                             payment['card']?.toString() ??
-                                                'Telr')),
+                                                _getTranslatedTelr(
+                                                    languageProvider))),
                                         DataCell(Text(
                                             payment['ref']?.toString() ??
-                                                'N/A')),
+                                                _getTranslatedNotAvailable(
+                                                    languageProvider))),
                                         DataCell(Text(
-                                            "${payment['amount']?.toStringAsFixed(2) ?? '0.00'} AED")),
+                                            "${payment['amount']?.toStringAsFixed(2) ?? '0.00'} ${_getTranslatedAED(languageProvider)}")),
                                         DataCell(Text(_formatDate(
                                             payment['created_at']?.toString() ??
                                                 ''))),
                                         DataCell(Text(
                                             payment['type']?.toString() ??
-                                                'N/A')),
+                                                _getTranslatedNotAvailable(
+                                                    languageProvider))),
                                         DataCell(
                                           Container(
                                             padding: const EdgeInsets.symmetric(
@@ -204,9 +227,11 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                                                   BorderRadius.circular(4),
                                             ),
                                             child: Text(
-                                              _formatStatus(payment['status']
-                                                      ?.toString() ??
-                                                  ''),
+                                              _formatStatus(
+                                                  payment['status']
+                                                          ?.toString() ??
+                                                      '',
+                                                  languageProvider),
                                               style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 12,
@@ -224,5 +249,132 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                   ),
                 ),
     );
+  }
+
+  // Translation helper methods
+  String _getTranslatedTitle(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المدفوعات";
+    if (lang == 'am') return "ክፍያዎች";
+    return "Payments";
+  }
+
+  String _getTranslatedTokenNotFound(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الرمز غير موجود، يرجى تسجيل الدخول مرة أخرى";
+    if (lang == 'am') return "ቶከን አልተገኘም፣ እባክዎ እንደገና ይግቡ";
+    return "Token not found, please login again";
+  }
+
+  String _getTranslatedError(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "خطأ";
+    if (lang == 'am') return "ስህተት";
+    return "Error";
+  }
+
+  String _getTranslatedRetry(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "إعادة المحاولة";
+    if (lang == 'am') return "እንደገና ሞክር";
+    return "Retry";
+  }
+
+  String _getTranslatedListDescription(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "قائمة المدفوعات";
+    if (lang == 'am') return "የክፍያዎች ዝርዝር";
+    return "The list of payments";
+  }
+
+  String _getTranslatedBank(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "البنك";
+    if (lang == 'am') return "ባንክ";
+    return "Bank";
+  }
+
+  String _getTranslatedTransactionID(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "رقم المعاملة";
+    if (lang == 'am') return "የግብይት መለያ";
+    return "Transaction ID";
+  }
+
+  String _getTranslatedAmount(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "المبلغ";
+    if (lang == 'am') return "መጠን";
+    return "Amount";
+  }
+
+  String _getTranslatedDate(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "التاريخ";
+    if (lang == 'am') return "ቀን";
+    return "Date";
+  }
+
+  String _getTranslatedType(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "النوع";
+    if (lang == 'am') return "ዓይነት";
+    return "Type";
+  }
+
+  String _getTranslatedStatus(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "الحالة";
+    if (lang == 'am') return "ሁኔታ";
+    return "Status";
+  }
+
+  String _getTranslatedNoPaymentsFound(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "لم يتم العثور على مدفوعات";
+    if (lang == 'am') return "ክፍያዎች አልተገኙም";
+    return "No payments found";
+  }
+
+  String _getTranslatedTelr(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "تلر";
+    if (lang == 'am') return "ቴልር";
+    return "Telr";
+  }
+
+  String _getTranslatedNotAvailable(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "غير متوفر";
+    if (lang == 'am') return "አይገኝም";
+    return "N/A";
+  }
+
+  String _getTranslatedAED(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "درهم";
+    if (lang == 'am') return "ዲርሃም";
+    return "AED";
+  }
+
+  String _getTranslatedCompleted(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "مكتمل";
+    if (lang == 'am') return "ተጠናቋል";
+    return "Completed";
+  }
+
+  String _getTranslatedPending(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "قيد الانتظار";
+    if (lang == 'am') return "በመጠባበቅ ላይ";
+    return "Pending";
+  }
+
+  String _getTranslatedFailed(LanguageProvider languageProvider) {
+    final lang = languageProvider.currentLang;
+    if (lang == 'ar') return "فشل";
+    if (lang == 'am') return "አልተሳካም";
+    return "Failed";
   }
 }

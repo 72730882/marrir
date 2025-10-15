@@ -4,9 +4,9 @@ import 'package:country_picker/country_picker.dart';
 import '../../services/user.dart'; // <-- make sure you created this file
 import 'package:provider/provider.dart';
 import 'package:marrir/Component/Language/language_provider.dart'; // Import your LanguageProvider
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
-  
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -19,7 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? selectedAccountType;
 
   // ===== Controllers =====
-  
+
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -28,28 +28,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
- 
-List<String> get accountTypeOptions {
-  return isCompany
-      ? ["agent", "recruitment", "sponsor"]
-      : ["employee", "sponsor"];
-}
-
-
+  List<String> get accountTypeOptions {
+    return isCompany
+        ? ["agent", "recruitment", "sponsor"]
+        : ["employee", "sponsor"];
+  }
 
   @override
   Widget build(BuildContext context) {
     final lang = Provider.of<LanguageProvider>(context);
 
-     final Map<String, String> accountTypeLabels = {
-
-   "agent": lang.t('agency'),
-  "recruitment": lang.t('rec_firm'),
-  "sponsor": lang.t('employer'),
-  "employee": lang.t('employee'),
-  
-};
-
+    final Map<String, String> accountTypeLabels = {
+      "agent": lang.t('agency'),
+      "recruitment": lang.t('rec_firm'),
+      "sponsor": lang.t('employer'),
+      "employee": lang.t('employee'),
+    };
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -87,9 +81,10 @@ List<String> get accountTypeOptions {
               ),
 
               const SizedBox(height: 25),
-             Text(
+              Text(
                 lang.t('create_account'),
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
 
@@ -145,14 +140,14 @@ List<String> get accountTypeOptions {
                       children: [
                         Expanded(
                           child: _buildLabeledField(
-                           lang.t('first_name'),
+                            lang.t('first_name'),
                             controller: firstNameController,
                           ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: _buildLabeledField(
-                           lang.t('last_name'),
+                            lang.t('last_name'),
                             controller: lastNameController,
                           ),
                         ),
@@ -160,23 +155,22 @@ List<String> get accountTypeOptions {
                     ),
                     const SizedBox(height: 15),
 
-                 _buildLabeledField(
-  lang.t('email_address'),
-  controller: emailController,
-),
-const SizedBox(height: 15),
+                    _buildLabeledField(
+                      lang.t('email_address'),
+                      controller: emailController,
+                    ),
+                    const SizedBox(height: 15),
 
-_buildLabeledField(
-  lang.t('phone_number'),
-  controller: phoneController,
-  prefixIcon: Icons.flag,
-),
-const SizedBox(height: 15),
+                    _buildLabeledField(
+                      lang.t('phone_number'),
+                      controller: phoneController,
+                      prefixIcon: Icons.flag,
+                    ),
+                    const SizedBox(height: 15),
 
                     // Country picker
-                     Text(
-                      lang.t('country'),
-                        style: TextStyle(
+                    Text(lang.t('country'),
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 5),
                     GestureDetector(
@@ -211,9 +205,8 @@ const SizedBox(height: 15),
                     const SizedBox(height: 15),
 
                     // Account type checkboxes
-                    Text(
-                      lang.t('account_type'),
-                        style: TextStyle(
+                    Text(lang.t('account_type'),
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
                     Column(
@@ -238,20 +231,19 @@ const SizedBox(height: 15),
                     ),
                     const SizedBox(height: 15),
 
-                  _buildLabeledField(
-  lang.t('password'),
-  controller: passwordController,
-  obscure: true,
-),
-const SizedBox(height: 15),
+                    _buildLabeledField(
+                      lang.t('password'),
+                      controller: passwordController,
+                      obscure: true,
+                    ),
+                    const SizedBox(height: 15),
 
-_buildLabeledField(
-  lang.t('confirm_password'),
-  controller: confirmPasswordController,
-  obscure: true,
-),
-const SizedBox(height: 15),
-
+                    _buildLabeledField(
+                      lang.t('confirm_password'),
+                      controller: confirmPasswordController,
+                      obscure: true,
+                    ),
+                    const SizedBox(height: 15),
 
                     // Terms
                     Row(
@@ -261,7 +253,7 @@ const SizedBox(height: 15),
                           onChanged: (val) =>
                               setState(() => agreeTerms = val ?? false),
                         ),
-                         Expanded(
+                        Expanded(
                           child: Text(lang.t('agree_terms')),
                         ),
                       ],
@@ -281,7 +273,7 @@ const SizedBox(height: 15),
                         ),
                         child: Text(
                           lang.t('sign_up'),
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.white),
@@ -291,30 +283,30 @@ const SizedBox(height: 15),
                     const SizedBox(height: 25),
 
                     // Footer
-                   Row(
-  mainAxisAlignment: MainAxisAlignment.center,
-  children: [
-    Text(lang.t('already_have_account')),
-    const SizedBox(width: 5),
-    GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
-      },
-      child: Text(
-        lang.t('log_in'),
-        style: const TextStyle(
-          color: Colors.purple,
-          fontWeight: FontWeight.bold,
-          decoration: TextDecoration.underline,
-        ),
-      ),
-    ),
-  ],
-),
-
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(lang.t('already_have_account')),
+                        const SizedBox(width: 5),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginScreen()),
+                            );
+                          },
+                          child: Text(
+                            lang.t('log_in'),
+                            style: const TextStyle(
+                              color: Colors.purple,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

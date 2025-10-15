@@ -23,7 +23,6 @@ import '../../Component/Employer/employee_rating.dart';
 import '../../Component/Employer/jobs.dart';
 import 'package:marrir/Component/Language/language_provider.dart';
 
-
 class EmployerPage extends StatefulWidget {
   const EmployerPage({super.key});
 
@@ -36,7 +35,6 @@ class _EmployerPageState extends State<EmployerPage> {
   String? employerName;
   bool isLoading = true;
 
-  
   @override
   void initState() {
     super.initState();
@@ -101,9 +99,9 @@ class _EmployerPageState extends State<EmployerPage> {
 
   @override
   Widget build(BuildContext context) {
-            final lang = Provider.of<LanguageProvider>(context);
+    final lang = Provider.of<LanguageProvider>(context);
 
-              final List<Widget> _pages = const [
+    const List<Widget> pages = [
       DashboardPage(),
       CompanyInfoPage(),
       EmployeePage(),
@@ -118,7 +116,7 @@ class _EmployerPageState extends State<EmployerPage> {
       HelpPage(),
     ];
 
-    final List<String> _menuTitles = [
+    final List<String> menuTitles = [
       lang.t('dashboard'),
       lang.t('company_info'),
       lang.t('employees'),
@@ -133,7 +131,7 @@ class _EmployerPageState extends State<EmployerPage> {
       lang.t('help'),
     ];
 
-    final List<IconData> _menuIcons = [
+    final List<IconData> menuIcons = [
       Icons.dashboard,
       Icons.business,
       Icons.people,
@@ -180,24 +178,24 @@ class _EmployerPageState extends State<EmployerPage> {
             ),
           ),
           actions: [
-    PopupMenuButton<String>(
-      tooltip: "Select Language",
-      icon: const Icon(Icons.translate, color: Colors.purple),
-      onSelected: (value) {
-        Provider.of<LanguageProvider>(context, listen: false)
-            .changeLanguage(value);
-      },
-      itemBuilder: (BuildContext context) => [
-        const PopupMenuItem(value: "en", child: Text("English")),
-        const PopupMenuItem(value: "ar", child: Text("العربية")),
-        const PopupMenuItem(value: "am", child: Text("አማርኛ")),
-      ],
-    ),
-    IconButton(
-      icon: const Icon(Icons.notifications_none),
-      onPressed: () {},
-    ),
-  ],
+            PopupMenuButton<String>(
+              tooltip: "Select Language",
+              icon: const Icon(Icons.translate, color: Colors.purple),
+              onSelected: (value) {
+                Provider.of<LanguageProvider>(context, listen: false)
+                    .changeLanguage(value);
+              },
+              itemBuilder: (BuildContext context) => [
+                const PopupMenuItem(value: "en", child: Text("English")),
+                const PopupMenuItem(value: "ar", child: Text("العربية")),
+                const PopupMenuItem(value: "am", child: Text("አማርኛ")),
+              ],
+            ),
+            IconButton(
+              icon: const Icon(Icons.notifications_none),
+              onPressed: () {},
+            ),
+          ],
         ),
         drawer: Drawer(
           backgroundColor: Colors.white,
@@ -210,18 +208,18 @@ class _EmployerPageState extends State<EmployerPage> {
                 const SizedBox(height: 20),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: _menuTitles.length + 1,
+                    itemCount: menuTitles.length + 1,
                     itemBuilder: (context, index) {
-                      if (index < _menuTitles.length) {
+                      if (index < menuTitles.length) {
                         return ListTile(
                           leading: Icon(
-                            _menuIcons[index],
+                            menuIcons[index],
                             color: _selectedIndex == index
                                 ? const Color(0xFF65b2c9)
                                 : Colors.black54,
                           ),
                           title: Text(
-                            _menuTitles[index],
+                            menuTitles[index],
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: _selectedIndex == index
@@ -242,10 +240,11 @@ class _EmployerPageState extends State<EmployerPage> {
                         );
                       } else {
                         return ListTile(
-                          leading: const Icon(Icons.logout, color: Colors.black54),
-                          title:  Text(
-                           lang.t('logout'),
-                            style: TextStyle(
+                          leading:
+                              const Icon(Icons.logout, color: Colors.black54),
+                          title: Text(
+                            lang.t('logout'),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.normal,
                               color: Colors.black87,
@@ -256,34 +255,39 @@ class _EmployerPageState extends State<EmployerPage> {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title:  Text(
+                                  title: Text(
                                     lang.t('end_session'),
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
-                                  content:  Text(
+                                  content: Text(
                                     lang.t('logout_confirmation'),
                                     textAlign: TextAlign.center,
                                   ),
                                   actions: [
                                     TextButton(
                                       onPressed: () async {
-                                        final userProvider = Provider.of<UserProvider>(context, listen: false);
+                                        final userProvider =
+                                            Provider.of<UserProvider>(context,
+                                                listen: false);
                                         await userProvider.logout();
 
                                         Navigator.of(context).pop();
                                         Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => const LoginScreen(),
+                                            builder: (context) =>
+                                                const LoginScreen(),
                                           ),
                                         );
                                       },
                                       child: Text(lang.t('yes')),
                                     ),
                                     TextButton(
-                                      onPressed: () => Navigator.of(context).pop(),
-                                     child: Text(lang.t('cancel')),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                      child: Text(lang.t('cancel')),
                                     ),
                                   ],
                                 );
@@ -301,7 +305,7 @@ class _EmployerPageState extends State<EmployerPage> {
         ),
         body: IndexedStack(
           index: _selectedIndex,
-          children: _pages,
+          children: pages,
         ),
       ),
     );
